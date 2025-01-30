@@ -72,9 +72,11 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
   try {
     const client = new DuneClient(env.DUNE_API_KEY ?? '');
     const { addresses } = user;
-    const paramsList = addresses.map((address) => ({
-      query_parameters: [QueryParameter.text('user_address', address)],
-    }));
+    const paramsList = addresses
+      .filter((address) => address.startsWith('0x')) // currently only supporting evm
+      .map((address) => ({
+        query_parameters: [QueryParameter.text('user_address', address)],
+      }));
 
     // eslint-disable-next-line no-console
     console.time(`Dune.com API call for user: ${user.id}`);
