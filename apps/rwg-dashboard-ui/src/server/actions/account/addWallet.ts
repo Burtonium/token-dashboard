@@ -1,3 +1,5 @@
+'use server';
+
 import { decodeUser } from '@/server/auth';
 import prisma from '@/server/prisma/client';
 

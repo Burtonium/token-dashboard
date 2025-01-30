@@ -14,7 +14,7 @@ const ErrorComponent: React.FC<{ className?: string }> = ({ className }) => {
       <div className="absolute inset-0 z-10 bg-vignette" />
       <div className="relative z-20 text-center">
         <h1 className="font-monoline text-6xl text-accent sm:text-7xl">
-          GAME OVER
+          MISSION FAILED
         </h1>
         <p className="text-xl sm:text-2xl">
           Unfortunately, something went wrong. <br /> We&apos;ll get &apos;em
