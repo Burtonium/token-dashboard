@@ -8,7 +8,6 @@ export const upsertDynamicUser = async (
     wallets?: {
       chain: string;
       address: string;
-      name: string;
     }[];
   },
   options: {
@@ -39,7 +38,6 @@ export const upsertDynamicUser = async (
                   user.wallets?.map((wallet) => ({
                     chain: wallet.chain,
                     address: wallet.address,
-                    name: wallet.name,
                   })) ?? [],
               },
             }
@@ -53,7 +51,6 @@ export const upsertDynamicUser = async (
             user.wallets?.map((wallet) => ({
               chain: wallet.chain,
               address: wallet.address,
-              name: wallet.name,
             })) ?? [],
         },
       },

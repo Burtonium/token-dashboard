@@ -81,14 +81,18 @@ const handleUserUpdatedEvent = async (
 const handleUserDeletedEvent = async (
   event: z.infer<typeof UserDeletedEventSchema>,
 ) => {
-  await prisma.dynamicUser.update({
-    where: {
-      id: event.userId,
-    },
-    data: {
-      deleted: true,
-    },
-  });
+  await prisma.dynamicUser
+    .update({
+      where: {
+        id: event.userId,
+      },
+      data: {
+        deleted: true,
+      },
+    })
+    .catch(() => {
+      // ignore
+    });
   return Response.json({
     success: true,
     message: 'User deleted event processed',
@@ -105,7 +109,6 @@ const handleWalletCreatedEvent = async (
         {
           chain: event.data.chain,
           address: event.data.publicKey,
-          name: event.data.name,
         },
       ],
     },
@@ -127,7 +130,6 @@ const handleWalletLinkedEvent = async (
         {
           chain: event.data.chain,
           address: event.data.publicKey,
-          name: event.data.name,
         },
       ],
     },
@@ -143,14 +145,18 @@ const handleWalletLinkedEvent = async (
 const handleWalletUnlinkedEvent = async (
   event: z.infer<typeof WalletUnlinkedEventSchema>,
 ) => {
-  await prisma.linkedWallet.delete({
-    where: {
-      dynamicUserId: event.userId,
-      chain: event.data.chain,
-      address: event.data.address,
-    },
-  });
-
+  await prisma.linkedWallet
+    .delete({
+      where: {
+        dynamicUserId: event.userId,
+        chain: event.data.chain,
+        address: event.data.address,
+      },
+    })
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.error('Error unlinking wallet:', e);
+    });
   return Response.json({
     success: true,
     message: 'Wallet unlinked event processed',

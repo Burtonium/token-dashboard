@@ -9,6 +9,7 @@ import { env } from '@/env';
 import { toCamel } from '@/lib/utils';
 import prisma from '../../prisma/client';
 import { BadRequestError, InternalServerError } from '@/server/errors';
+import { isAddress } from 'viem';
 
 const QUERY_ID = 4537410;
 
@@ -73,7 +74,7 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
     const client = new DuneClient(env.DUNE_API_KEY ?? '');
     const { addresses } = user;
     const paramsList = addresses
-      .filter((address) => address.startsWith('0x')) // currently only supporting evm
+      .filter((address) => isAddress(address)) // currently only supporting evm
       .map((address) => ({
         query_parameters: [QueryParameter.text('user_address', address)],
       }));
