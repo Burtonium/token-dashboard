@@ -122,7 +122,6 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
               symbol: p.symbol,
               address: p.address,
               amount: p.totalUsdValue.toFixed(2),
-              claimed: false,
             })),
           },
         },
