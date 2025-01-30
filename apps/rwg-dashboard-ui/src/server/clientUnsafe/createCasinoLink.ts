@@ -1,5 +1,3 @@
-'use server';
-
 import prisma from '@/server/prisma/client';
 import { subscribeToWave_clientUnsafe } from './subscribeToWave';
 import { env } from '@/env';

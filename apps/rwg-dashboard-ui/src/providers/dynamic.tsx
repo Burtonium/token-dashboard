@@ -8,7 +8,6 @@ import {
   BitcoinWalletConnectors,
 } from '../lib/dynamic';
 import { addWallet } from '@/server/actions/account/addWallet';
-import { upsertDynamicUser } from '@/server/clientUnsafe/upsertDynamicUser';
 
 const isLocalhost =
   typeof window !== 'undefined' && window.location.hostname === 'localhost';
@@ -49,19 +48,26 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
               },
               onUserProfileUpdate: (user) => {
                 const token = getAuthToken();
-                if (!token || !user.userId) {
+                if (!token || user.userId === undefined) {
                   return;
                 }
-                void upsertDynamicUser({
-                  id: user.userId,
-                  username: user.username ?? undefined,
-                  wallets: user.verifiedCredentials
-                    ?.filter((wallet) => wallet.chain && wallet.address)
-                    .map((wallet) => ({
-                      chain: wallet.chain!,
-                      address: wallet.address!,
-                    })),
-                });
+
+                void import('@/app/developer/upsertUser')
+                  .then((mod) =>
+                    mod.upsertSelf({
+                      id: user.userId!,
+                      username: user.username ?? undefined,
+                      wallets: user.verifiedCredentials
+                        ?.filter((wallet) => wallet.chain && wallet.address)
+                        .map((wallet) => ({
+                          chain: wallet.chain!,
+                          address: wallet.address!,
+                        })),
+                    }),
+                  )
+                  .catch(() => {
+                    // ignore, module could be deleted in prod
+                  });
               },
               onEmbeddedWalletCreated: (creds) => {
                 const token = getAuthToken();

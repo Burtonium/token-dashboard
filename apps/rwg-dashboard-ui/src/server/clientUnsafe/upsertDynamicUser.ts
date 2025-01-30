@@ -1,15 +1,17 @@
 import prisma from '../prisma/client';
 
-export const upsertDynamicUser = async (
-  user: {
-    id: string;
-    username?: string;
-    email?: string;
-    wallets?: {
-      chain: string;
-      address: string;
-    }[];
-  },
+export type User = {
+  id: string;
+  username?: string;
+  email?: string;
+  wallets?: {
+    chain: string;
+    address: string;
+  }[];
+};
+
+export const upsertDynamicUser_clientUnsafe = async (
+  user: User,
   options: {
     deleteWallets?: boolean;
   } = { deleteWallets: true },

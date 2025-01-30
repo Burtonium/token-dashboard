@@ -10,8 +10,9 @@ import {
   type WalletCreatedEventSchema,
   type WalletLinkedEventSchema,
   type WalletUnlinkedEventSchema,
+  type WalletTransferredEventSchema,
 } from './schemas';
-import { upsertDynamicUser } from '@/server/clientUnsafe/upsertDynamicUser';
+import { upsertDynamicUser_clientUnsafe } from '@/server/clientUnsafe/upsertDynamicUser';
 import prisma from '@/server/prisma/client';
 
 const verifySignature = ({
@@ -40,7 +41,7 @@ const handlePingEvent = (_event: z.infer<typeof TestEventSchema>) =>
 const handleUserCreatedEvent = async (
   event: z.infer<typeof UserCreatedEventSchema>,
 ) => {
-  await upsertDynamicUser({
+  await upsertDynamicUser_clientUnsafe({
     id: event.userId,
     email: event.data.email,
     wallets: event.data.verifiedCredentials.map((vc) => ({
@@ -60,7 +61,7 @@ const handleUserCreatedEvent = async (
 const handleUserUpdatedEvent = async (
   event: z.infer<typeof UserUpdatedEventSchema>,
 ) => {
-  await upsertDynamicUser({
+  await upsertDynamicUser_clientUnsafe({
     id: event.userId,
     username: event.data.username,
     wallets: event.data.verifiedCredentials.map((vc) => ({
@@ -102,7 +103,7 @@ const handleUserDeletedEvent = async (
 const handleWalletCreatedEvent = async (
   event: z.infer<typeof WalletCreatedEventSchema>,
 ) => {
-  await upsertDynamicUser(
+  await upsertDynamicUser_clientUnsafe(
     {
       id: event.userId,
       wallets: [
@@ -123,7 +124,7 @@ const handleWalletCreatedEvent = async (
 const handleWalletLinkedEvent = async (
   event: z.infer<typeof WalletLinkedEventSchema>,
 ) => {
-  await upsertDynamicUser(
+  await upsertDynamicUser_clientUnsafe(
     {
       id: event.userId,
       wallets: [
@@ -160,6 +161,20 @@ const handleWalletUnlinkedEvent = async (
   return Response.json({
     success: true,
     message: 'Wallet unlinked event processed',
+  });
+};
+
+const handleWalletTransferredEvent = async (
+  event: z.infer<typeof WalletTransferredEventSchema>,
+) => {
+  await prisma.linkedWallet.update({
+    where: {
+      chain: event.data.chain,
+      address: event.data.publicKey,
+    },
+    data: {
+      dynamicUserId: event.userId,
+    },
   });
 };
 
@@ -215,6 +230,8 @@ export async function POST(request: Request) {
       return handleWalletLinkedEvent(event.data);
     case 'wallet.unlinked':
       return handleWalletUnlinkedEvent(event.data);
+    case 'wallet.transferred':
+      return handleWalletTransferredEvent(event.data);
     default:
       return Response.json(
         {
