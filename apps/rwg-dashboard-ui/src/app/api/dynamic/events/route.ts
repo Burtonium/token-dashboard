@@ -114,8 +114,11 @@ const handleWalletCreatedEvent = async (
       ],
     },
     { deleteWallets: false },
-  );
-  Response.json({
+  ).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(error);
+  });
+  return Response.json({
     success: true,
     message: 'Wallet created event processed',
   });
@@ -135,7 +138,10 @@ const handleWalletLinkedEvent = async (
       ],
     },
     { deleteWallets: false },
-  );
+  ).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(error);
+  });
 
   return Response.json({
     success: true,
@@ -167,14 +173,24 @@ const handleWalletUnlinkedEvent = async (
 const handleWalletTransferredEvent = async (
   event: z.infer<typeof WalletTransferredEventSchema>,
 ) => {
-  await prisma.linkedWallet.update({
-    where: {
-      chain: event.data.chain,
-      address: event.data.publicKey,
-    },
-    data: {
-      dynamicUserId: event.userId,
-    },
+  await prisma.linkedWallet
+    .update({
+      where: {
+        chain: event.data.chain,
+        address: event.data.publicKey,
+      },
+      data: {
+        dynamicUserId: event.userId,
+      },
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    });
+
+  return Response.json({
+    success: true,
+    message: 'Wallet transferred event processed',
   });
 };
 
