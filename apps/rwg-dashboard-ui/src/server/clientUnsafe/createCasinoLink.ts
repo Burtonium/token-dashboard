@@ -61,6 +61,7 @@ export const createCasinoLink_clientUnsafe = async ({
                 chain,
                 address: publicKey,
               })),
+              skipDuplicates: true,
             },
           },
         },
@@ -99,7 +100,7 @@ export const createCasinoLink_clientUnsafe = async ({
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Couldnt subscribe to wave', error);
+    console.info('Couldnt subscribe to wave:', error);
   }
 
   return dynamicUser;

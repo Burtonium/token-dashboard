@@ -72,12 +72,10 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
 
   try {
     const client = new DuneClient(env.DUNE_API_KEY ?? '');
-    const { addresses } = user;
-    const paramsList = addresses
-      .filter((address) => isAddress(address)) // currently only supporting evm
-      .map((address) => ({
-        query_parameters: [QueryParameter.text('user_address', address)],
-      }));
+    const addresses = user.addresses.filter((address) => isAddress(address)); // currently only supporting evm
+    const paramsList = addresses.map((address) => ({
+      query_parameters: [QueryParameter.text('user_address', address)],
+    }));
 
     // eslint-disable-next-line no-console
     console.time(`Dune.com API call for user: ${user.id}`);
@@ -128,8 +126,10 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    if (error instanceof Error) {
+      // eslint-disable-next-line no-console
+      console.error(error.message);
+    }
     await prisma.casinoDepositApiCall.update({
       where: {
         id: pendingCall.id,
