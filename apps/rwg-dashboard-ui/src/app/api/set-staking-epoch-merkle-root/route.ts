@@ -37,6 +37,8 @@ export async function GET(request: NextRequest) {
 
   // Get epoch from query string
   const epoch = Number(new URL(request.url).searchParams.get('epoch'));
+  const skipContractWrite =
+    new URL(request.url).searchParams.get('skipContractWrite') === 'true';
 
   const account = privateKeyToAccount(
     env.TESTNET_SIGNER_PRIVATE_KEY! as `0x${string}`,
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest) {
 
   const proposals = await getProposals({
     space: snapshotSpace,
-    first: 5,
+    first: 20,
     skip: 0,
   });
 
@@ -115,13 +117,17 @@ export async function GET(request: NextRequest) {
     Number(previousEpoch),
   );
 
-  const txHash = await walletClient.writeContract({
-    chain,
-    abi: tokenStakingConfig.abi,
-    address: contractAddress,
-    functionName: 'setMerkleRoot',
-    args: [previousEpoch, root],
-  });
+  let txHash: string | undefined;
+
+  if (!skipContractWrite) {
+    txHash = await walletClient.writeContract({
+      chain,
+      abi: tokenStakingConfig.abi,
+      address: contractAddress,
+      functionName: 'setMerkleRoot',
+      args: [previousEpoch, root],
+    });
+  }
 
   return NextResponse.json({
     success: true,
