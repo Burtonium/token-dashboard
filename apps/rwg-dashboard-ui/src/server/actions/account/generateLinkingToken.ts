@@ -2,21 +2,19 @@
 
 import { keccak256 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { decodeUser } from '../../auth';
+import { authGuard } from '../../auth';
 import { env } from '@/env';
-import assert from 'assert';
-import { InternalServerError } from '@/server/errors';
+import { constructError } from '../errors';
 
-export const generateLinkingToken = async (authToken: string) => {
-  assert(
-    env.TESTNET_SIGNER_PRIVATE_KEY?.startsWith('0x'),
-    new InternalServerError('TESTNET_SIGNER_PRIVATE_KEY is required'),
-  );
-
-  const { id: userId } = await decodeUser(authToken);
+export const generateLinkingToken = authGuard(async (user) => {
+  if (!env.TESTNET_SIGNER_PRIVATE_KEY?.startsWith('0x')) {
+    // eslint-disable-next-line no-console
+    console.error('TESTNET_SIGNER_PRIVATE_KEY is required');
+    return constructError('Server configuration error');
+  }
 
   const ts = Date.now() + 1000 * 60 * 5;
-  const hash = keccak256(Buffer.from(`${ts}${userId}`));
+  const hash = keccak256(Buffer.from(`${ts}${user.id}`));
 
   const x = privateKeyToAccount(
     env.TESTNET_SIGNER_PRIVATE_KEY as `0x${string}`,
@@ -25,8 +23,8 @@ export const generateLinkingToken = async (authToken: string) => {
   const token = await x.sign({ hash });
 
   return {
-    userId,
+    userId: user.id,
     ts,
     token,
   };
-};
+});

@@ -14,8 +14,14 @@ import { useToken } from '@/hooks/useToken';
 import { Button } from '@/components/ui/button';
 import { useCurrentWaveMembership } from '@/hooks/useCurrentWaveMembership';
 import { useCurrentTicketWave } from '@/hooks/useCurrentTicketWave';
+import {
+  type ExcludeServerActionError,
+  serverActionErrorGuard,
+} from '@/lib/serverActionErrorGuard';
 
-type AwardedReward = Awaited<ReturnType<typeof awardRandomReward>>;
+type AwardedReward = ExcludeServerActionError<
+  Awaited<ReturnType<typeof awardRandomReward>>
+>;
 
 const GiftBox = ({
   onClick,
@@ -114,7 +120,7 @@ const GiftBoxes = () => {
       if (!authToken) {
         throw new Error('No token');
       }
-      return awardRandomReward(authToken, 2);
+      return serverActionErrorGuard(awardRandomReward(authToken, 2));
     },
   });
 

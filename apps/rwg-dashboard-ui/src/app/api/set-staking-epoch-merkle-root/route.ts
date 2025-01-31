@@ -5,7 +5,7 @@ import { tokenStakingConfig } from '@/contracts/generated';
 import { env, isDev } from '@/env';
 import { privateKeyToAccount } from 'viem/accounts';
 import { type NextRequest, NextResponse } from 'next/server';
-import { setStakingEpochMerkleTree } from '@/server/actions/staking/setStakingEpochMerkleTree';
+import { setStakingEpochMerkleTree_clientUnsafe } from '@/server/clientUnsafe/setStakingEpochMerkleTree';
 import {
   getProposals,
   ProposalFrontMatterSchema,
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
 
   const proposalId = epochProposal.id;
 
-  const root = await setStakingEpochMerkleTree(
+  const root = await setStakingEpochMerkleTree_clientUnsafe(
     proposalId,
     Number(previousEpoch),
   );

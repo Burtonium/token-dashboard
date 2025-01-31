@@ -4,9 +4,7 @@ import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 export const useCasinoLink = () => {
   const linked = useAuthenticatedQuery({
     queryKey: ['casinoLink'],
-    queryFn: async (token) => {
-      return getCasinoLink(token);
-    },
+    queryFn: getCasinoLink,
   });
 
   return {

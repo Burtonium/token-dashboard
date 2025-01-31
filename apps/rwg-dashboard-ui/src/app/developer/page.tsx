@@ -224,6 +224,9 @@ const DeveloperPage = () => {
       <div className="flex flex-wrap gap-5">
         <div>
           <h3>Casino Link:</h3>
+          <p className="text-destructive empty:hidden">
+            {casinoLink.error?.message}
+          </p>
           <pre className="grow overflow-x-scroll">
             {casinoLink.data ? (
               JSON.stringify(casinoLink.data, null, 2)
@@ -236,6 +239,9 @@ const DeveloperPage = () => {
         </div>
         <div>
           <h3>Wave Membership:</h3>
+          <p className="text-destructive empty:hidden">
+            {currentWave.error?.message}
+          </p>
           <pre className="grow overflow-x-scroll">
             {currentWave.data?.memberships[0] ? (
               JSON.stringify(currentWave.data?.memberships[0], null, 2)

@@ -1,43 +1,48 @@
 'use server';
 
-import assert from 'assert';
-import { decodeUser } from '../../auth';
+import { authGuard } from '../../auth';
 import prisma from '@/server/prisma/client';
 import { ClaimStatus } from '@prisma/client';
-import { AuthenticationError, BadRequestError } from '@/server/errors';
+import { constructError } from '@/server/actions/errors';
 
-export const updateClaimStatus = async (
-  authToken: string,
-  claimId: number,
-  status: typeof ClaimStatus.Claimed | typeof ClaimStatus.Error,
-  reasonOrTx?: string,
-) => {
-  const { id: userId } = await decodeUser(authToken);
-  assert(userId, new AuthenticationError('Invalid token'));
-  assert(
-    status === 'Error' || status === 'Claimed',
-    new BadRequestError('Invalid status'),
-  );
-  const claim = await prisma.claim.findUnique({
-    where: {
-      id: claimId,
-    },
-  });
-  assert(
-    claim?.status === 'Signed' || claim?.status === 'Error',
-    new BadRequestError('Invalid claim status'),
-  );
+export const updateClaimStatus = authGuard(
+  async (
+    _user,
+    claimId: number,
+    status: typeof ClaimStatus.Claimed | typeof ClaimStatus.Error,
+    reasonOrTx?: string,
+  ) => {
+    try {
+      if (status !== 'Error' && status !== 'Claimed') {
+        return constructError('Invalid status');
+      }
 
-  await prisma.claim.update({
-    where: {
-      id: claimId,
-    },
-    data:
-      status === ClaimStatus.Error
-        ? { status, reason: reasonOrTx }
-        : {
-            status,
-            txHash: reasonOrTx,
-          },
-  });
-};
+      const claim = await prisma.claim.findUnique({
+        where: {
+          id: claimId,
+        },
+      });
+
+      if (claim?.status !== 'Signed' && claim?.status !== 'Error') {
+        return constructError('Invalid claim status');
+      }
+
+      await prisma.claim.update({
+        where: {
+          id: claimId,
+        },
+        data:
+          status === ClaimStatus.Error
+            ? { status, reason: reasonOrTx }
+            : {
+                status,
+                txHash: reasonOrTx,
+              },
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return constructError('An unexpected error occurred');
+    }
+  },
+);

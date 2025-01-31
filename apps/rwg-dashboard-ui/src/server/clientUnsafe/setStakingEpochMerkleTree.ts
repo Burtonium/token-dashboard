@@ -1,10 +1,8 @@
-'use server';
-
 import prisma from '@/server/prisma/client';
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
 import { getVotes } from '@/utils/snapshot/snapshot-api';
 
-export const setStakingEpochMerkleTree = async (
+export const setStakingEpochMerkleTree_clientUnsafe = async (
   proposalId: string,
   epoch: number,
 ) => {

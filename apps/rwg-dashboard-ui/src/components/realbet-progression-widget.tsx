@@ -65,77 +65,79 @@ const RealbetProgressionWidget = () => {
         ) : !link.isLinked && link.isSuccess ? (
           <p>Link your realbet account to start tracking your progression. </p>
         ) : (
-          <div className="flex gap-3">
-            <div className="shrink-0">
-              {!progression.isSuccess && !progression.error ? (
-                <Skeleton className="size-24" />
-              ) : (
-                <img
-                  className="w-24"
-                  alt={`Level icon for the ${progression.data?.level.data?.levelName} tier`}
-                  src={progression.data?.level.data?.levelIcon}
+          !progression.error && (
+            <div className="flex gap-3">
+              <div className="shrink-0">
+                {!progression.isSuccess && !progression.error ? (
+                  <Skeleton className="size-24" />
+                ) : (
+                  <img
+                    className="w-24"
+                    alt={`Level icon for the ${progression.data?.level.data?.levelName} tier`}
+                    src={progression.data?.level.data?.levelIcon}
+                  />
+                )}
+              </div>
+              <div className="w-full justify-between">
+                <div className="flex justify-between">
+                  <h2 className="mb-1.5 leading-none">
+                    <RealbetVipTiersModal
+                      currentRank={progression.data?.level.data?.vipLevel}
+                    >
+                      <button className="hover:text-primary active:text-primary">
+                        VIP Status
+                        <QuestionMarkCircledIcon className="ml-1 inline-block" />
+                      </button>
+                    </RealbetVipTiersModal>
+                  </h2>
+                  <p className="text-sm">
+                    {!progression.isSuccess && !progression.error ? (
+                      <Skeleton className="inline-block h-3 w-24" />
+                    ) : (
+                      <>
+                        $
+                        {progression.data?.level.data?.currentWager.toLocaleString()}{' '}
+                        / $
+                        {progression.data?.level.data?.nextLevelWager.toLocaleString()}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <Progress
+                  variant="accent"
+                  value={(progression.data?.level.data?.percentage ?? 0) * 100}
                 />
-              )}
-            </div>
-            <div className="w-full justify-between">
-              <div className="flex justify-between">
-                <h2 className="mb-1.5 leading-none">
-                  <RealbetVipTiersModal
-                    currentRank={progression.data?.level.data?.vipLevel}
-                  >
-                    <button className="hover:text-primary active:text-primary">
-                      VIP Status
-                      <QuestionMarkCircledIcon className="ml-1 inline-block" />
-                    </button>
-                  </RealbetVipTiersModal>
-                </h2>
-                <p className="text-sm">
+                <div className="mt-1 flex justify-between">
                   {!progression.isSuccess && !progression.error ? (
-                    <Skeleton className="inline-block h-3 w-24" />
+                    <>
+                      <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                      <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                    </>
                   ) : (
                     <>
-                      $
-                      {progression.data?.level.data?.currentWager.toLocaleString()}{' '}
-                      / $
-                      {progression.data?.level.data?.nextLevelWager.toLocaleString()}
-                    </>
-                  )}
-                </p>
-              </div>
-              <Progress
-                variant="accent"
-                value={(progression.data?.level.data?.percentage ?? 0) * 100}
-              />
-              <div className="mt-1 flex justify-between">
-                {!progression.isSuccess && !progression.error ? (
-                  <>
-                    <Skeleton className="mt-0.5 inline-block h-3 w-24" />
-                    <Skeleton className="mt-0.5 inline-block h-3 w-24" />
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm">
-                      {progression.data?.level.data?.levelName} |{' '}
-                      {(
-                        (progression.data?.level.vipTier?.cashback ?? 0) * 100
-                      ).toFixed(0)}
-                      % Cashback
-                    </p>
-                    {progression.data?.level.nextVipTier && (
                       <p className="text-sm">
-                        {progression.data?.level.nextVipTier?.name} |{' '}
+                        {progression.data?.level.data?.levelName} |{' '}
                         {(
-                          (progression.data?.level.nextVipTier?.cashback ?? 0) *
-                          100
+                          (progression.data?.level.vipTier?.cashback ?? 0) * 100
                         ).toFixed(0)}
                         % Cashback
                       </p>
-                    )}
-                  </>
-                )}
+                      {progression.data?.level.nextVipTier && (
+                        <p className="text-sm">
+                          {progression.data?.level.nextVipTier?.name} |{' '}
+                          {(
+                            (progression.data?.level.nextVipTier?.cashback ??
+                              0) * 100
+                          ).toFixed(0)}
+                          % Cashback
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )
         )}
       </CardContent>
     </Card>

@@ -2,12 +2,6 @@ import prisma from '../prisma/client';
 import type { User } from '../auth';
 import { getCurrentWave } from '../actions/ticket-waves/getCurrentWave';
 import { AwardedTicketsType } from '@prisma/client';
-import {
-  BadRequestError,
-  GenericError,
-  InternalServerError,
-  NotFoundError,
-} from '../errors';
 
 export const subscribeToWave_clientUnsafe = async (user: User) => {
   return prisma.$transaction(
@@ -15,21 +9,19 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
       const currentWave = await getCurrentWave(tx, user.addresses);
 
       if (!currentWave) {
-        throw new NotFoundError('No current wave');
+        throw new Error('No current wave');
       }
 
       if (!currentWave.whitelisted || !currentWave.whitelist[0]) {
-        throw new BadRequestError('Not whitelisted');
+        throw new Error('Not whitelisted');
       }
 
       if (currentWave.availableSeats <= 0) {
-        throw new BadRequestError('No seats available');
+        throw new Error('No seats available');
       }
 
       if (currentWave.memberships.length > 0) {
-        throw new BadRequestError(
-          'One or more memberships already to that address.',
-        );
+        throw new Error('One or more memberships already to that address.');
       }
 
       const waveMembership = Promise.all([
@@ -51,9 +43,7 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
           .catch((e) => {
             // eslint-disable-next-line no-console
             console.error(e);
-            throw new GenericError(
-              'Something went wrong creating wave membership.',
-            );
+            throw new Error('Something went wrong creating wave membership.');
           }),
         tx.rewardWave
           .update({
@@ -69,7 +59,7 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
           .catch((e) => {
             // eslint-disable-next-line no-console
             console.error(e);
-            throw new InternalServerError('Something went wrong');
+            throw new Error('Something went wrong');
           }),
       ]);
 

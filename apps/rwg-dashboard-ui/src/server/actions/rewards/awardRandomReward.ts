@@ -1,40 +1,34 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { getUserFromToken } from '../../auth';
+import { authGuard } from '../../auth';
 import { getCurrentWave } from '../ticket-waves/getCurrentWave';
 import assert from 'assert';
 import { getRandomWeightedItem } from '@/utils';
-import { creditUserBonus, rewardToBonusId } from '../updateRealbetCredits';
 import {
-  BadRequestError,
-  NotFoundError,
-  RealbetApiError,
-} from '@/server/errors';
+  creditUserBonus_clientUnsafe,
+  rewardToBonusId,
+} from '../../clientUnsafe/updateRealbetCredits';
+import { constructError } from '../errors';
 
-export const awardRandomReward = async (
-  authToken: string,
-  nearWins: number,
-) => {
-  const { userId, addresses } = await getUserFromToken(authToken);
-
+export const awardRandomReward = authGuard(async (user, nearWins: number) => {
   return await prisma.$transaction(
     async (tx) => {
       const rewardWave = await getCurrentWave(tx);
       if (!rewardWave) {
-        throw new NotFoundError('No active ticket wave');
+        return constructError('No active ticket wave');
       }
 
       const waveMembership = await tx.waveMembership.findFirst({
         where: {
           address: {
-            in: addresses,
+            in: user.addresses,
           },
         },
       });
 
       if (!waveMembership || waveMembership.reedeemableTickets <= 0) {
-        throw new BadRequestError('No tickets remaining');
+        return constructError('No tickets remaining');
       }
 
       const preset = getRandomWeightedItem(
@@ -42,12 +36,16 @@ export const awardRandomReward = async (
         rewardWave.rewardPresets.map((p) => p.remaining),
       );
 
-      assert(preset?.remaining, new BadRequestError('Limit reached'));
+      try {
+        assert(preset?.remaining, new Error());
+      } catch {
+        return constructError('Limit reached');
+      }
 
       const [reward] = await Promise.all([
         tx.reward.create({
           data: {
-            userId,
+            userId: user.id,
             type: preset.type,
             amount: preset.prize,
             membershipId: waveMembership.id,
@@ -77,24 +75,30 @@ export const awardRandomReward = async (
       if (reward.type === 'RealBetCredit') {
         const casinoLink = await tx.casinoLink.findFirst({
           where: {
-            dynamicUserId: userId,
+            dynamicUserId: user.id,
           },
         });
 
         const bonusId = rewardToBonusId[Number(reward.amount)];
 
-        assert(casinoLink, new NotFoundError('Casino link not found'));
-        assert(
-          bonusId,
-          new NotFoundError(`Invalid reward: ${Number(reward.amount)}`),
-        );
+        try {
+          assert(casinoLink, new Error());
+        } catch {
+          return constructError('Casino link not found');
+        }
 
         try {
-          await creditUserBonus(casinoLink.realbetUserId, {
+          assert(bonusId, new Error());
+        } catch {
+          return constructError(`Invalid reward: ${Number(reward.amount)}`);
+        }
+
+        try {
+          await creditUserBonus_clientUnsafe(casinoLink.realbetUserId, {
             id: bonusId,
           });
         } catch {
-          throw new RealbetApiError('Realbet API failed to credit user bonus');
+          return constructError('Realbet API failed to credit user bonus');
         }
       }
 
@@ -117,4 +121,4 @@ export const awardRandomReward = async (
       isolationLevel: 'Serializable',
     },
   );
-};
+});

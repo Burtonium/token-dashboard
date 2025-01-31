@@ -1,3 +1,7 @@
+import {
+  serverActionErrorGuard,
+  type ExcludeServerActionError,
+} from '@/lib/serverActionErrorGuard';
 import { getAuthToken, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import {
   useQuery,
@@ -34,7 +38,7 @@ export const useAuthenticatedQuery = <TData = unknown, TError = Error>(
         throw new Error('Invalid query function');
       }
 
-      return options.queryFn(token);
+      return serverActionErrorGuard(options.queryFn(token));
     },
   });
 
@@ -46,6 +50,6 @@ export const useAuthenticatedQuery = <TData = unknown, TError = Error>(
 
   return {
     ...query,
-    data: isLoggedIn ? query.data : undefined,
+    data: query.data as ExcludeServerActionError<TData>,
   };
 };

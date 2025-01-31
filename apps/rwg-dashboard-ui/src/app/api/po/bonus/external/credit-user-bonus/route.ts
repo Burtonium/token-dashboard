@@ -2,7 +2,7 @@ import { validateSignature } from '@/lib/utils/crypto';
 import { env } from '@/env';
 import { Bonus } from '@bltzr-gg/realbet-api';
 import { MAX_CLAIM } from '@/config/realbetApi';
-import { bonusIdToReward } from '@/server/actions/updateRealbetCredits';
+import { bonusIdToReward } from '@/server/clientUnsafe/updateRealbetCredits';
 
 export async function POST(request: Request) {
   const processingSignature = request.headers.get('X-Processing-Signature');

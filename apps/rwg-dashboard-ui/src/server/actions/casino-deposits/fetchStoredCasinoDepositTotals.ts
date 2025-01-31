@@ -1,17 +1,10 @@
 'use server';
 
-import { decodeUser } from '../../auth';
+import { authGuard } from '../../auth';
 import prisma from '../../prisma/client';
 import { calculateDepositsScore } from '@/server/utils';
-import { AuthenticationError } from '@/server/errors';
 
-export const fetchCasinoDepositTotals = async (authToken: string) => {
-  const user = await decodeUser(authToken);
-
-  if (!user) {
-    throw new AuthenticationError('Invalid token');
-  }
-
+export const fetchCasinoDepositTotals = authGuard(async (user) => {
   const apiCall = await prisma.casinoDepositApiCall.findFirst({
     where: {
       dynamicUserId: user.id,
@@ -37,4 +30,4 @@ export const fetchCasinoDepositTotals = async (authToken: string) => {
         })),
       }
     : null;
-};
+});

@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { getUserFromToken } from '@/server/auth';
+import { decodeUser } from '@/server/auth';
 import { type RewardWave } from '@prisma/client';
 import { isDev } from '@/env';
 import assert from 'assert';
@@ -14,10 +14,9 @@ export const saveWave = async (
   > & { userTickets: number },
 ) => {
   assert(isDev, 'Not in dev mode');
-  const { userId, addresses } = await getUserFromToken(authToken);
-  if (!userId) {
-    throw new Error('No user id');
-  }
+  const user = await decodeUser(authToken);
+
+  const { addresses } = user;
 
   const membership = await prisma.rewardWave.findFirst({
     where: {

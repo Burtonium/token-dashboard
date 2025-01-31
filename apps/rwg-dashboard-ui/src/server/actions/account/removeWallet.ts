@@ -1,19 +1,15 @@
 'use server';
 
-import { decodeUser } from '@/server/auth';
 import prisma from '@/server/prisma/client';
+import { authGuard } from '@/server/auth'; // Make sure this import path is correct
 
-export const removeWallet = async (
-  authToken: string,
-  { chain, address }: { chain: string; address: string },
-) => {
-  const user = await decodeUser(authToken);
-
-  return prisma.linkedWallet.delete({
-    where: {
-      chain,
-      address,
-      dynamicUserId: user.id,
-    },
-  });
-};
+export const removeWallet = authGuard(
+  (user, { chain, address }: { chain: string; address: string }) =>
+    prisma.linkedWallet.delete({
+      where: {
+        chain,
+        address,
+        dynamicUserId: user.id,
+      },
+    }),
+);

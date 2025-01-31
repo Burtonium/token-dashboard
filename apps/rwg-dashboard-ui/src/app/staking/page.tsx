@@ -45,8 +45,8 @@ export default function Stake() {
       let rewards = 0n;
       const promises: Promise<bigint>[] = [];
       deposits.data?.forEach((deposit) => {
-        const votedEpochs = merkleProofs
-          .data!.filter((proof) => proof.epoch > deposit.lastClaimEpoch)
+        const votedEpochs = merkleProofs.data
+          .filter((proof) => proof.epoch > deposit.lastClaimEpoch)
           .map((proof) => BigInt(proof.epoch));
 
         promises.push(
@@ -88,7 +88,7 @@ export default function Stake() {
         }
 
         // Get proofs that we care about
-        const votedProofs = merkleProofs.data!.filter(
+        const votedProofs = merkleProofs.data.filter(
           (proof) => proof.epoch > deposit.lastClaimEpoch,
         );
         // We must claim rewards for all epochs since the last claim

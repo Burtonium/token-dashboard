@@ -1,19 +1,13 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { decodeUser } from '../../auth';
-import { creditUserBonus } from '../updateRealbetCredits';
+import { creditUserBonus_clientUnsafe } from '../../clientUnsafe/updateRealbetCredits';
 import assert from 'assert';
 import { calculateDepositsScore } from '@/server/utils';
-import {
-  BadRequestError,
-  NotFoundError,
-  RealbetApiError,
-} from '@/server/errors';
+import { constructError } from '../errors';
+import { authGuard } from '@/server/auth';
 
-export const claimCasinoDepositReward = async (authToken: string) => {
-  const user = await decodeUser(authToken);
-
+export const claimCasinoDepositReward = authGuard(async (user) => {
   return prisma.$transaction(
     async (tx) => {
       const dynamicUser = await tx.dynamicUser.findFirst({
@@ -31,17 +25,17 @@ export const claimCasinoDepositReward = async (authToken: string) => {
       });
 
       if (!dynamicUser?.casinoLink) {
-        throw new BadRequestError('Casino link required');
+        return constructError('Casino link required');
       }
 
       const apiCall = dynamicUser.apiCall;
 
       if (!apiCall) {
-        throw new NotFoundError('Api call not found');
+        return constructError('Api call not found');
       }
 
       if (apiCall.status !== 'Success' || apiCall.totals.length === 0) {
-        throw new BadRequestError('API Call in an invalid state to claim');
+        return constructError('API Call in an invalid state to claim');
       }
 
       assert(dynamicUser.casinoLink, 'Casino link not found');
@@ -68,18 +62,21 @@ export const claimCasinoDepositReward = async (authToken: string) => {
       assert(updatedCall?.rewardId, 'Reward id not found');
 
       try {
-        await creditUserBonus(dynamicUser.casinoLink.realbetUserId, {
-          name: 'Casino Deposits Bonus Claim',
-          amount: Number(amount),
-          description:
-            'You got this bonus because you deposited to eligible casinos.',
-        });
+        await creditUserBonus_clientUnsafe(
+          dynamicUser.casinoLink.realbetUserId,
+          {
+            name: 'Casino Deposits Bonus Claim',
+            amount: Number(amount),
+            description:
+              'You got this bonus because you deposited to eligible casinos.',
+          },
+        );
       } catch {
-        throw new RealbetApiError('Realbet API failed to credit user bonus');
+        return constructError('Realbet API failed to credit user bonus');
       }
     },
     {
       isolationLevel: 'RepeatableRead',
     },
   );
-};
+});

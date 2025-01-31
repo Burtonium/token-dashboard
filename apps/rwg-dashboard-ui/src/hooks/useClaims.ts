@@ -11,6 +11,7 @@ import useStateWatcher from './useStateWatcher';
 import { useToken } from './useToken';
 import { useNetworkGuard } from '@/providers/network-guard';
 import { isDev } from '@/env';
+import { serverActionErrorGuard } from '@/lib/serverActionErrorGuard';
 
 export const useClaims = () => {
   const publicClient = usePublicClient();
@@ -51,11 +52,13 @@ export const useClaims = () => {
           .catch((err) => {
             // eslint-disable-next-line no-console
             console.error(err);
-            return updateClaimStatus(
-              token,
-              claim.id,
-              'Error',
-              (err as Error).message,
+            return serverActionErrorGuard(
+              updateClaimStatus(
+                token,
+                claim.id,
+                'Error',
+                (err as Error).message,
+              ),
             );
           });
 
@@ -92,7 +95,7 @@ export const useClaims = () => {
 
   const hasError =
     claims.isSuccess &&
-    claims.data!.claims.some((claim) => claim.status === 'Error');
+    claims.data.claims.some((claim) => claim.status === 'Error');
 
   return {
     claims,

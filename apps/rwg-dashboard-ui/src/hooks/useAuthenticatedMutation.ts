@@ -1,3 +1,7 @@
+import {
+  type ExcludeServerActionError,
+  serverActionErrorGuard,
+} from '@/lib/serverActionErrorGuard';
 import { getAuthToken } from '@dynamic-labs/sdk-react-core';
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 
@@ -38,9 +42,12 @@ export const useAuthenticatedMutation = <
         throw new Error('Invalid mutation function');
       }
 
-      return options.mutationFn(token, variables);
+      return serverActionErrorGuard(options.mutationFn(token, variables));
     },
   });
 
-  return mutation;
+  return {
+    ...mutation,
+    data: mutation.data as ExcludeServerActionError<TData>,
+  };
 };

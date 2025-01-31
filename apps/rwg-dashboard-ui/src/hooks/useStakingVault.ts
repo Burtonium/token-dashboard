@@ -16,6 +16,7 @@ import { tokenAddress } from '@/config/realToken';
 import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { getStakingMerkleProofs } from '@/server/actions/staking/getStakingMerkleProofs';
 import { uniqBy } from 'lodash';
+import { serverActionErrorGuard } from '@/lib/serverActionErrorGuard';
 
 const chainId = isDev ? sepolia.id : mainnet.id;
 const contractAddress = tokenStakingConfig.address[chainId];
@@ -438,7 +439,9 @@ export const useStakingVault = () => {
   const merkleProofs = useAuthenticatedQuery({
     queryKey: ['merkleProofs', minLastClaimEpoch],
     queryFn: async (token) => {
-      const proofs = await getStakingMerkleProofs(token, minLastClaimEpoch);
+      const proofs = await serverActionErrorGuard(
+        getStakingMerkleProofs(token, minLastClaimEpoch),
+      );
       // Make sure we only have 1 proof per epoch.
       // Proofs are duplicated in case of a single voter in an epoch.
       return uniqBy(proofs, 'epoch');

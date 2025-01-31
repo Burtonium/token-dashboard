@@ -1,5 +1,3 @@
-'use server';
-
 import { env } from '@/env';
 import jwt from 'jsonwebtoken';
 import type { JwtPayload, VerifyErrors } from 'jsonwebtoken';
@@ -7,7 +5,8 @@ import jwksClient from 'jwks-rsa';
 import { cache } from 'react';
 import 'server-only';
 import { z } from 'zod';
-import { AuthenticationError } from './errors';
+import { constructError } from './actions/errors';
+import { isServerActionError } from '@/lib/serverActionErrorGuard';
 
 export const getDynamicPublicKey = cache(async () => {
   const client = jwksClient({
@@ -43,6 +42,8 @@ const JwtPayloadSchema = z
     addresses: payload.verified_credentials.map((vc) => vc.address),
   }));
 
+export type User = { id: string; addresses: string[] };
+
 export const decodeUser = async (token: string) => {
   const publicKey = await getDynamicPublicKey();
   return new Promise<z.infer<typeof JwtPayloadSchema>>((resolve, reject) =>
@@ -52,12 +53,12 @@ export const decodeUser = async (token: string) => {
       { algorithms: ['RS256'] },
       (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
         if (err) {
-          reject(err);
+          reject(new Error('JWT verification failed'));
         } else {
           if (typeof decoded === 'object' && decoded !== null) {
             resolve(JwtPayloadSchema.parse(decoded));
           } else {
-            reject(new AuthenticationError('Invalid token'));
+            reject(new Error('Invalid token'));
           }
         }
       },
@@ -65,9 +66,16 @@ export const decodeUser = async (token: string) => {
   );
 };
 
-export const getUserFromToken = async (token: string) => {
-  const { id: userId, addresses } = await decodeUser(token);
-  return { userId, addresses };
+export const authGuard = <T, Args extends unknown[]>(
+  fn: (user: User, ...args: Args) => Promise<T>,
+) => {
+  return async (token: string, ...args: Args) => {
+    const user = await decodeUser(token).catch((err: Error) =>
+      constructError(err.message),
+    );
+    if (isServerActionError(user)) {
+      return user;
+    }
+    return fn(user, ...args);
+  };
 };
-
-export type User = Awaited<ReturnType<typeof decodeUser>>;

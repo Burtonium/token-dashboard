@@ -8,8 +8,9 @@ import { decodeUser } from '../../auth';
 import { env } from '@/env';
 import { toCamel } from '@/lib/utils';
 import prisma from '../../prisma/client';
-import { BadRequestError, InternalServerError } from '@/server/errors';
 import { isAddress } from 'viem';
+import { constructError } from '../errors';
+import { isServerActionError } from '@/lib/serverActionErrorGuard';
 
 const QUERY_ID = 4537410;
 
@@ -27,8 +28,17 @@ const CasinoDepositTotalRowsSchema = z
   .pipe(z.array(CasinoTotalSchema));
 
 export const calculateCasinoDepositTotals = async (authToken: string) => {
-  assert(!!env.DUNE_API_KEY, 'DUNE_API_KEY is required');
+  if (!env.DUNE_API_KEY) {
+    // eslint-disable-next-line no-console
+    console.error('DUNE_API_KEY is required');
+    return constructError('Server configuration error');
+  }
+
   const user = await decodeUser(authToken);
+
+  if (isServerActionError(user)) {
+    return user;
+  }
 
   const dynamicUser = await prisma.dynamicUser.findFirst({
     where: {
@@ -41,7 +51,7 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
   });
 
   if (!dynamicUser?.casinoLink) {
-    throw new BadRequestError('Casino link required');
+    return constructError('Casino link required');
   }
 
   const existingCall = dynamicUser.apiCall;
@@ -50,11 +60,11 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
     existingCall?.status === 'Pending' &&
     new Date().getTime() - existingCall.timestamp.getTime() < 1000 * 60
   ) {
-    throw new BadRequestError('Pending call, cannot recalculate.');
+    return constructError('Pending call, cannot recalculate.');
   }
 
   if (existingCall && existingCall.status === 'Claimed') {
-    throw new BadRequestError('Already claimed deposits, cannot recalculate.');
+    return constructError('Already claimed deposits, cannot recalculate.');
   }
 
   await prisma.casinoDepositApiCall.deleteMany({
@@ -139,6 +149,6 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       },
     });
 
-    throw new InternalServerError('Error calculating deposits.');
+    return constructError('Error calculating deposits.');
   }
 };

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { getAuthToken } from '@dynamic-labs/sdk-react-core';
 import { generateLinkingToken } from '@/server/actions/account/generateLinkingToken';
 import { env } from '@/env';
+import { serverActionErrorGuard } from '@/lib/serverActionErrorGuard';
 
 export const useLinkCasinoAccount = () => {
   return useMutation({
@@ -11,7 +12,9 @@ export const useLinkCasinoAccount = () => {
       if (!authToken) {
         throw new Error('No token');
       }
-      const linkingData = await generateLinkingToken(authToken);
+      const linkingData = await serverActionErrorGuard(
+        generateLinkingToken(authToken),
+      );
 
       if (!linkingData) {
         throw new Error('Error generating linking token');

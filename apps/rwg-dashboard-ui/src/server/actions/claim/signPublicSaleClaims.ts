@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '../../prisma/client';
+import { constructError } from '../errors';
 import { decodeUser } from '../../auth';
 import { getClaimableAmounts } from './getClaimableAmounts';
 import { readContracts } from '@wagmi/core';
@@ -10,22 +11,29 @@ import assert from 'assert';
 import { privateKeyToAccount } from 'viem/accounts';
 import { env, isDev } from '@/env';
 import { toHex } from 'viem';
-import { AuthenticationError, InternalServerError } from '@/server/errors';
+import { isServerActionError } from '@/lib/serverActionErrorGuard';
 
 export const signPublicSaleClaims = async (authToken: string) => {
-  assert(
-    env.TOKEN_MASTER_SIGNER_PRIVATE_KEY?.startsWith('0x'),
-    new InternalServerError('No signer key'),
-  );
-  assert(isDev, new InternalServerError('token master not deployed to prod'));
-  const { id: userId, addresses } = await decodeUser(authToken);
+  let user;
+  try {
+    user = await decodeUser(authToken);
+  } catch (error) {
+    return constructError((error as Error).message);
+  }
 
-  if (!userId) {
-    throw new AuthenticationError('Invalid token');
+  assert(isDev, 'token master not deployed to prod');
+  if (!env.TOKEN_MASTER_SIGNER_PRIVATE_KEY?.startsWith('0x')) {
+    return constructError('No signer key');
   }
 
   return prisma.$transaction(async (tx) => {
-    const { signable } = await getClaimableAmounts(authToken, tx);
+    const claimable = await getClaimableAmounts(authToken, tx);
+
+    if (isServerActionError(claimable)) {
+      return claimable;
+    }
+
+    const { signable } = claimable;
 
     const hashedMessages = (
       await readContracts(config, {
@@ -43,16 +51,12 @@ export const signPublicSaleClaims = async (authToken: string) => {
       })
     ).map((read) => read.result);
 
-    assert(
-      hashedMessages.length === signable.length,
-      new InternalServerError(
-        'Found different amount of hashes than expected.',
-      ),
-    );
-    assert(
-      hashedMessages.every((result) => typeof result === 'string'),
-      new InternalServerError('Something went wrong while signing the claims.'),
-    );
+    if (hashedMessages.length !== signable.length) {
+      return constructError('Found different amount of hashes than expected.');
+    }
+    if (!hashedMessages.every((result) => typeof result === 'string')) {
+      return constructError('Something went wrong while signing the claims.');
+    }
 
     const account = privateKeyToAccount(
       env.TOKEN_MASTER_SIGNER_PRIVATE_KEY as `0x${string}`,
@@ -79,11 +83,11 @@ export const signPublicSaleClaims = async (authToken: string) => {
       ),
       tx.reward.updateMany({
         where: {
-          userId,
+          userId: user.id,
           AND: {
             membership: {
               address: {
-                in: addresses,
+                in: user.addresses,
               },
               wave: {
                 endTime: {

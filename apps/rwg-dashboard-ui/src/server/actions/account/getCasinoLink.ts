@@ -1,18 +1,12 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { getUserFromToken } from '../../auth';
+import { authGuard } from '../../auth';
 
-export const getCasinoLink = async (token: string) => {
-  const { userId } = await getUserFromToken(token);
-
-  if (!userId) {
-    return null;
-  }
-
+export const getCasinoLink = authGuard(async (user) => {
   const casinoLink = await prisma.casinoLink.findFirst({
     where: {
-      dynamicUserId: userId,
+      dynamicUserId: user.id,
     },
   });
 
@@ -21,4 +15,4 @@ export const getCasinoLink = async (token: string) => {
   }
 
   return casinoLink;
-};
+});

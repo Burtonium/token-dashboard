@@ -2,26 +2,24 @@
 
 import { ApiClient, User } from '@bltzr-gg/realbet-api';
 import { env } from '@/env';
-import { decodeUser } from '@/server/auth';
+import { authGuard } from '@/server/auth';
 import prisma from '@/server/prisma/client';
-import { BadRequestError, InternalServerError } from '@/server/errors';
+import { constructError } from '../errors';
 
 const realbetApi = new ApiClient({
   secret: env.REALBET_API_SECRET_KEY,
   apiUrl: env.REALBET_API_URL,
 });
 
-export const getRealbetProgression = async (authToken: string) => {
-  const { id: userId } = await decodeUser(authToken);
-
+export const getRealbetProgression = authGuard(async (user) => {
   const link = await prisma.casinoLink.findFirst({
     where: {
-      dynamicUserId: userId,
+      dynamicUserId: user.id,
     },
   });
 
   if (!link) {
-    throw new BadRequestError('No casino link found');
+    return constructError('No casino link found');
   }
 
   try {
@@ -37,6 +35,6 @@ export const getRealbetProgression = async (authToken: string) => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    throw new InternalServerError('Something went wrong with the Realbet API');
+    return constructError('Something went wrong with the Realbet API');
   }
-};
+});
