@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Scrollable } from '@/components/ui/scrollable';
 import dayjs from '@/dayjs';
 import { useToken } from '@/hooks/useToken';
 import { useStakingVault } from '@/hooks/useStakingVault';

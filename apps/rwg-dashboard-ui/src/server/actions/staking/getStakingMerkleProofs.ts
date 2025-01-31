@@ -34,6 +34,13 @@ export const getStakingMerkleProofs = async (
         },
       },
     },
+    // This is important, as proofs must be supplied to the
+    // smart contract in ascending order
+    orderBy: {
+      tree: {
+        epoch: 'asc',
+      },
+    },
   });
 
   return proofs.map(({ proof, tree: { epoch } }) => ({

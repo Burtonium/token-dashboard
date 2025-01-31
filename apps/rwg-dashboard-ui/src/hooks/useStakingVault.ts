@@ -371,13 +371,22 @@ export const useStakingVault = () => {
       if (!contractAddress) {
         throw new Error('Contract address not found');
       }
+      if (!publicClient) {
+        throw new Error('Public client not found');
+      }
+      if (!primaryWallet) {
+        throw new Error('Wallet required');
+      }
 
-      const tx = await writeContractAsync({
+      const { request } = await publicClient.simulateContract({
         address: contractAddress,
         abi: tokenStakingConfig.abi,
         functionName: 'claimRewards',
         args: [stakeIndex, epochs, merkleProofs],
+        account: primaryWallet.address as `0x${string}`,
       });
+
+      const tx = await writeContractAsync(request);
 
       await waitForTransactionReceipt(config, { hash: tx });
     },
@@ -430,7 +439,8 @@ export const useStakingVault = () => {
     queryKey: ['merkleProofs', minLastClaimEpoch],
     queryFn: async (token) => {
       const proofs = await getStakingMerkleProofs(token, minLastClaimEpoch);
-      // Make sure we only have 1 proof per epoch
+      // Make sure we only have 1 proof per epoch.
+      // Proofs are duplicated in case of a single voter in an epoch.
       return uniqBy(proofs, 'epoch');
     },
   });

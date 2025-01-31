@@ -26,7 +26,6 @@ export default function Stake() {
   const {
     deposits,
     stakedBalance,
-    shares,
     shareSymbol,
     currentEpoch,
     calculateRewards,
@@ -44,12 +43,14 @@ export default function Stake() {
 
       let rewards = 0n;
       const promises: Promise<bigint>[] = [];
-      deposits.data?.forEach((deposit, i) => {
+      deposits.data?.forEach((deposit) => {
         const votedEpochs = merkleProofs
           .data!.filter((proof) => proof.epoch > deposit.lastClaimEpoch)
           .map((proof) => BigInt(proof.epoch));
 
-        promises.push(calculateRewards(BigInt(i), votedEpochs));
+        promises.push(
+          calculateRewards(BigInt(deposit.depositIndex), votedEpochs),
+        );
       });
 
       const rewardsPerEpoch = await Promise.all(promises);
@@ -74,23 +75,43 @@ export default function Stake() {
       if (!merkleProofs.data) {
         return;
       }
+      if (!currentEpoch) {
+        return;
+      }
 
       const promises: Promise<void>[] = [];
 
-      deposits.data?.forEach((deposit, i) => {
-        const proofs = merkleProofs.data!.filter(
-          (proof) =>
-            proof.epoch > deposit.lastClaimEpoch && proof.proof.length > 0,
+      deposits.data?.forEach((deposit) => {
+        if (deposit.lastClaimEpoch === currentEpoch.epoch - 1) {
+          return;
+        }
+
+        // Get proofs that we care about
+        const votedProofs = merkleProofs.data!.filter(
+          (proof) => proof.epoch > deposit.lastClaimEpoch,
         );
-        const votedEpochs = proofs.map((proof) => proof.epoch);
+        // We must claim rewards for all epochs since the last claim
+        const epochs = new Array(
+          currentEpoch.epoch - 1 - deposit.lastClaimEpoch,
+        )
+          .fill(0)
+          .map((_, i) => i + deposit.lastClaimEpoch + 1);
+
+        // Each epoch must have a proof, even if it's empty (not voted)
+        const proofs = epochs.map((epoch) => {
+          const proof = votedProofs.find((p) => p.epoch === epoch);
+          if (!proof) {
+            return [];
+          }
+
+          return proof.proof.split(',') as `0x${string}`[];
+        });
 
         promises.push(
           claimRewards.mutateAsync({
-            stakeIndex: BigInt(i),
-            epochs: votedEpochs,
-            merkleProofs: proofs.map(
-              (proof) => proof.proof.split(',') as `0x${string}`[],
-            ),
+            stakeIndex: BigInt(deposit.depositIndex),
+            epochs,
+            merkleProofs: proofs,
           }),
         );
       });
@@ -174,7 +195,8 @@ export default function Stake() {
           </div>
           <p
             className={cn('flex items-center gap-3 text-xl', {
-              'animate-pulse': !sdkHasLoaded || shares.isLoading,
+              'animate-pulse':
+                !sdkHasLoaded || deposits.isLoading || merkleProofs.isLoading,
             })}
           >
             <span className="inline-flex size-8 flex-col items-center justify-center rounded-full border-2 border-primary bg-black p-1.5 text-primary">
