@@ -26,6 +26,7 @@ export default function Stake() {
   const {
     deposits,
     stakedBalance,
+    totalStaked,
     shareSymbol,
     currentEpoch,
     calculateRewards,
@@ -118,6 +119,7 @@ export default function Stake() {
 
       await Promise.all(promises);
     },
+    onSuccess: () => [totalStaked.refetch(), token.balance.refetch()],
   });
 
   return (
@@ -142,7 +144,7 @@ export default function Stake() {
             </span>
             <span className="mb-1 text-3xl font-medium leading-none">
               <AnimatedNumber
-                value={formatBalance(token.balance)}
+                value={formatBalance(token.balance.data ?? 0n)}
                 decimals={2}
               />
             </span>

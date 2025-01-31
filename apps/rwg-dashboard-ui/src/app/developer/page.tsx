@@ -528,7 +528,7 @@ const DeveloperPage = () => {
             Approved Spend: {formatBalance(tokenMasterApprovedSpend.data ?? 0n)}
           </p>
           <h3 className="mb-2 font-medium">
-            You have: {formatBalance(token.balance)}
+            You have: {formatBalance(token.balance.data ?? 0n)}
           </h3>
           <Input
             className="mb-3"

@@ -63,7 +63,7 @@ export default function HomePage() {
                   <Skeleton className="inline-block h-6 w-24 rounded-full" />
                 ) : (
                   <>
-                    {formatBalance(token.balance)}
+                    {formatBalance(token.balance.data ?? 0n)}
                     <RealIcon />
                   </>
                 )}

@@ -88,7 +88,7 @@ const ClaimPage = () => {
                     <Skeleton className="-mb-1 inline-block h-6 w-24 rounded-full" />
                   ) : (
                     <span className="text-2xl font-bold sm:text-5xl">
-                      {formatBalance(token.balance)}
+                      {formatBalance(token.balance.data ?? 0n)}
                     </span>
                   )}{' '}
                   <span className="text-lg font-bold text-primary sm:text-3xl">

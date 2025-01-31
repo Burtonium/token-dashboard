@@ -167,7 +167,7 @@ const StakeComponent = () => {
         return stakeForm.setError('amount', { message: 'Amount required' });
       }
 
-      if (amount > token.balance) {
+      if (amount > (token.balance.data ?? 0n)) {
         stakeForm.setError('amount', { message: 'Insufficient balance' });
         return;
       }
@@ -190,7 +190,7 @@ const StakeComponent = () => {
         }
       }
 
-      if (amount > token.balance) {
+      if (amount > (token.balance.data ?? 0n)) {
         stakeForm.setError('amount', { message: 'Insufficient balance' });
         return;
       }
@@ -320,7 +320,7 @@ const StakeComponent = () => {
                       <Wallet className="mr-2 inline size-5" />
                       Stakeable balance:{' '}
                       {formatBigIntWithSeparators(
-                        token.balance,
+                        token.balance.data ?? 0n,
                         token.decimals,
                       )}{' '}
                       {token.symbol}
@@ -349,7 +349,7 @@ const StakeComponent = () => {
                             onClick={() => {
                               field.onChange(
                                 formatUnits(
-                                  token.balance ?? 0n,
+                                  token.balance.data ?? 0n,
                                   token.decimals,
                                 ),
                               );

@@ -85,7 +85,7 @@ export const useToken = () => {
     },
     isLoading: symbol.isLoading || balance.isLoading || decimals.isLoading,
     symbol: `$${symbol.data ?? ''}`,
-    balance: balance.data ?? 0n,
+    balance,
     decimals: decimals.data ?? 18,
     contract: erc20Abi,
     mint,
