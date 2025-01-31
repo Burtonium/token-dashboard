@@ -33,7 +33,7 @@ export default function Stake() {
     claimRewards,
     merkleProofs,
   } = useStakingVault();
-  const { sdkHasLoaded } = useDynamicContext();
+  const { sdkHasLoaded, primaryWallet } = useDynamicContext();
   const [rewards, setRewards] = useState(0n);
 
   useEffect(() => {
@@ -61,7 +61,13 @@ export default function Stake() {
       setRewards(rewards);
     };
     void calculate();
-  }, [deposits.data, currentEpoch, calculateRewards, merkleProofs.data]);
+  }, [
+    primaryWallet,
+    deposits.data,
+    currentEpoch,
+    calculateRewards,
+    merkleProofs.data,
+  ]);
 
   const claim = useMutation({
     mutationFn: async () => {

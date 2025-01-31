@@ -32,6 +32,7 @@ export default function DepositsIndicator() {
   type Deposit = (typeof deposits)[number];
   type SimpleDeposit = Omit<
     Deposit,
+    | 'depositIndex'
     | 'timestamp'
     | 'tier'
     | 'tierIndex'

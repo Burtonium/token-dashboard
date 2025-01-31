@@ -34,7 +34,7 @@ export const PreviousStakes = () => {
         <div className="flex flex-col gap-3 md:grid md:grid-cols-6 md:gap-5">
           {deposits.data
             .filter((dep) => dep.amount > 0n)
-            .map((deposit, index) => {
+            .map((deposit) => {
               const now = new Date().getTime() / 1000;
               const remaining = deposit.unlockTime - now;
               const progress =
@@ -106,7 +106,7 @@ export const PreviousStakes = () => {
                       className="border-none bg-teal-500 text-black"
                       onClick={() =>
                         unstake.mutateAsync({
-                          stakeIndex: BigInt(index),
+                          stakeIndex: BigInt(deposit.depositIndex),
                         })
                       }
                       disabled={remaining > 0}
@@ -114,6 +114,9 @@ export const PreviousStakes = () => {
                     >
                       Unstake
                     </Button>
+                    <p className="text-destructive empty:hidden">
+                      {unstake.error?.message}
+                    </p>
                   </div>
                 </Card>
               );

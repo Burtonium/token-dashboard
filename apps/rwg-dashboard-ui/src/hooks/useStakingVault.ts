@@ -70,8 +70,9 @@ export const useStakingVault = () => {
 
       return amounts
         .slice()
-        .map((deposit) => ({
+        .map((deposit, idx) => ({
           ...deposit,
+          depositIndex: idx,
           tier: tiers.data[deposit.tierIndex],
           unlockTime:
             deposit.startTime +
@@ -341,6 +342,7 @@ export const useStakingVault = () => {
         abi: tokenStakingConfig.abi,
         functionName: 'unstake',
         args: [stakeIndex],
+        account: primaryWallet.address as `0x${string}`,
       });
 
       const tx = await writeContractAsync(request);
