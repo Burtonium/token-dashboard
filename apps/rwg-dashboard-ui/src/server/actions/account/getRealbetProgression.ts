@@ -34,7 +34,9 @@ export const getRealbetProgression = async (authToken: string) => {
       rakeback,
       level,
     };
-  } catch {
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
     throw new InternalServerError('Something went wrong with the Realbet API');
   }
 };
