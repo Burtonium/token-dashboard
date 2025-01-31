@@ -14,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StakeComponent from './components/stake-component';
 import RewardComponent from './components/reward-component';
 import { Info } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
 import {
   Popover,
   PopoverContent,
@@ -26,11 +25,10 @@ export default function Stake() {
   const {
     deposits,
     stakedBalance,
-    totalStaked,
     shareSymbol,
     currentEpoch,
     calculateRewards,
-    claimRewards,
+    claim,
     merkleProofs,
   } = useStakingVault();
   const { sdkHasLoaded, primaryWallet } = useDynamicContext();
@@ -70,57 +68,6 @@ export default function Stake() {
     calculateRewards,
     merkleProofs.data,
   ]);
-
-  const claim = useMutation({
-    mutationFn: async () => {
-      if (!merkleProofs.data) {
-        return;
-      }
-      if (!currentEpoch) {
-        return;
-      }
-
-      const promises: Promise<void>[] = [];
-
-      deposits.data?.forEach((deposit) => {
-        if (deposit.lastClaimEpoch === currentEpoch.epoch - 1) {
-          return;
-        }
-
-        // Get proofs that we care about
-        const votedProofs = merkleProofs.data.filter(
-          (proof) => proof.epoch > deposit.lastClaimEpoch,
-        );
-        // We must claim rewards for all epochs since the last claim
-        const epochs = new Array(
-          currentEpoch.epoch - 1 - deposit.lastClaimEpoch,
-        )
-          .fill(0)
-          .map((_, i) => i + deposit.lastClaimEpoch + 1);
-
-        // Each epoch must have a proof, even if it's empty (not voted)
-        const proofs = epochs.map((epoch) => {
-          const proof = votedProofs.find((p) => p.epoch === epoch);
-          if (!proof) {
-            return [];
-          }
-
-          return proof.proof.split(',') as `0x${string}`[];
-        });
-
-        promises.push(
-          claimRewards.mutateAsync({
-            stakeIndex: BigInt(deposit.depositIndex),
-            epochs,
-            merkleProofs: proofs,
-          }),
-        );
-      });
-
-      await Promise.all(promises);
-    },
-    onSuccess: () => [totalStaked.refetch(), token.balance.refetch()],
-  });
 
   return (
     <div className="w-full p-3 sm:p-5">
@@ -212,7 +159,11 @@ export default function Stake() {
             </span>
             <Button
               className="rounded-lg"
-              onClick={() => claim.mutateAsync()}
+              onClick={() =>
+                claim.mutateAsync(undefined, {
+                  onSuccess: () => [token.balance.refetch()],
+                })
+              }
               disabled={rewards === 0n}
               loading={claim.isPending}
             >

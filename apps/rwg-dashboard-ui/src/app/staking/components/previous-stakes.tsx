@@ -6,10 +6,33 @@ import { useToken } from '@/hooks/useToken';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import { cn } from '@/lib/cn';
 import { formatBalance } from '@/utils';
+import { useMutation } from '@tanstack/react-query';
 
 export const PreviousStakes = () => {
-  const { deposits, unstake } = useStakingVault();
+  const { deposits, claim, unstake, currentEpoch } = useStakingVault();
   const token = useToken();
+
+  const unstakeDeposit = useMutation({
+    mutationFn: async ({
+      depositIndex,
+      lastClaimEpoch,
+    }: {
+      depositIndex: bigint;
+      lastClaimEpoch: number;
+    }) => {
+      if (!currentEpoch) {
+        return;
+      }
+
+      if (lastClaimEpoch < currentEpoch.epoch - 1) {
+        await claim.mutateAsync();
+      }
+
+      await unstake.mutateAsync({
+        stakeIndex: depositIndex,
+      });
+    },
+  });
 
   if (!deposits.isSuccess || deposits.data.length === 0) {
     return null;
@@ -103,12 +126,13 @@ export const PreviousStakes = () => {
                     variant="outline"
                     className="border-none bg-teal-500 text-black"
                     onClick={() =>
-                      unstake.mutateAsync({
-                        stakeIndex: BigInt(deposit.depositIndex),
+                      unstakeDeposit.mutateAsync({
+                        depositIndex: BigInt(deposit.depositIndex),
+                        lastClaimEpoch: deposit.lastClaimEpoch,
                       })
                     }
                     disabled={remaining > 0}
-                    loading={unstake.isPending}
+                    loading={unstakeDeposit.isPending}
                   >
                     Unstake
                   </Button>
