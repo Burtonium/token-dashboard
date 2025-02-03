@@ -6,9 +6,9 @@ export function isServerActionError(
   value: unknown,
 ): value is ServerActionError {
   return (
-    (value as any).type === 'ServerActionError' &&
-    (value as any).error === true &&
-    typeof (value as any).message === 'string'
+    (value as any)?.type === 'ServerActionError' &&
+    (value as any)?.error === true &&
+    typeof (value as any)?.message === 'string'
   );
 }
 
