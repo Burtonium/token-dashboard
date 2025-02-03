@@ -448,6 +448,57 @@ export const useStakingVault = () => {
     },
   });
 
+  const claim = useMutation({
+    mutationFn: async () => {
+      if (!merkleProofs.data) {
+        return;
+      }
+      if (!currentEpoch) {
+        return;
+      }
+
+      const promises: Promise<void>[] = [];
+
+      deposits.data?.forEach((deposit) => {
+        if (deposit.lastClaimEpoch === currentEpoch.epoch - 1) {
+          return;
+        }
+
+        // Get proofs that we care about
+        const votedProofs = merkleProofs.data.filter(
+          (proof) => proof.epoch > deposit.lastClaimEpoch,
+        );
+        // We must claim rewards for all epochs since the last claim
+        const epochs = new Array(
+          currentEpoch.epoch - 1 - deposit.lastClaimEpoch,
+        )
+          .fill(0)
+          .map((_, i) => i + deposit.lastClaimEpoch + 1);
+
+        // Each epoch must have a proof, even if it's empty (not voted)
+        const proofs = epochs.map((epoch) => {
+          const proof = votedProofs.find((p) => p.epoch === epoch);
+          if (!proof) {
+            return [];
+          }
+
+          return proof.proof.split(',') as `0x${string}`[];
+        });
+
+        promises.push(
+          claimRewards.mutateAsync({
+            stakeIndex: BigInt(deposit.depositIndex),
+            epochs,
+            merkleProofs: proofs,
+          }),
+        );
+      });
+
+      await Promise.all(promises);
+    },
+    onSuccess: () => [totalStaked.refetch()],
+  });
+
   return {
     errors: [shares.error, allowance.error, deposits.error].filter((e) => !!e),
     shares,
@@ -470,6 +521,7 @@ export const useStakingVault = () => {
     lastEpochRewards,
     merkleProofs,
     totalStaked,
+    claim,
     shareSymbol: 'sREAL',
   };
 };
