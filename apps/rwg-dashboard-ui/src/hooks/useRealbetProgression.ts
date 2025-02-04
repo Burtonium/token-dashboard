@@ -1,4 +1,4 @@
-import { getRealbetProgression } from '@/server/actions/account/getRealbetProgression';
+import { getRealbetProgression } from '@/server/actions/realbet/getProgression';
 import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { useCasinoLink } from './useCasinoLink';
 

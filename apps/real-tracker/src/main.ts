@@ -70,6 +70,5 @@ processor.run(db, async (ctx) => {
 
   if (addresses.size > 0) {
     const balances = await getBalances(Array.from(addresses));
-    console.log(balances);
   }
 });

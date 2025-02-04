@@ -2,10 +2,10 @@ import pg from "pg";
 import { z } from "zod";
 
 const buildQuery = (addresses: string[]) => `
-  WITH AddressList AS (
+  WITH addresses AS (
     SELECT address FROM (VALUES ${addresses.map((address) => `('${address}')`).join(", ")}) AS v(address)
   ),
-  AddressBalance AS (
+  balances AS (
     SELECT
       address,
       SUM(CASE 
@@ -13,11 +13,11 @@ const buildQuery = (addresses: string[]) => `
           ELSE t.value 
       END) AS balance
     FROM transfer t
-    JOIN AddressList a ON t.from = a.address OR t.to = a.address
+    JOIN addresses a ON t.from = a.address OR t.to = a.address
     GROUP BY address
   )
 
-  SELECT address, balance FROM AddressBalance;
+  SELECT address, balance FROM balances;
 `;
 
 export const getBalances = async (addresses: string[]) => {

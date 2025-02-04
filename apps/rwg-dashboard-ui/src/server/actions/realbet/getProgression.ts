@@ -34,7 +34,7 @@ export const getRealbetProgression = authGuard(async (user) => {
     };
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(error);
+    console.error((error as Error).message);
     return constructError('Something went wrong with the Realbet API');
   }
 });

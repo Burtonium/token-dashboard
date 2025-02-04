@@ -162,7 +162,7 @@ const handleWalletUnlinkedEvent = async (
     })
     .catch((e) => {
       // eslint-disable-next-line no-console
-      console.error('Error unlinking wallet:', e);
+      console.error('Error unlinking wallet:', (e as Error).message);
     });
   return Response.json({
     success: true,

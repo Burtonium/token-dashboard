@@ -136,10 +136,8 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       },
     });
   } catch (error) {
-    if (error instanceof Error) {
-      // eslint-disable-next-line no-console
-      console.error(error.message);
-    }
+    // eslint-disable-next-line no-console
+    console.error((error as Error).message);
     await prisma.casinoDepositApiCall.update({
       where: {
         id: pendingCall.id,
