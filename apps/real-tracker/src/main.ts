@@ -3,7 +3,8 @@ import { TypeormDatabase } from "@subsquid/typeorm-store";
 import * as realAbi from "./abi/TestReal";
 import * as sRealAbi from "./abi/TestStakedReal";
 import { Transfer } from "./model";
-import { getBalances } from "./queries/balances";
+import { updateRakebacks } from "./lib/updateRakebacks";
+import { parseTransferAddresses } from "./lib/utils";
 
 const config = {
   rpcEndpoint: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
@@ -58,17 +59,8 @@ processor.run(db, async (ctx) => {
     }
   }
 
-  await ctx.store.insert(transfers);
-
-  const addresses = transfers.reduce((acc, transfer) => {
-    acc.add(transfer.from);
-    acc.add(transfer.to);
-    return acc;
-  }, new Set<string>());
-
-  addresses.delete("0x0000000000000000000000000000000000000000");
-
-  if (addresses.size > 0) {
-    const balances = await getBalances(Array.from(addresses));
-  }
+  await Promise.all([
+    ctx.store.insert(transfers),
+    updateRakebacks(ctx, parseTransferAddresses(transfers)),
+  ]);
 });

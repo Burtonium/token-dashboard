@@ -9,6 +9,7 @@
     "start": "tsc && node -r dotenv/config lib/main.js"
   },
   "dependencies": {
+    "@bltzr-gg/realbet-api": "^1.2.1",
     "@subsquid/evm-abi": "^0.3.0",
     "@subsquid/evm-codec": "^0.3.0",
     "@subsquid/evm-processor": "^1.19.1",
@@ -19,6 +20,7 @@
     "dotenv": "^16.4.5",
     "pg": "^8.13.1",
     "typeorm": "^0.3.20",
+    "viem": "^2.22.21",
     "zod": "^3.23.8"
   },
   "devDependencies": {

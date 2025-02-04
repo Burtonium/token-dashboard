@@ -22,7 +22,7 @@ const buildQuery = (addresses: string[]) => `
 
 export const getBalances = async (addresses: string[]) => {
   if (addresses.length === 0) {
-    return [];
+    throw new Error("No addresses provided");
   }
   const client = new pg.Client({
     host: "localhost", // Use the service name from docker-compose
@@ -37,6 +37,6 @@ export const getBalances = async (addresses: string[]) => {
   await client.end();
 
   return z
-    .array(z.object({ address: z.string(), balance: z.string() }))
+    .array(z.object({ address: z.string(), balance: z.string().default("0") }))
     .parse(rows);
 };
