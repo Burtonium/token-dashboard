@@ -1,6 +1,15 @@
 import pg from "pg";
 import { z } from "zod";
 
+const BalancesSchema = z
+  .object({
+    address: z.string(),
+    balance: z.string().default("0"),
+  })
+  .array();
+
+type Balances = z.infer<typeof BalancesSchema>;
+
 const buildQuery = (addresses: string[]) => `
   WITH addresses AS (
     SELECT address FROM (VALUES ${addresses.map((address) => `('${address}')`).join(", ")}) AS v(address)
@@ -12,7 +21,7 @@ const buildQuery = (addresses: string[]) => `
           WHEN t.from = address THEN -t.value 
           ELSE t.value 
       END) AS balance
-    FROM transfer t
+    FROM "Transfers" t
     JOIN addresses a ON t.from = a.address OR t.to = a.address
     GROUP BY address
   )
@@ -20,17 +29,11 @@ const buildQuery = (addresses: string[]) => `
   SELECT address, balance FROM balances;
 `;
 
-export const getBalances = async (addresses: string[]) => {
+export const getBalances = async (addresses: string[]): Promise<Balances> => {
   if (addresses.length === 0) {
-    throw new Error("No addresses provided");
+    return [];
   }
-  const client = new pg.Client({
-    host: "localhost", // Use the service name from docker-compose
-    port: parseInt(process.env.DB_PORT || "5432"),
-    database: process.env.POSTGRES_DB,
-    user: "postgres", // Default PostgreSQL user
-    password: process.env.POSTGRES_PASSWORD || "postgres",
-  });
+  const client = new pg.Client(process.env.DB_URL);
 
   await client.connect();
   const { rows } = await client.query(buildQuery(addresses));

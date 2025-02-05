@@ -33,6 +33,23 @@ model LinkedWallet {
   @@unique([address, dynamicUserId, chain])
 }
 
+enum TokenType {
+  Real
+  sReal
+}
+
+model Transfers {
+  hash      String        @id
+  token     TokenType
+  from      String
+  to        String
+  value     Decimal
+
+  @@index([from])
+  @@index([to])
+  @@index([token])
+}
+
 model CasinoLink {
   id              Int                       @id @default(autoincrement())
   dynamicUser     DynamicUser               @relation(fields: [dynamicUserId], references: [id])

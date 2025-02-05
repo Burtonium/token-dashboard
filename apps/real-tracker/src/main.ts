@@ -2,9 +2,11 @@ import { EvmBatchProcessor } from "@subsquid/evm-processor";
 import { TypeormDatabase } from "@subsquid/typeorm-store";
 import * as realAbi from "./abi/TestReal";
 import * as sRealAbi from "./abi/TestStakedReal";
-import { Transfer } from "./model";
 import { updateRakebacks } from "./lib/updateRakebacks";
 import { parseTransferAddresses } from "./lib/utils";
+import { Transfer } from "./types";
+import { insertTransactions } from "./queries/insertTransfers";
+import { getAddress } from "viem";
 
 const config = {
   rpcEndpoint: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
@@ -32,6 +34,11 @@ const processor = new EvmBatchProcessor()
     range: { from: config.sRealToken.fromBlock },
     address: [config.sRealToken.address],
     topic0: [sRealAbi.events.Transfer.topic],
+  })
+  .setFields({
+    log: {
+      transactionHash: true,
+    },
   });
 
 const db = new TypeormDatabase();
@@ -40,27 +47,27 @@ processor.run(db, async (ctx) => {
   const transfers: Transfer[] = [];
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
+      const address = getAddress(log.address);
       if (
-        (log.address === config.realToken.address.toLowerCase() &&
+        (address === config.realToken.address &&
           log.topics[0] === realAbi.events.Transfer.topic) ||
-        (log.address === config.sRealToken.address.toLowerCase() &&
+        (address === config.sRealToken.address &&
           log.topics[0] === sRealAbi.events.Transfer.topic)
       ) {
         let { from, to, value } = realAbi.events.Transfer.decode(log);
-        transfers.push(
-          new Transfer({
-            id: log.id,
-            from,
-            to,
-            value,
-          }),
-        );
+        transfers.push({
+          hash: log.transactionHash,
+          from: getAddress(from),
+          to: getAddress(to),
+          token: address === config.realToken.address ? "Real" : "sReal",
+          value: value.toString(),
+        });
       }
     }
   }
 
   await Promise.all([
-    ctx.store.insert(transfers),
+    insertTransactions(transfers),
     updateRakebacks(ctx, parseTransferAddresses(transfers)),
   ]);
 });

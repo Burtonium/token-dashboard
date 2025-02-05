@@ -2,7 +2,11 @@ import {
   serverActionErrorGuard,
   type ExcludeServerActionError,
 } from '@/lib/serverActionErrorGuard';
-import { getAuthToken, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import {
+  getAuthToken,
+  useDynamicContext,
+  useIsLoggedIn,
+} from '@dynamic-labs/sdk-react-core';
 import {
   useQuery,
   useQueryClient,
@@ -22,11 +26,13 @@ type AuthQueryOptions<TData = unknown, TError = unknown> = Omit<
 export const useAuthenticatedQuery = <TData = unknown, TError = Error>(
   options: AuthQueryOptions<TData, TError>,
 ) => {
+  const { user } = useDynamicContext();
   const queryClient = useQueryClient();
   const isLoggedIn = useIsLoggedIn();
 
   const query = useQuery({
     ...options,
+    queryKey: options.queryKey.concat(user?.userId),
     enabled: isLoggedIn && options.enabled,
     queryFn: async () => {
       const token = getAuthToken();

@@ -1,4 +1,4 @@
-import { Transfer } from "../model";
+import { Transfer } from "../types";
 
 export const parseTransferAddresses = (transfers: Transfer[]) => {
   const addressesSet = transfers.reduce((acc, transfer) => {

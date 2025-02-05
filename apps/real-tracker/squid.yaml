@@ -5,7 +5,6 @@ description: ERC20 token tracker for the REAL token
 build:
 deploy:
   addons:
-    postgres:
     rpc:
       - eth.http
   processor:
