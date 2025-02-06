@@ -3,33 +3,21 @@ import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { useCasinoLink } from './useCasinoLink';
 import { useMemo } from 'react';
 import useTrackedBalances from './useTrackedBalances';
+import { rakeToLevel, rakebackTiers } from '@/lib/utils/rakeback';
+import { formatUnits } from 'viem';
 
-export const rakebackTiers = [
-  { threshold: 0, rate: 0 },
-  { threshold: 100, rate: 0.01 },
-  { threshold: 1_000, rate: 0.02 },
-  { threshold: 2_500, rate: 0.03 },
-  { threshold: 5_000, rate: 0.04 },
-  { threshold: 10_000, rate: 0.05 },
-  { threshold: 25_000, rate: 0.06 },
-  { threshold: 50_000, rate: 0.07 },
-  { threshold: 100_000, rate: 0.08 },
-  { threshold: 250_000, rate: 0.09 },
-  { threshold: 500_000, rate: 0.1 },
-].map((item, index) => ({
-  ...item,
-  rank: index + 1,
-}));
-
-const rakeToLevel = (rake: number) =>
-  rakebackTiers
-    .slice()
-    .reverse()
-    .find((item) => item.rate <= rake);
+const REAL_TOKEN_PRICE = 0.03;
 
 export const useRealbetProgression = () => {
   const link = useCasinoLink();
   const trackedBalances = useTrackedBalances();
+
+  const dollarValueTracked = useMemo(
+    () =>
+      trackedBalances.data &&
+      Number(formatUnits(trackedBalances.data?.total, 18)) * REAL_TOKEN_PRICE,
+    [trackedBalances.data],
+  );
 
   const progression = useAuthenticatedQuery({
     queryKey: ['progression', link.data?.realbetUserId],
@@ -47,6 +35,14 @@ export const useRealbetProgression = () => {
     return { level, nextLevel };
   }, [progression.data]);
 
+  const rakebackProgress = useMemo(() => {
+    if (!dollarValueTracked) {
+      return 0;
+    }
+
+    return !nextLevel ? 100 : (dollarValueTracked / nextLevel.threshold) * 100;
+  }, [dollarValueTracked, nextLevel]);
+
   return {
     isLoading: progression.isLoading || trackedBalances.isLoading,
     isSuccess: progression.isSuccess && trackedBalances.isSuccess,
@@ -54,9 +50,10 @@ export const useRealbetProgression = () => {
     data: {
       wagerLevel: progression.data?.wagerLevel,
       rakeback: {
+        dollarValueTracked,
+        progress: rakebackProgress,
         level,
         nextLevel,
-
         trackedBalances: trackedBalances.data,
       },
     },
@@ -64,3 +61,5 @@ export const useRealbetProgression = () => {
       Promise.all([progression.refetch(), trackedBalances.refetch()]),
   };
 };
+
+export * from '@/lib/utils/rakeback';

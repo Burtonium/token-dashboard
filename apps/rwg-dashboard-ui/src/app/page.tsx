@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import stakingPoster from '@/assets/images/staking-poster.png';
 import linkToWinPoster from '@/assets/images/link-to-win-poster.png';
 import bonusChecker from '@/assets/images/bonus-checker-poster.png';
-import { formatBalance, formatWithSeparators } from '@/utils';
+import { formatBalance } from '@/utils';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import RealIcon from '@/components/real-icon';
 import RealbetProgressionWidget from '@/components/realbet-progression-widget';
@@ -110,15 +110,18 @@ export default function HomePage() {
                   ) : (
                     progression.isSuccess && (
                       <>
-                        {formatBalance(
-                          progression.data.rakeback.trackedBalances.total,
-                        )}
-                        ${' '}
-                        {progression.data.rakeback.nextLevel && (
+                        {progression.data.rakeback.nextLevel === undefined ? (
+                          <span className="text-accent">MAX LEVEL</span>
+                        ) : (
                           <>
-                            /{' '}
-                            {formatWithSeparators(
-                              progression.data.rakeback.nextLevel.threshold,
+                            {progression.data.rakeback.dollarValueTracked.toLocaleString()}
+                            ${' '}
+                            {progression.data.rakeback.nextLevel && (
+                              <>
+                                /{' '}
+                                {progression.data.rakeback.nextLevel.threshold.toLocaleString()}
+                                $
+                              </>
                             )}
                           </>
                         )}
@@ -127,7 +130,34 @@ export default function HomePage() {
                   )}
                 </div>
               </div>
-              <Progress />
+              <Progress
+                variant="primary"
+                value={progression.data.rakeback.progress}
+              />
+              <div className="mt-1 flex justify-between">
+                {progression.isLoading ? (
+                  <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                ) : (
+                  <h3 className="">
+                    Level {progression.data.rakeback.level?.rank} |{' '}
+                    {(
+                      (progression.data?.rakeback.level?.rate ?? 0) * 100
+                    ).toFixed()}
+                    % Rakeback
+                  </h3>
+                )}
+                {progression.isLoading ? (
+                  <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                ) : (
+                  <h3 className="">
+                    Next: Level {progression.data.rakeback.nextLevel?.rank} |{' '}
+                    {(
+                      (progression.data?.rakeback.nextLevel?.rate ?? 0) * 100
+                    ).toFixed(0)}
+                    % Rakeback
+                  </h3>
+                )}
+              </div>
             </div>
           )}
         </CardContent>

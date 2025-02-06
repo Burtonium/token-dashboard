@@ -1,11 +1,17 @@
 import { validateSignature } from '@/lib/utils/crypto';
-import { env } from '@/env';
+import { env, isDev } from '@/env';
 import { User } from '@bltzr-gg/realbet-api';
+import { getTrackedBalances } from '@/server/clientUnsafe/getTrackedBalances';
+import assert from 'assert';
+import prisma from '@/server/prisma/client';
+import { calculateRakebackFromReal } from '@/hooks/useRealbetProgression';
+import { isServerActionError } from '@/lib/serverActionErrorGuard';
 
 const requestPath = 'api/gd/user/external/get-rakeback';
 const elapsed = 0;
 
 export async function POST(request: Request) {
+  assert(isDev, 'This is a mocked endpoint only available in development');
   const processingSignature = request.headers.get('X-Processing-Signature');
   if (!processingSignature) {
     return Response.json(
@@ -65,6 +71,39 @@ export async function POST(request: Request) {
     );
   }
 
+  const link = await prisma.casinoLink.findUnique({
+    where: {
+      realbetUserId: body.data.userId,
+    },
+    include: {
+      dynamicUser: {
+        include: {
+          wallets: true,
+        },
+      },
+    },
+  });
+
+  if (!link) {
+    return Response.json({
+      success: false,
+      error: 'User not found',
+      code: 9001400,
+      msg: 'Invalid request.',
+      elapsed,
+      requestPath,
+    });
+  }
+  const user = {
+    id: link.dynamicUserId,
+    addresses: link.dynamicUser.wallets.map((wallet) => wallet.address),
+  };
+
+  const trackedBalances = await getTrackedBalances(user);
+  assert(!isServerActionError(trackedBalances), 'Fetching balances failed.');
+
+  const { tier } = calculateRakebackFromReal(trackedBalances.total);
+
   return Response.json({
     success: true,
     error: null,
@@ -73,11 +112,13 @@ export async function POST(request: Request) {
     elapsed,
     requestPath,
     userId: body.data.userId,
-    data: User.getRakebackResponseSchema.parse({
-      userId: body.data.userId,
-      rate: 0.01,
-      updatedAt: new Date().toISOString(),
-      description: 'Test rakeback tier',
-    }),
+    data:
+      tier &&
+      User.getRakebackResponseSchema.parse({
+        userId: body.data.userId,
+        rate: tier?.rate,
+        updatedAt: new Date().toISOString(),
+        description: `Rakeback tier ${tier?.rank}`,
+      }),
   });
 }
