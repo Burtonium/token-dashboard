@@ -15,7 +15,6 @@ import { useClaims } from '@/hooks/useClaims';
 import { useToken } from '@/hooks/useToken';
 import { formatBalance } from '@/utils';
 import { Calendar, Check, CircleX, HandCoins, Info } from 'lucide-react';
-import { parseUnits } from 'viem';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isDev } from '@/env';
 import { cn } from '@/lib/cn';
@@ -64,18 +63,15 @@ const ClaimPage = () => {
                 </div>
               </div>
             </div>
-            <Button
-              loading={!sdkHasLoaded || token.mint.isPending}
-              onClick={() =>
-                token.mint.mutate(parseUnits('100', token.decimals ?? 18))
-              }
-              variant="neutral"
-            >
-              {token.mint.isPending ? 'Buying' : 'Buy'} {token.symbol}
+            <Button variant="neutral" asChild>
+              <a
+                href="https://app.uniswap.org"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Buy {token.symbol}
+              </a>
             </Button>
-            <p className="text-destructive empty:hidden">
-              {token.mint.error?.message}
-            </p>
           </div>
         </CardContent>
       </Card>
