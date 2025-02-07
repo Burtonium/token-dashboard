@@ -188,12 +188,12 @@ const RewardComponent = () => {
   return (
     <>
       <div className="grid grid-cols-1 gap-5 py-5 md:grid-cols-3">
-        <Card className="col-span-1 flex flex-col gap-4 rounded-2xl p-5">
+        <Card className="col-span-1 flex flex-col gap-4 rounded-2xl p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl">Current Epoch Voting</h2>
             <Popover>
               <PopoverTrigger>
-                <Info className="text-muted-foreground" />
+                <Info className="text-muted-foreground" strokeWidth={1} />
               </PopoverTrigger>
               <PopoverContent align="start">
                 <div className="leading-tight">
@@ -206,7 +206,11 @@ const RewardComponent = () => {
           <div className="flex flex-col gap-4">
             <p>{latestProposal?.body}</p>
             <p className="text-right">
-              <a href={latestProposal?.link} target="_blank" className="italic">
+              <a
+                href={latestProposal?.link}
+                target="_blank"
+                className="text-xs italic text-primary"
+              >
                 View full proposal on Snapshot
               </a>
             </p>
@@ -220,15 +224,12 @@ const RewardComponent = () => {
                     <Button
                       key={idx}
                       variant="outline"
-                      className={cn(
-                        'w-auto min-w-fit flex-1 border-none bg-teal-500 text-black',
-                        {
-                          'bg-primary':
-                            votingChoice === idx + 1 ||
-                            (latestProposal.userVote !== undefined &&
-                              latestProposal.userVote === choice),
-                        },
-                      )}
+                      className={cn('w-auto min-w-fit flex-1', {
+                        'bg-primary-intermediate-1 text-black':
+                          votingChoice === idx + 1 ||
+                          (latestProposal.userVote !== undefined &&
+                            latestProposal.userVote === choice),
+                      })}
                       onClick={() => {
                         setVotingChoice(idx + 1);
                       }}
@@ -292,12 +293,12 @@ const RewardComponent = () => {
           </div>
         </Card>
 
-        <Card className="col-span-2 flex h-full grow flex-col gap-4 rounded-2xl p-5">
-          <div className="flex items-end gap-4">
+        <Card className="col-span-2 flex h-full grow flex-col gap-4 rounded-2xl p-4 md:p-6">
+          <div className="flex items-center gap-2">
             <h2 className="text-xl">Results</h2>
 
             {latestProposal && (
-              <span className="rounded-lg bg-muted px-1">
+              <span className="mt-1 rounded-lg bg-white/10 px-2 py-0.5 text-xs">
                 {latestProposal.votes}{' '}
                 {pluralize(latestProposal?.votes, 'vote', 'votes')}
               </span>
@@ -321,14 +322,16 @@ const RewardComponent = () => {
           <span className="my-2 h-px w-full bg-zinc-700" />
         </Card>
       </div>
-      <Card className="col-span-2 flex h-full grow flex-col gap-4 rounded-2xl p-5">
+      <Card className="col-span-2 flex h-full grow flex-col gap-4 rounded-2xl p-4 md:p-6">
         <h2 className="text-xl">Voting History</h2>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Epoch name</TableHead>
               <TableHead>End Date</TableHead>
-              <TableHead>Voted (Choice)</TableHead>
+              <TableHead className="text-center md:text-left">
+                Voted (Choice)
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -340,7 +343,7 @@ const RewardComponent = () => {
                   </a>
                 </TableCell>
                 <TableCell>{formatDate(proposal.end)}</TableCell>
-                <TableCell>
+                <TableCell className="text-center md:text-left">
                   {userProposalVotes.data &&
                     (!!proposal.userVote || idx !== 0) && (
                       <VotingHistoryVote vote={proposal.userVote} />
@@ -352,6 +355,7 @@ const RewardComponent = () => {
         </Table>
         <div>
           <Button
+            size="sm"
             onClick={() => proposals.fetchNextPage()}
             disabled={!proposals.hasNextPage}
             loading={proposals.isFetchingNextPage}

@@ -12,6 +12,9 @@ export default {
         tusker: ['var(--font-tusker-grotesk)', ...fontFamily.sans],
         monoline: ['var(--font-monoline)', ...fontFamily.sans],
       },
+      fontSize: {
+        heading: '2rem',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

@@ -18,7 +18,7 @@ const Banner: React.FC<
       ref={bannerRef}
       className={cn(
         // eslint-disable-next-line tailwindcss/no-contradicting-classname
-        'relative rounded-3xl bg-[size:200%] bg-[position:center] bg-no-repeat px-4 py-8 sm:bg-[center_10%] sm:px-12',
+        'relative rounded-3xl bg-[size:200%] bg-[position:center] bg-no-repeat px-4 py-4 sm:bg-[center_10%] md:px-6 md:py-8',
         className,
       )}
       style={{

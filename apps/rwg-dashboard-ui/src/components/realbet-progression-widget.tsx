@@ -1,21 +1,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { useRealbetProgression } from '@/hooks/useRealbetProgression';
-import { Check } from 'lucide-react';
+import { Check, Wallet2 } from 'lucide-react';
 import Link from 'next/link';
 import { Skeleton } from './ui/skeleton';
 import { Progress } from './ui/progress';
 import RealbetVipTiersModal from './modals/RealbetVipTiersModal';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
-import ConnectWallet from './connect-wallet';
 import { Button } from './ui/button';
+import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 
 const RealbetProgressionWidget = () => {
   const progression = useRealbetProgression();
   const link = useCasinoLink();
   const { sdkHasLoaded } = useDynamicContext();
   const loggedIn = useIsLoggedIn();
+  const handleDynamicAuthClick = useDynamicAuthClickHandler();
 
   return (
     <Card>
@@ -30,7 +31,7 @@ const RealbetProgressionWidget = () => {
               >
                 REALBET.IO
               </Link>{' '}
-              Reward Tiers
+              Rewards Tier
             </span>
             {link.isSuccess && link.data?.realbetUsername && (
               <>
@@ -44,18 +45,6 @@ const RealbetProgressionWidget = () => {
               </>
             )}
           </span>
-          {!loggedIn && sdkHasLoaded ? (
-            <Button asChild className="ml-1">
-              <ConnectWallet />
-            </Button>
-          ) : (
-            !link.isLinked &&
-            link.isSuccess && (
-              <Button asChild className="ml-1">
-                <Link href={'/link-to-win'}>Link your account</Link>
-              </Button>
-            )
-          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -63,7 +52,7 @@ const RealbetProgressionWidget = () => {
         {!loggedIn && sdkHasLoaded ? (
           <p>You must be logged in to see your progression.</p>
         ) : !link.isLinked && link.isSuccess ? (
-          <p>Link your realbet account to start tracking your progression. </p>
+          <p>Link your Realbet account to start tracking your progression.</p>
         ) : (
           !progression.error && (
             <div className="flex gap-3">
@@ -139,6 +128,20 @@ const RealbetProgressionWidget = () => {
             </div>
           )
         )}
+        <div className="mt-6">
+          {!loggedIn && sdkHasLoaded ? (
+            <Button onClick={handleDynamicAuthClick}>
+              <Wallet2 className="mr-2" /> Connect Wallet
+            </Button>
+          ) : (
+            !link.isLinked &&
+            link.isSuccess && (
+              <Button asChild className="ml-1">
+                <Link href={'/link-realbet'}>Link your account</Link>
+              </Button>
+            )
+          )}
+        </div>
       </CardContent>
     </Card>
   );

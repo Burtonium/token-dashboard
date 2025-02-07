@@ -10,22 +10,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import RealIcon from '@/assets/images/R.svg';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClaims } from '@/hooks/useClaims';
 import { useToken } from '@/hooks/useToken';
-import { formatBalance, formatBalanceTruncated } from '@/utils';
-import { Calendar, Check, CircleX, HandCoins } from 'lucide-react';
+import { formatBalance } from '@/utils';
+import { Calendar, Check, CircleX, HandCoins, Info } from 'lucide-react';
 import { parseUnits } from 'viem';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import dayjs from '@/dayjs';
 import { isDev } from '@/env';
 import { cn } from '@/lib/cn';
-import { useVesting } from '@/hooks/useVesting';
-import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
-import { useMemo } from 'react';
-import assert from 'assert';
 import VestingIndicator from './components/vesting-indicator';
+import { VestingSchedules } from './components/vesting-schedules';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import RealIcon from '@/components/real-icon';
 
 const ClaimPage = () => {
   const { sdkHasLoaded } = useDynamicContext();
@@ -34,66 +35,32 @@ const ClaimPage = () => {
   const token = useToken();
   const showPeriod = claims.isLoading || claims.data?.period;
 
-  const {
-    withdrawableAmount,
-    releasableAmounts,
-    vestingAmount,
-    vestingSchedulesWithAmounts,
-    nextWithdrawal,
-    release,
-  } = useVesting();
-
-  const withdrawableAmountAnimated = useAnimatedNumber(
-    formatBalanceTruncated(withdrawableAmount),
-    {
-      decimals: 0,
-      duration: 300,
-    },
-  );
-
-  const fullyUnlockedDate = useMemo(() => {
-    const timestamps = vestingSchedulesWithAmounts
-      .filter((v) => !v.revoked)
-      .map((v) => Number(v.start + v.duration));
-
-    if (timestamps.length > 0) {
-      return new Date(Math.max(...timestamps) * 1000);
-    }
-    return null;
-  }, [vestingSchedulesWithAmounts]);
-
   return (
-    <div className="space-y-8 p-3 sm:p-5">
+    <div className="space-y-8 p-6 md:p-5">
       <div>
-        <h2 className="mb-3 text-[2rem] font-medium">
-          <HandCoins className="mb-1 inline size-9" /> Token Claim
+        <h2 className="text-heading mb-3">
+          <HandCoins className="mb-1 inline size-7 stroke-1" /> Token Claim
         </h2>
-        <p className="mb-4 text-xl font-medium leading-tight text-white/80">
+        <p className="mb-4 leading-tight text-white/90">
           Claim your tokens from various sources here.
         </p>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle className="uppercase">{token.symbol} Balance</CardTitle>
+          <CardTitle>{token.symbol} Balance</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center justify-between gap-5">
-            <div className="flex items-center gap-3 sm:gap-5">
-              <span className="mt-1 inline-flex size-8 flex-col items-center justify-center rounded-full border-2 border-primary bg-black p-1 text-primary sm:size-12 sm:p-2">
-                <RealIcon className="size-full" />
-              </span>
+          <div className="flex flex-col flex-wrap items-start justify-between gap-5 md:flex-row md:items-center">
+            <div className="flex items-center gap-3 md:gap-5">
+              <RealIcon size="lg" />
               <div>
-                <div className="font-bold">
+                <div className="md:text-heading text-xl">
                   {token.isLoading ? (
                     <Skeleton className="-mb-1 inline-block h-6 w-24 rounded-full" />
                   ) : (
-                    <span className="text-2xl font-bold sm:text-5xl">
-                      {formatBalance(token.balance.data ?? 0n)}
-                    </span>
+                    <span>{formatBalance(token.balance.data ?? 0n)}</span>
                   )}{' '}
-                  <span className="text-lg font-bold text-primary sm:text-3xl">
-                    {token.symbol}
-                  </span>
+                  <span className="text-primary">{token.symbol}</span>
                 </div>
               </div>
             </div>
@@ -103,7 +70,6 @@ const ClaimPage = () => {
                 token.mint.mutate(parseUnits('100', token.decimals ?? 18))
               }
               variant="neutral"
-              size="xl"
             >
               {token.mint.isPending ? 'Buying' : 'Buy'} {token.symbol}
             </Button>
@@ -115,7 +81,7 @@ const ClaimPage = () => {
       </Card>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             <CardTitle className="text-xl font-normal">
               Public Sale Token Claim
             </CardTitle>
@@ -138,6 +104,7 @@ const ClaimPage = () => {
                   loading={
                     claims.isLoading || process.isPending || claim.isPending
                   }
+                  className="max-sm:min-w-3"
                 >
                   {hasError
                     ? 'Retry'
@@ -158,63 +125,100 @@ const ClaimPage = () => {
           </p>
         </CardHeader>
         <CardContent className="pb-3">
-          {claims.isLoading || token.isLoading ? (
-            <>
-              <Skeleton className="mb-4 h-6 w-full rounded-full" />
-              <Skeleton className="h-6 w-full rounded-full" />
-            </>
-          ) : (
-            <div>
-              {claims.data && claims.data.amounts.claimed > 0n && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <h3 className="mb-2 text-lg">Claimed Amount</h3>
-                    <h3 className="mb-2 flex items-center gap-1 text-right text-2xl font-medium">
-                      <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                        <RealIcon className="size-full" />
-                      </span>
-                      {formatBalance(claims.data?.amounts.claimed ?? 0n)}{' '}
-                    </h3>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="mb-2 text-lg">Claimed Bonus Amount</h3>
-                    <h3 className="mb-2 flex items-center gap-1 text-right text-2xl font-medium">
-                      <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                        <RealIcon className="size-full" />
-                      </span>
-                      {formatBalance(claims.data?.amounts.claimedBonus ?? 0n)}{' '}
-                    </h3>
-                  </div>
-                </>
-              )}
-              {!hasEnded &&
-                (!claims.data || claims.data.amounts.claimable > 0n) && (
+          <div className="flex flex-col justify-evenly gap-6 md:flex-row">
+            {claims.isLoading || token.isLoading ? (
+              <>
+                <Skeleton className="h-32 w-full rounded-xl" />
+                <Skeleton className="h-32 w-full rounded-xl" />
+              </>
+            ) : (
+              <>
+                {claims.data && claims.data.amounts.claimed > 0n && (
                   <>
-                    <div className="flex items-center justify-between">
-                      <h3 className="mb-2 text-lg">
-                        Claimable Purchased Amount
-                      </h3>
-                      <h3 className="mb-2 flex items-center gap-1 text-right text-2xl font-medium">
-                        <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                          <RealIcon className="size-full" />
-                        </span>
-                        {formatBalance(claims.data?.amounts.claimable ?? 0n)}{' '}
+                    <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                      <div>
+                        Claimed Amount
+                        <Popover>
+                          <PopoverTrigger>
+                            <Info className="text-muted-foreground" />
+                          </PopoverTrigger>
+                          <PopoverContent align="start">
+                            <div className="leading-tight">Claimed amount.</div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <h3 className="text-heading flex items-center gap-1 text-right">
+                        {formatBalance(claims.data?.amounts.claimed ?? 0n)}{' '}
+                        <RealIcon size="sm" />
                       </h3>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="mb-2 text-lg">Claimable Bonus</h3>
-                      <h3 className="mb-2 flex items-center gap-1 text-right text-2xl font-medium">
-                        <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                          <RealIcon className="size-full" />
-                        </span>
-                        {formatBalance(claims.data?.amounts.bonus ?? 0n)}{' '}
+                    <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                      <div>
+                        Claimed Bonus Amount
+                        <Popover>
+                          <PopoverTrigger>
+                            <Info className="text-muted-foreground" />
+                          </PopoverTrigger>
+                          <PopoverContent align="start">
+                            <div className="leading-tight">
+                              Claimed bonus amount.
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <h3 className="text-heading flex items-center gap-1 text-right">
+                        {formatBalance(claims.data?.amounts.claimedBonus ?? 0n)}{' '}
+                        <RealIcon size="sm" />
                       </h3>
                     </div>
                   </>
-                )}
-              {}
-            </div>
-          )}
+                )}{' '}
+                {!hasEnded &&
+                  (!claims.data || claims.data.amounts.claimable > 0n) && (
+                    <>
+                      <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                        <div className="flex items-center gap-2">
+                          Claimable Purchased Amount
+                          <Popover>
+                            <PopoverTrigger>
+                              <Info className="stroke-1 text-muted-foreground" />
+                            </PopoverTrigger>
+                            <PopoverContent align="start">
+                              <div className="leading-tight">
+                                Claimable purchased amount.
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <h3 className="text-heading flex items-center gap-1 text-right">
+                          {formatBalance(claims.data?.amounts.claimable ?? 0n)}{' '}
+                          <RealIcon size="sm" />
+                        </h3>
+                      </div>
+                      <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                        <div className="flex items-center gap-2">
+                          Claimable Bonus
+                          <Popover>
+                            <PopoverTrigger>
+                              <Info className="stroke-1 text-muted-foreground" />
+                            </PopoverTrigger>
+                            <PopoverContent align="start">
+                              <div className="leading-tight">
+                                Claimable bonus.
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <h3 className="text-heading flex items-center gap-1 text-right">
+                          {formatBalance(claims.data?.amounts.bonus ?? 0n)}{' '}
+                          <RealIcon size="sm" />
+                        </h3>
+                      </div>
+                    </>
+                  )}
+              </>
+            )}
+          </div>
           <p className="max-w-[60rem] overflow-x-auto whitespace-pre break-all text-sm text-destructive empty:hidden">
             {hasError &&
               !isDev &&
@@ -253,84 +257,18 @@ const ClaimPage = () => {
         </CardFooter>
       </Card>
       <Card>
-        <CardHeader>
-          <CardTitle className="flex flex-wrap justify-between gap-5">
-            <span className="uppercase">Vesting</span>
-            {fullyUnlockedDate !== null && (
-              <span className="text-sm">
-                Fully unlocked:{' '}
-                {!sdkHasLoaded ? (
-                  <Skeleton className="-mb-1 inline-block h-4 w-24" />
-                ) : (
-                  <Button variant="ghost" size="sm">
-                    {dayjs(fullyUnlockedDate).format('DD/MM/YYYY')}
-                  </Button>
-                )}
-              </span>
-            )}
-          </CardTitle>
+        <CardHeader className="p-6">
+          <CardTitle>Vesting</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap items-center justify-between gap-5">
-            <div>
-              <h3 className="mb-2 text-xl">Vesting</h3>
-              <span className="inline-flex items-center gap-1 text-2xl">
-                <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                  <RealIcon className="size-full" />
-                </span>
-                {token.isLoading || vestingAmount.isLoading ? (
-                  <Skeleton className="h-6 w-24 rounded-full" />
-                ) : (
-                  <span>
-                    {formatBalanceTruncated(vestingAmount.data ?? 0n)}
-                  </span>
-                )}
-              </span>
-            </div>
-            <div>
-              <h3 className="mb-2 text-xl">Vested</h3>
-              <div className="flex items-center gap-5">
-                <span className="inline-flex items-center gap-1 text-2xl">
-                  <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                    <RealIcon className="size-full" />
-                  </span>
-                  {token.isLoading || releasableAmounts.isLoading ? (
-                    <Skeleton className="h-6 w-24 rounded-full" />
-                  ) : (
-                    withdrawableAmountAnimated
-                  )}
-                </span>
-                <Button
-                  disabled={withdrawableAmount <= 0n || !nextWithdrawal}
-                  loading={!sdkHasLoaded || release.isPending}
-                  size="sm"
-                  onClick={async () => {
-                    assert(nextWithdrawal?.id, 'nextWithdrawal.id is required');
-                    await release.mutateAsync({
-                      amount: nextWithdrawal.releasableAmount ?? 0n,
-                      vestingScheduleId: nextWithdrawal.id,
-                    });
-                  }}
-                >
-                  Withdraw{' '}
-                  {nextWithdrawal
-                    ? `${formatBalanceTruncated(
-                        nextWithdrawal?.releasableAmount,
-                      )} ${token.symbol}`
-                    : ''}
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div className="mt-2 py-4">
-            {!sdkHasLoaded ? (
-              <Skeleton className="h-4 w-full" />
-            ) : (
-              <VestingIndicator />
-            )}
-          </div>
+        <CardContent className="p-6 pt-1">
+          {!sdkHasLoaded ? (
+            <Skeleton className="h-4 w-full" />
+          ) : (
+            <VestingIndicator />
+          )}
         </CardContent>
       </Card>
+      <VestingSchedules />
     </div>
   );
 };

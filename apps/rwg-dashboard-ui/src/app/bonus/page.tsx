@@ -231,10 +231,10 @@ const BonusPage = () => {
     <div className="flex flex-col gap-5 p-5">
       <Banner>
         <div className="space-y-4">
-          <h3 className="inline rounded-md bg-accent-2 px-2 font-monoline text-2xl text-white xl:text-3xl">
+          <h3 className="inline rounded-md bg-accent-2 px-2 font-monoline text-2xl text-white">
             EARN {token.symbol} REWARDS FROM CASINO PLAY
           </h3>
-          <p className="max-w-lg text-lg">
+          <p className="max-w-lg text-base">
             Claim $REAL rewards from your past deposits on top casinos. Link
             your wallets to scan for deposit rewards.
           </p>
@@ -242,7 +242,7 @@ const BonusPage = () => {
             {sdkHasLoaded && !isAuthenticated && (
               <div className="space-between no-wrap flex flex-row items-center justify-center gap-5">
                 <Button onClick={handleDynamicAuthClick}>
-                  Connect Wallet <Wallet2 className="ml-2" />
+                  <Wallet2 className="mr-2" /> Connect Wallet
                 </Button>
               </div>
             )}
@@ -284,7 +284,7 @@ const BonusPage = () => {
                           <Button
                             onClick={() => setShowLinkNewWalletModal(true)}
                             variant="outline"
-                            className="place-self-end"
+                            className="place-self-end focus:ring-0"
                           >
                             + Add new crypto wallet
                           </Button>
@@ -304,7 +304,7 @@ const BonusPage = () => {
                                   bonus.claimed ||
                                   casinoDeposits.data?.status === 'Pending'
                                 }
-                                className="place-self-end"
+                                className="place-self-end focus:ring-0"
                               >
                                 Rescan Rewards
                               </Button>
@@ -314,7 +314,7 @@ const BonusPage = () => {
                               loading={calculateDeposits.isPending}
                               disabled={bonus.claimed}
                               onClick={scanRewards}
-                              className="place-self-end"
+                              className="place-self-end focus:ring-0"
                             >
                               {casinoDeposits.data &&
                               casinoDeposits.data.status === 'Success'
@@ -329,12 +329,7 @@ const BonusPage = () => {
                     </>
                   ) : (
                     <Button asChild className="place-self-end">
-                      <Link
-                        href="/link-to-win"
-                        className="font-bold text-primary"
-                      >
-                        Link Realbet Account
-                      </Link>
+                      <Link href="/link-realbet">Link Realbet Account</Link>
                     </Button>
                   ))}
               </div>
@@ -354,8 +349,8 @@ const BonusPage = () => {
                 )}
                 <div className="grid grid-cols-1 gap-3 rounded-xl bg-lighter/50 px-5 py-3 sm:grid-cols-2">
                   <div className="flex flex-col items-center gap-1 rounded-xl border border-orange-100/20 bg-red-500/5 px-2 py-4">
-                    <h3 className="text-md">Total Deposits</h3>
-                    <h3 className="text-center text-lg">
+                    <h3 className="text-sm">Total Deposits</h3>
+                    <h3 className="text-center text-xl">
                       <span className="flex items-center gap-2 text-xl text-primary">
                         {(casinoDeposits.isPending ||
                           calculateDeposits.isPending ||
@@ -370,7 +365,7 @@ const BonusPage = () => {
                     </h3>
                   </div>
                   <div className="flex flex-col items-center justify-between gap-1 rounded-xl border border-orange-100/20 bg-red-500/5 px-2 py-4">
-                    <h3 className="text-md text-center">
+                    <h3 className="text-center text-sm">
                       {bonus.claimed ? (
                         <Popover>
                           <PopoverTrigger className="hover:text-primary">
@@ -389,7 +384,7 @@ const BonusPage = () => {
                         </Popover>
                       )}
                     </h3>
-                    <h3 className="text-md text-center">
+                    <h3 className="text-center text-xl">
                       {bonus.claimed ? (
                         <p className="text-lg text-green-500">
                           {score.toLocaleString()}
@@ -399,7 +394,7 @@ const BonusPage = () => {
                         <span className="text-xl text-primary">
                           {score.toLocaleString()}
                           <span className="inline-flex items-center gap-1 text-2xl">
-                            <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full border border-primary bg-black p-1.5 text-primary">
+                            <span className="m-1.5 inline-flex size-7 flex-col items-center justify-center rounded-full border border-primary bg-black p-1.5 text-primary">
                               <RealIcon className="inline size-full" />
                             </span>
                             {bonus.claimable && (
@@ -431,9 +426,13 @@ const BonusPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="px-5 font-normal">Casino</TableHead>
-                      <TableHead className="px-5 font-normal">Asset</TableHead>
-                      <TableHead className="px-5 text-right font-normal">
+                      <TableHead className="px-5 text-sm font-normal">
+                        Casino
+                      </TableHead>
+                      <TableHead className="px-5 text-sm font-normal">
+                        Asset
+                      </TableHead>
+                      <TableHead className="px-5 text-right text-sm font-normal">
                         Eligible Deposits
                       </TableHead>
                     </TableRow>
@@ -486,7 +485,9 @@ const BonusPage = () => {
                   <TableFooter className="border-b-5 border border-lighter/50 bg-lighter/20">
                     <TableRow>
                       <TableHead className="px-5 font-normal"></TableHead>
-                      <TableHead className="px-5 font-normal">Total</TableHead>
+                      <TableHead className="px-5 text-sm font-normal">
+                        Total
+                      </TableHead>
                       <TableHead className="px-5 text-right text-lg font-normal text-primary">
                         +{score.toLocaleString()}{' '}
                         <span className="m-1 inline-flex size-6 flex-col items-center justify-center rounded-full border border-primary bg-black p-1 text-primary">

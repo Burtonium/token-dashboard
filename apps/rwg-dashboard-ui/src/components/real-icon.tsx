@@ -3,20 +3,23 @@ import Icon from '@/assets/images/R.svg';
 
 type Props = {
   border?: boolean;
-  size?: 'lg' | 'md';
+  size?: 'lg' | 'md' | 'sm' | 'xs';
+  className?: string;
 };
 
 const iconClass = cva(
-  'ml-2 mt-1 inline-flex flex-col items-center justify-center rounded-full bg-black text-primary',
+  'ml-2 inline-flex flex-col items-center justify-center rounded-full bg-black text-primary',
   {
     variants: {
       border: {
-        true: 'border-2 border-primary',
-        false: 'border-2 border-black',
+        true: 'border-primary',
+        false: 'border-black',
       },
       size: {
-        lg: 'size-12 p-1.5',
-        md: 'size-8 p-1',
+        lg: 'border-2 size-12 p-1.5 mt-1',
+        md: 'border-2 size-8 p-1 mt-1',
+        sm: 'border size-6 p-1 mt-1',
+        xs: 'border size-5 p-[3px]',
       },
     },
     defaultVariants: {
@@ -26,9 +29,9 @@ const iconClass = cva(
   },
 );
 
-export default function RealIcon({ border, size }: Props) {
+export default function RealIcon({ border, size, className }: Props) {
   return (
-    <span className={iconClass({ border, size })}>
+    <span className={iconClass({ border, size, className })}>
       <Icon className="size-full" />
     </span>
   );

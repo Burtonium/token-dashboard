@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import RealIcon from '@/assets/images/R.svg';
 import {
   Form,
   FormControl,
@@ -28,58 +27,33 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { Wallet } from 'lucide-react';
 import { PreviousStakes } from './previous-stakes';
+import RealIcon from '@/components/real-icon';
 
-const gradientTierButtonClasses = [
+const tierButtonCommonClasses =
+  'flex justify-between min-w-0 max-w-28 md:max-w-full w-full rounded-[4px] p-2 h-8 text-xs';
+
+const tierButtonClasses = [
   (active: boolean) =>
     active
-      ? {
-          className:
-            'bg-primary border-none hover:bg-primary hover:text-black focus:ring-primary',
-        }
-      : {
-          className:
-            'text-primary bg-transparent border border-primary hover:bg-primary hover:text-black focus:ring-primary',
-        },
+      ? 'text-black bg-primary border-none hover:bg-primary hover:text-black focus:ring-primary'
+      : 'text-primary bg-transparent border border-primary hover:bg-primary hover:text-black focus:ring-primary',
   (active: boolean) =>
     active
-      ? {
-          className:
-            'bg-primary-intermediate-1 border-none hover:bg-primary-intermediate-1 hover:text-black focus:ring-primary-intermediate-1',
-        }
-      : {
-          className:
-            'text-primary-intermediate-1 bg-transparent border border-primary-intermediate-1 hover:bg-primary-intermediate-1 hover:text-black focus:ring-primary-intermediate-1',
-        },
+      ? 'text-black bg-primary-intermediate-1 border-none hover:bg-primary-intermediate-1 hover:text-black focus:ring-primary-intermediate-1'
+      : 'text-primary-intermediate-1 bg-transparent border border-primary-intermediate-1 hover:bg-primary-intermediate-1 hover:text-black focus:ring-primary-intermediate-1',
   (active: boolean) =>
     active
-      ? {
-          className:
-            'bg-primary-intermediate-3 border-none hover:bg-primary-intermediate-3 hover:text-black focus:ring-primary-intermediate-3',
-        }
-      : {
-          className:
-            'text-primary-intermediate-3 bg-transparent border border-primary-intermediate-3 hover:bg-primary-intermediate-3 hover:text-black focus:ring-primary-intermediate-3',
-        },
+      ? 'bg-primary-intermediate-3 border-none focus:ring-primary-intermediate-3'
+      : 'text-primary-intermediate-3 bg-transparent border border-primary-intermediate-3 hover:bg-primary-intermediate-3 hover:text-black focus:ring-primary-intermediate-3',
   (active: boolean) =>
     active
-      ? {
-          className:
-            'bg-accent border-none hover:bg-accent hover:text-black focus:ring-accent',
-        }
-      : {
-          className:
-            'text-accent bg-transparent border border-accent hover:bg-accent hover:text-black focus:ring-accent',
-        },
+      ? 'bg-red-600 border-none hover:bg-red-600 focus:ring-red-600'
+      : 'text-red-600 bg-transparent border border-red-600 hover:bg-red-600 hover:text-black focus:ring-red-600',
+
   (active: boolean) =>
     active
-      ? {
-          className:
-            'bg-accent-2 border-none hover:bg-accent-2 hover:text-black focus:ring-accent-2',
-        }
-      : {
-          className:
-            'text-accent-2 bg-transparent border border-accent-2 hover:bg-accent-2 hover:text-black focus:ring-accent-2',
-        },
+      ? 'bg-red-700 border-none hover:bg-red-700 focus:ring-red-700'
+      : 'text-red-700 bg-transparent border border-red-700 hover:bg-red-700 hover:text-black focus:ring-red-700',
 ];
 
 const StakeComponent = () => {
@@ -287,7 +261,7 @@ const StakeComponent = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 gap-3 py-3 sm:gap-5 md:grid-cols-3 md:py-5">
+      <div className="mb-3 flex flex-col gap-4 py-3 md:mb-0 md:grid md:grid-cols-3 md:py-5">
         <Card className="col-span-2 space-y-5 p-5">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl">Stake {token.symbol}</h2>
@@ -295,7 +269,7 @@ const StakeComponent = () => {
             {!currentEpoch ? (
               <Skeleton className="h-4 w-24 rounded-lg bg-muted" />
             ) : (
-              <span className="rounded-lg bg-muted px-1 text-sm">
+              <span className="text-sm text-muted">
                 Epoch {currentEpoch.epoch} (ends in{' '}
                 {dayjs
                   .duration(Date.now() - currentEpoch.endDate * 1000)
@@ -313,11 +287,11 @@ const StakeComponent = () => {
                 render={({ field, formState }) => (
                   <FormItem>
                     <FormLabel
-                      className={cn('block', {
+                      className={cn('block font-normal', {
                         'text-muted': stakeFormLoading,
                       })}
                     >
-                      <Wallet className="mr-2 inline size-5" />
+                      <Wallet className="mr-2 inline size-5" strokeWidth={1} />
                       Stakeable balance:{' '}
                       {formatBigIntWithSeparators(
                         token.balance.data ?? 0n,
@@ -336,10 +310,8 @@ const StakeComponent = () => {
                       <Input
                         loading={stakeFormLoading}
                         startAdornment={
-                          <span className="inline-flex items-center gap-1 text-sm">
-                            <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                              <RealIcon className="size-full" />
-                            </span>
+                          <span className="mt-px inline-flex items-center gap-1">
+                            <RealIcon border={false} className="mt-0" />
                             {token.symbol}
                           </span>
                         }
@@ -354,14 +326,14 @@ const StakeComponent = () => {
                                 ),
                               );
                             }}
-                            variant="ghost"
+                            variant="neutral"
                             size="sm"
-                            className="mr-1 text-sm"
+                            className="radius-sm mr-1 h-auto rounded-[4px] border-0 px-2 py-[2px] text-xs"
                           >
-                            Max
+                            max
                           </Button>
                         }
-                        className={cn({
+                        className={cn('h-11', {
                           'border-destructive': formState.errors.amount,
                         })}
                         placeholder="0"
@@ -381,12 +353,14 @@ const StakeComponent = () => {
                     <FormItem>
                       <FormLabel
                         className={cn(
-                          { 'text-muted': stakeFormLoading },
-                          'flex justify-between py-2',
+                          'text-md mt-2 flex justify-between py-2 font-normal',
+                          {
+                            'text-muted': stakeFormLoading,
+                          },
                         )}
                       >
                         Choose staking lock duration:
-                        <p>
+                        <p className="text-muted">
                           Unlocks at{' '}
                           {selectedTier?.lockPeriod
                             ? dayjs
@@ -400,25 +374,26 @@ const StakeComponent = () => {
                         </p>
                       </FormLabel>
                       <FormControl>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap justify-start gap-2 md:justify-evenly lg:flex-nowrap">
                           <p className="text-destructive empty:hidden">
                             {tiers.error?.message}
                           </p>
                           {tiers.isLoading ? (
                             <>
-                              <Skeleton className="h-8 w-24 rounded-lg bg-primary" />
-                              <Skeleton className="h-8 w-24 rounded-lg bg-primary-intermediate-1" />
-                              <Skeleton className="h-8 w-24 rounded-lg bg-primary-intermediate-2" />
-                              <Skeleton className="h-8 w-24 rounded-lg bg-primary-intermediate-3" />
-                              <Skeleton className="h-8 w-24 rounded-lg bg-accent" />
+                              <Skeleton className="h-8 w-full rounded-lg bg-primary" />
+                              <Skeleton className="h-8 w-full rounded-lg bg-primary-intermediate-1" />
+                              <Skeleton className="h-8 w-full rounded-lg bg-primary-intermediate-2" />
+                              <Skeleton className="h-8 w-full rounded-lg bg-primary-intermediate-3" />
+                              <Skeleton className="h-8 w-full rounded-lg bg-accent" />
                             </>
                           ) : (
                             tiers.data?.map((tier, index) => (
                               <Button
+                                variant="unset"
+                                size="unset"
                                 type="button"
                                 key={index}
                                 loading={stakeFormLoading}
-                                size="sm"
                                 onClick={() => {
                                   field.onChange(index.toString());
                                   stakeForm.setValue(
@@ -426,14 +401,24 @@ const StakeComponent = () => {
                                     index.toString(),
                                   );
                                 }}
-                                {...gradientTierButtonClasses[index]?.(
-                                  parseInt(field.value) === index,
+                                className={cn(
+                                  tierButtonCommonClasses,
+                                  tierButtonClasses[index]?.(
+                                    parseInt(field.value) === index,
+                                  ),
                                 )}
                               >
-                                {dayjs
-                                  .duration(Number(tier.lockPeriod), 'seconds')
-                                  .humanize()}{' '}
-                                ({tier.decimalMult}x)
+                                <span>
+                                  {dayjs
+                                    .duration(
+                                      Number(tier.lockPeriod),
+                                      'seconds',
+                                    )
+                                    .humanize()}
+                                </span>
+                                <span className="text-base">
+                                  {tier.decimalMult}x
+                                </span>
                               </Button>
                             ))
                           )}
@@ -447,14 +432,10 @@ const StakeComponent = () => {
               <Button
                 loading={stakeFormLoading}
                 type="submit"
-                className="mt-5 w-full"
-                size="lg"
-                variant="default"
+                className="mt-5 w-64"
               >
                 Stake
-                <span className="ml-2 inline-flex flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                  <RealIcon className="inline-block size-4" />
-                </span>
+                <RealIcon size="sm" className="ml-0 mt-0" />
               </Button>
             </form>
           </Form>
@@ -470,9 +451,9 @@ const StakeComponent = () => {
         >
           <div className="absolute inset-0 z-10 bg-black opacity-50" />
           <div className="relative z-10 text-center">
-            <h2 className="flex flex-col gap-3 text-2xl font-medium">
+            <h2 className="flex flex-col gap-4 text-2xl">
               {selectedTier && (
-                <div className="text-xl font-medium">
+                <div className="text-xl">
                   <span>You&apos;ll get </span>
                   <span
                     className={cn('rounded-lg bg-black/50 px-2', {
@@ -491,18 +472,15 @@ const StakeComponent = () => {
                   <span>the rewards</span>
                 </div>
               )}
-              <div className="text-[2rem] font-medium">{animatedAPY}% APY</div>
+              <div className="text-heading">{animatedAPY}% APY</div>
               <div className="text-xl">
-                ~{anticipatedMonthlyRewardAnimated}
+                ≈{anticipatedMonthlyRewardAnimated}
                 <span className="inline-flex items-center gap-1">
-                  <span className="m-1.5 inline-flex size-8 flex-col items-center justify-center rounded-full bg-black p-1.5 text-primary">
-                    <RealIcon className="size-full" />
-                  </span>
+                  <RealIcon size="sm" />
                   {token.symbol}
                 </span>
-                <br />
-                per month
               </div>
+              <div className="text-xl">per month</div>
             </h2>
           </div>
         </div>
@@ -511,10 +489,10 @@ const StakeComponent = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-xl">{shareSymbol} Balances</h2>
 
-          <h2 className="text-xl">
+          <span className="text-sm">
             Current multiplier:{' '}
             <span
-              className={cn('font-semibold', {
+              className={cn({
                 'text-primary': parseFloat(currentMultiplier) >= 1,
                 'text-primary-intermediate-1':
                   parseFloat(currentMultiplier) >= 1.25,
@@ -527,7 +505,7 @@ const StakeComponent = () => {
             >
               {currentMultiplier}x
             </span>
-          </h2>
+          </span>
         </div>
         <div>
           <DepositsIndicator />

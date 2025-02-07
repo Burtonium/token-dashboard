@@ -21,11 +21,9 @@ import {
   PackagePlus,
   Paintbrush,
   UserCog,
-  Box,
   Code,
   Rocket,
   HandCoins,
-  // Trophy,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { env, isDev } from '@/env';
@@ -88,7 +86,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
 
   return (
     <nav ref={navRef} className={cn('relative z-50', className)}>
-      <div className="lg:flex-start fixed top-12 z-30 flex h-0 w-full items-center justify-between gap-3 px-3 sm:px-5 lg:top-5 lg:p-8 lg:py-6">
+      <div className="lg:flex-start fixed top-12 z-30 flex h-0 w-full items-center justify-between gap-3 px-6 lg:top-[28px] lg:p-8 lg:py-6">
         <Burger
           className={cn('shrink-0 rounded-xl bg-light lg:hidden', {
             'shadow-dark': !isNavOpen,
@@ -105,15 +103,15 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
       </div>
       <div
         className={cn(
-          'fixed left-0 top-0 h-screen w-full bg-light px-8 py-6 pt-24 transition-transform sm:w-64',
+          'fixed left-0 top-0 h-screen w-full bg-light px-6 py-6 pt-24 transition-transform sm:w-64',
           {
             'translate-x-0': isNavOpen,
             '-translate-x-full lg:translate-x-0': !isNavOpen,
           },
         )}
       >
-        <ul className="flex flex-col gap-3">
-          <hr className="hidden h-px border-none bg-lighter lg:block" />
+        <ul className="flex flex-col gap-4 lg:gap-2">
+          <hr className="mb-4 hidden h-px border-none bg-lighter lg:block" />
           <li>
             <ConnectWallet className="w-full max-w-64" />
             {hasOverride && (
@@ -129,46 +127,42 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
             )}
             <DynamicUserProfile />
             {isAuthenticated && (
-              <div className="font-regular space-y-1 py-3 text-xl">
+              <div className="font-regular space-y-1 text-xl">
                 <p className="text-primary">{user?.username}</p>
               </div>
             )}
           </li>
-          <hr className="mt-3 h-px border-none bg-lighter" />
-          {vault.isAdmin.data && (
-            <li>
-              <NextLink
-                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
-                path="/admin"
-              >
-                <UserCog />
-                <span>Admin</span>
-              </NextLink>
-            </li>
-          )}
-          {env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && (
-            <li>
-              <NextLink
-                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
-                path="/styleguide"
-              >
-                <Paintbrush />
-                <span>Styleguide</span>
-              </NextLink>
-            </li>
-          )}
+          <hr className="my-4 h-px border-none bg-lighter" />
           <li>
             <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
               path="/"
             >
-              <House />
-              <span>Home</span>
+              <House strokeWidth={1} />
+              <span>Dashboard</span>
             </NextLink>
           </li>
           <li>
             <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
+              path="/link-realbet"
+            >
+              <Rocket strokeWidth={1} />
+              <span>Link Realbet</span>
+            </NextLink>
+          </li>
+          <li>
+            <NextLink
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
+              path="/staking"
+            >
+              <PackagePlus strokeWidth={1} />
+              <span>Stake and Earn</span>
+            </NextLink>
+          </li>
+          <li>
+            <NextLink
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
               path="/bonus"
             >
               <svg
@@ -190,49 +184,49 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>Vampire Bonus</span>
+              <span>Switch Bonus</span>
             </NextLink>
           </li>
           <li>
             <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
-              path="/staking"
-            >
-              <PackagePlus />
-              <span>Staking</span>
-            </NextLink>
-          </li>
-          <li>
-            <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
-              path="/link-to-win"
-            >
-              <Rocket />
-              <span>Link to Win</span>
-            </NextLink>
-          </li>
-          <li>
-            <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
-              path="/airdrop"
-            >
-              <Box />
-              <span>Airdrop</span>
-            </NextLink>
-          </li>
-          <li>
-            <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
               path="/token-claim"
             >
-              <HandCoins />
-              <span>Token Claim</span>
+              <HandCoins strokeWidth={1} />
+              <span>Vesting and Claims</span>
             </NextLink>
           </li>
+          {(isDev ||
+            !!vault.isAdmin.data ||
+            env.NEXT_PUBLIC_VERCEL_ENV !== 'production') && (
+            <hr className="hidden h-px border-none bg-lighter lg:block" />
+          )}
+          {env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && (
+            <li>
+              <NextLink
+                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
+                path="/styleguide"
+              >
+                <Paintbrush strokeWidth={1} />
+                <span>Styleguide</span>
+              </NextLink>
+            </li>
+          )}
+          {vault.isAdmin.data && (
+            <li>
+              <NextLink
+                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
+                path="/admin"
+              >
+                <UserCog />
+                <span>Admin</span>
+              </NextLink>
+            </li>
+          )}
           {isDev && (
             <li>
               <NextLink
-                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
+                className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
                 path="/developer"
               >
                 <Code />

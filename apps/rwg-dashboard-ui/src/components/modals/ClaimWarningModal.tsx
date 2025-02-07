@@ -63,7 +63,7 @@ const ClaimWarningModal: FC<
             <OctagonAlert className="inline size-12" />{' '}
             <span>
               It is highly advisable you link your Realbet account and play{' '}
-              <Link href="/link-to-win" className="font-bold">
+              <Link href="/link-realbet" className="font-bold">
                 Link to Win
               </Link>{' '}
               first which could contain Token Bonuses.
@@ -77,7 +77,7 @@ const ClaimWarningModal: FC<
               You still have{' '}
               <strong>{membership.data?.reedeemableTickets} tickets</strong>{' '}
               remaining in{' '}
-              <Link href="/link-to-win" className="font-bold">
+              <Link href="/link-realbet" className="font-bold">
                 Link to Win
               </Link>{' '}
               which could contain Token Bonuses.

@@ -24,17 +24,22 @@ export default function HomePage() {
   return (
     <main className="relative space-y-5 p-5">
       <Banner>
-        <div>
-          <h2 className="font-tusker text-6xl uppercase leading-none md:max-w-[66%] xl:text-7xl">
+        <div className="flex flex-col">
+          <h2 className="font-tusker text-6xl font-semibold uppercase leading-none md:max-w-[66%]">
             Welcome to the Real World
           </h2>
-          <p className="mt-3 text-lg md:max-w-[66%] xl:text-xl">
+          <div className="max-w-1/3 mt-6 font-sans text-base md:max-w-[66%]">
             Boost your rakeback and cashback rewards by owning and staking{' '}
             {token.symbol}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-5">
-            <Button asChild variant="default" size="lg">
-              <Link href={'/link-to-win'}>Get {token.symbol} Rewards</Link>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-5">
+            <Button
+              asChild
+              variant="default"
+              size="lg"
+              className="px-3 text-sm md:px-5"
+            >
+              <Link href={'/link-realbet'}>Get {token.symbol} Rewards</Link>
             </Button>
             <Button asChild variant="neutral" size="lg">
               <Link
@@ -43,6 +48,7 @@ export default function HomePage() {
                 href={
                   'https://realworldgaming.gitbook.io/the-real-paper/usdreal-token'
                 }
+                className="px-3 text-sm md:px-5"
               >
                 Why {token.symbol}
               </Link>
@@ -55,9 +61,9 @@ export default function HomePage() {
           <CardTitle>{token.symbol} Balance</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center gap-12 pb-3">
-            <div className="space-y-3">
-              <h3 className="text-md mb-2">Available</h3>
+          <div className="flex-col flex-wrap items-center gap-12 space-y-3 pb-3 md:flex md:flex-row md:space-y-0">
+            <div className="space-y-3 font-medium">
+              <h3 className="text-md mb-2 text-sm">Available</h3>
               <div className="text-3xl font-medium text-primary">
                 {token.isLoading ? (
                   <Skeleton className="inline-block h-6 w-24 rounded-full" />
@@ -69,9 +75,9 @@ export default function HomePage() {
                 )}
               </div>
             </div>
-            <div className="space-y-3">
-              <h3 className="text-md mb-2">Staked</h3>
-              <div className="text-3xl font-medium">
+            <div className="space-y-3 font-medium">
+              <h3 className="text-md mb-2 text-sm">Staked</h3>
+              <div className="text-3xl">
                 {vault.totalStaked.isLoading ? (
                   <Skeleton className="inline-block h-6 w-24 rounded-full" />
                 ) : (
@@ -105,7 +111,7 @@ export default function HomePage() {
         >
           <Link
             className="inset-0 block size-full"
-            href="/link-to-win"
+            href="/link-realbet"
             rel="noreferrer noopener"
           />
         </Card>
