@@ -8,6 +8,10 @@ import { Transfer } from "./types";
 import { insertTransactions } from "./queries/insertTransfers";
 import { getAddress } from "viem";
 
+if (!process.env.DB_URL) {
+  throw new Error("DB_URL environment variable is not set");
+}
+
 const config = {
   rpcEndpoint: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
   gateway: "https://v2.archive.subsquid.io/network/ethereum-sepolia",
