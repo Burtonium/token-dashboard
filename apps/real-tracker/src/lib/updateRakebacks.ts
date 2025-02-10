@@ -26,7 +26,9 @@ const rakebackTiers = [
 ] as const;
 
 const balanceToRakeback = (amount: string) => {
-  const balance = Number(formatUnits(BigInt(amount), 18)) * USD_PRICE_PER_REAL;
+  const balance =
+    Number(formatUnits(BigInt(amount.split(".")?.[0]), 18)) *
+    USD_PRICE_PER_REAL;
 
   return rakebackTiers.find(([threshold]) => balance >= threshold)?.[1];
 };
