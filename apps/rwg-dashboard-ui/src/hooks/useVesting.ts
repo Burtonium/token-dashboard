@@ -10,8 +10,10 @@ import assert from 'assert';
 import useNetworkId from './useNetworkId';
 import { encodePacked, keccak256 } from 'viem';
 import { hashFn } from '@wagmi/core/query';
+import { useToken } from './useToken';
 
 export const useVesting = () => {
+  const token = useToken();
   const { primaryWallet } = useDynamicContext();
   const { writeContractAsync } = useWriteContract();
   const { data: networkId } = useNetworkId();
@@ -207,6 +209,7 @@ export const useVesting = () => {
       await waitForTransactionReceipt(config, { hash: tx });
     },
     onSuccess: () => [
+      token.balance.refetch(),
       vestingSchedules.refetch(),
       releasableAmounts.refetch(),
       vestingSchedulesWithAmounts.refetch(),
