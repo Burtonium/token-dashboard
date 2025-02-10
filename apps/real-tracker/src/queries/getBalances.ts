@@ -18,8 +18,9 @@ const buildQuery = (addresses: string[]) => `
     SELECT
       address,
       SUM(CASE 
-          WHEN t.from = address THEN -t.value 
-          ELSE t.value 
+          WHEN t.from = address AND t.to <> address THEN -t.value
+          WHEN t.to = address AND t.from <> address THEN t.value
+          ELSE 0
       END) AS balance
     FROM "Transfers" t
     JOIN addresses a ON t.from = a.address OR t.to = a.address

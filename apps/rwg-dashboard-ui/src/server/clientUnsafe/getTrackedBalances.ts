@@ -26,6 +26,7 @@ export const getTrackedBalances = async (user: User) => {
       FROM "LinkedWallet" l
       JOIN "Transfers" t
         ON l.address = t.to
+        AND l.address <> t.from
       WHERE l."dynamicUserId" = ${user.id}
       UNION ALL
       SELECT
@@ -34,6 +35,7 @@ export const getTrackedBalances = async (user: User) => {
       FROM "LinkedWallet" l
       JOIN "Transfers" t
         ON l.address = t.from
+        AND l.address <> t.to
       WHERE l."dynamicUserId" = ${user.id}
     ) AS transfers
     GROUP BY token;
