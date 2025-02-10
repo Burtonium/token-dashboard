@@ -28,6 +28,9 @@ export const getRealbetProgression = authGuard(async (user) => {
       User.getVipLevel(realbetApi, { userId: link.realbetUserId }),
     ]);
 
+    // eslint-disable-next-line no-console
+    console.error({ rakeback, wagerLevel });
+
     return {
       rakeback,
       wagerLevel,
