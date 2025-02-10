@@ -23,18 +23,18 @@ export const getRealbetProgression = authGuard(async (user) => {
   }
 
   try {
-    const [rakeback, level] = await Promise.all([
+    const [rakeback, wagerLevel] = await Promise.all([
       User.getRakeback(realbetApi, { userId: link.realbetUserId }),
       User.getVipLevel(realbetApi, { userId: link.realbetUserId }),
     ]);
 
     return {
       rakeback,
-      level,
+      wagerLevel,
     };
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(error);
+    console.error((error as Error).message);
     return constructError('Something went wrong with the Realbet API');
   }
 });

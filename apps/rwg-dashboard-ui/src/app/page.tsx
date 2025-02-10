@@ -3,7 +3,7 @@
 import Banner from '@/components/banner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import brawlersPoster from '@/assets/images/brawlers-poster.png';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToken } from '@/hooks/useToken';
@@ -15,11 +15,19 @@ import { formatBalance } from '@/utils';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import RealIcon from '@/components/real-icon';
 import RealbetProgressionWidget from '@/components/realbet-progression-widget';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
+import StakingTiers from '@/components/modals/RealTokenTiers';
+import { useRealbetProgression } from '@/hooks/useRealbetProgression';
+import { Progress } from '@/components/ui/progress';
+import { useCasinoLink } from '@/hooks/useCasinoLink';
 
 export default function HomePage() {
   const token = useToken();
   const vault = useStakingVault();
   const { sdkHasLoaded } = useDynamicContext();
+  const progression = useRealbetProgression();
+  const loggedIn = useIsLoggedIn();
+  const casinoLink = useCasinoLink();
 
   return (
     <main className="relative space-y-5 p-5">
@@ -89,6 +97,75 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+          {loggedIn && casinoLink.isLinked && progression.isSuccess && (
+            <div className="mt-5">
+              <div className="mb-1 flex items-center justify-between">
+                <h3 className="text-lg">
+                  <StakingTiers>
+                    <button className="flex items-center gap-2 hover:text-primary">
+                      Staking Level <InfoCircledIcon className="size-5" />
+                    </button>
+                  </StakingTiers>
+                </h3>
+                <div>
+                  {progression.isLoading ? (
+                    <>
+                      <Skeleton className="w-18 inline h-4" /> /{' '}
+                      <Skeleton className="w-18 inline h-4" />
+                    </>
+                  ) : (
+                    progression.isSuccess && (
+                      <>
+                        {progression.data.rakeback.nextLevel === undefined ? (
+                          <span className="text-accent">MAX LEVEL</span>
+                        ) : (
+                          <>
+                            {progression.data.rakeback.dollarValueTracked.toLocaleString()}
+                            ${' '}
+                            {progression.data.rakeback.nextLevel && (
+                              <>
+                                /{' '}
+                                {progression.data.rakeback.nextLevel.threshold.toLocaleString()}
+                                $
+                              </>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )
+                  )}
+                </div>
+              </div>
+              <Progress
+                variant="primary"
+                value={progression.data.rakeback.progress}
+              />
+              <div className="mt-1 flex justify-between">
+                {progression.isLoading ? (
+                  <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                ) : (
+                  <h3 className="">
+                    Level {progression.data.rakeback.level?.rank} |{' '}
+                    {(
+                      (progression.data?.rakeback.level?.rate ?? 0) * 100
+                    ).toFixed()}
+                    % Rakeback
+                  </h3>
+                )}
+                {progression.isLoading ? (
+                  <Skeleton className="mt-0.5 inline-block h-3 w-24" />
+                ) : (
+                  <h3 className="">
+                    Next: Level {progression.data.rakeback.nextLevel?.rank} |{' '}
+                    {(
+                      (progression.data?.rakeback.nextLevel?.rate ?? 0) * 100
+                    ).toFixed(0)}
+                    % Rakeback
+                  </h3>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
       <RealbetProgressionWidget />

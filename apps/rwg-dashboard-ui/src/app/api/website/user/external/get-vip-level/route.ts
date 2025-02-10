@@ -1,11 +1,13 @@
 import { validateSignature } from '@/lib/utils/crypto';
-import { env } from '@/env';
+import { env, isDev } from '@/env';
 import { User } from '@bltzr-gg/realbet-api';
+import { assert } from 'console';
 
 const requestPath = 'api/gd/user/external/get-vip-level';
 const elapsed = 0;
 
 export async function POST(request: Request) {
+  assert(isDev, 'This is a mocked endpoint only available in development');
   const processingSignature = request.headers.get('X-Processing-Signature');
   if (!processingSignature) {
     return Response.json(

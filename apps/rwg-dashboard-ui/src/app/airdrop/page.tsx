@@ -35,7 +35,7 @@ export default function Airdrop() {
 
   return (
     <div className="p-6 md:p-5">
-      <h2 className="text-heading mb-3">
+      <h2 className="mb-3 text-heading">
         <Box className="mb-1 inline size-7 stroke-1" /> Airdrop Eligibility
       </h2>
       <p className="mb-8 leading-tight text-white/90">

@@ -42,7 +42,7 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
           })
           .catch((e) => {
             // eslint-disable-next-line no-console
-            console.error(e);
+            console.error((e as Error).message);
             throw new Error('Something went wrong creating wave membership.');
           }),
         tx.rewardWave
@@ -58,7 +58,7 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
           })
           .catch((e) => {
             // eslint-disable-next-line no-console
-            console.error(e);
+            console.error((e as Error).message);
             throw new Error('Something went wrong');
           }),
       ]);

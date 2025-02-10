@@ -16,15 +16,15 @@ import {
   TableBody,
   TableCell,
 } from '../ui/table';
-import { vipTiers } from '@bltzr-gg/realbet-api';
 import { formatWithSeparators } from '@/utils';
 import { cn } from '@/lib/cn';
+import {
+  useRealbetProgression,
+  rakebackTiers,
+} from '@/hooks/useRealbetProgression';
 
-type RealbetVipTiers = PropsWithChildren<{
-  currentRank?: number;
-}>;
-
-const TokenTiers: FC<RealbetVipTiers> = ({ children, currentRank }) => {
+const StakingTiers: FC<PropsWithChildren> = ({ children }) => {
+  const currentRank = useRealbetProgression()?.data.rakeback.level?.rank;
   const [open, setOpen] = useState(false);
 
   return (
@@ -35,20 +35,18 @@ const TokenTiers: FC<RealbetVipTiers> = ({ children, currentRank }) => {
       </DialogTrigger>
       <DialogContent className="border-transparent bg-zinc-950 px-2 sm:max-w-xl">
         <DialogHeader className="px-4">
-          <DialogTitle className="font-normal">
-            REALBET.IO VIP TIERS
-          </DialogTitle>
+          <DialogTitle className="font-normal">REAL TOKEN TIERS</DialogTitle>
         </DialogHeader>
         <Scrollable className="max-h-[80vh] w-full overflow-hidden px-4">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-2/5">Wagered</TableHead>
-                <TableHead>Tier</TableHead>
-                <TableHead>Cashback</TableHead>
+                <TableHead className="w-2/5">Staked + Balance</TableHead>
+                <TableHead>Level</TableHead>
+                <TableHead>Rakeback</TableHead>
               </TableRow>
             </TableHeader>
-            {vipTiers.map((item, index) => (
+            {rakebackTiers.map((tier, index) => (
               <TableBody key={index}>
                 <TableRow
                   className={cn({
@@ -60,14 +58,14 @@ const TokenTiers: FC<RealbetVipTiers> = ({ children, currentRank }) => {
                       'border border-r-0 border-primary': index === currentRank,
                     })}
                   >
-                    ${formatWithSeparators(item.totalWager)}
+                    ${formatWithSeparators(tier.threshold)}
                   </TableCell>
                   <TableCell
                     className={cn({
                       'border border-x-0 border-primary': index === currentRank,
                     })}
                   >
-                    {item.name}
+                    {tier.rank}
                   </TableCell>
                   <TableCell
                     className={cn({
@@ -75,7 +73,7 @@ const TokenTiers: FC<RealbetVipTiers> = ({ children, currentRank }) => {
                         index === currentRank,
                     })}
                   >
-                    +{(item.cashback * 100).toFixed(0)}% Cashback
+                    +{(tier.rate * 100).toFixed(0)}% Rakeback
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -87,4 +85,4 @@ const TokenTiers: FC<RealbetVipTiers> = ({ children, currentRank }) => {
   );
 };
 
-export default TokenTiers;
+export default StakingTiers;

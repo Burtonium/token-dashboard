@@ -173,7 +173,7 @@ export default function StakePreview() {
   return (
     <div className="grid grid-cols-1 gap-3 p-3 sm:gap-5 sm:p-5 md:grid-cols-2">
       <div className="w-full md:col-span-2">
-        <h2 className="text-heading mb-3">
+        <h2 className="mb-3 text-heading">
           <CalculatorIcon className="mb-1 inline" /> Staking Simulator
         </h2>
         <p className="mb-4 text-xl font-medium leading-tight text-white/80">

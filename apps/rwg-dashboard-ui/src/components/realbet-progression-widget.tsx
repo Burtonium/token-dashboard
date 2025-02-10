@@ -5,7 +5,7 @@ import { Check, Wallet2 } from 'lucide-react';
 import Link from 'next/link';
 import { Skeleton } from './ui/skeleton';
 import { Progress } from './ui/progress';
-import RealbetVipTiersModal from './modals/RealbetVipTiersModal';
+import RealbetVipTiersModal from './modals/RealbetWagerTiersModal';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { Button } from './ui/button';
@@ -54,25 +54,26 @@ const RealbetProgressionWidget = () => {
         ) : !link.isLinked && link.isSuccess ? (
           <p>Link your Realbet account to start tracking your progression.</p>
         ) : (
-          !progression.error && (
+          !progression.error &&
+          progression.data.wagerLevel && (
             <div className="flex gap-3">
               <div className="shrink-0">
                 {!progression.isSuccess && !progression.error ? (
                   <Skeleton className="size-24" />
                 ) : (
-                  <img
-                    className="w-24"
-                    alt={`Level icon for the ${progression.data?.level.data?.levelName} tier`}
-                    src={progression.data?.level.data?.levelIcon}
-                  />
+                  progression.data.wagerLevel && (
+                    <img
+                      className="w-24"
+                      alt={`Level icon for the ${progression.data.wagerLevel.data?.levelName} tier`}
+                      src={progression.data.wagerLevel.data?.levelIcon}
+                    />
+                  )
                 )}
               </div>
               <div className="w-full justify-between">
                 <div className="flex justify-between">
                   <h2 className="mb-1.5 leading-none">
-                    <RealbetVipTiersModal
-                      currentRank={progression.data?.level.data?.vipLevel}
-                    >
+                    <RealbetVipTiersModal>
                       <button className="hover:text-primary active:text-primary">
                         VIP Status
                         <QuestionMarkCircledIcon className="ml-1 inline-block" />
@@ -85,16 +86,18 @@ const RealbetProgressionWidget = () => {
                     ) : (
                       <>
                         $
-                        {progression.data?.level.data?.currentWager.toLocaleString()}{' '}
+                        {progression.data.wagerLevel.data?.currentWager.toLocaleString()}{' '}
                         / $
-                        {progression.data?.level.data?.nextLevelWager.toLocaleString()}
+                        {progression.data.wagerLevel.data?.nextLevelWager.toLocaleString()}
                       </>
                     )}
                   </p>
                 </div>
                 <Progress
                   variant="accent"
-                  value={(progression.data?.level.data?.percentage ?? 0) * 100}
+                  value={
+                    (progression.data.wagerLevel.data?.percentage ?? 0) * 100
+                  }
                 />
                 <div className="mt-1 flex justify-between">
                   {!progression.isSuccess && !progression.error ? (
@@ -105,18 +108,19 @@ const RealbetProgressionWidget = () => {
                   ) : (
                     <>
                       <p className="text-sm">
-                        {progression.data?.level.data?.levelName} |{' '}
+                        {progression.data.wagerLevel.data?.levelName} |{' '}
                         {(
-                          (progression.data?.level.vipTier?.cashback ?? 0) * 100
+                          (progression.data.wagerLevel.vipTier?.cashback ?? 0) *
+                          100
                         ).toFixed(0)}
                         % Cashback
                       </p>
-                      {progression.data?.level.nextVipTier && (
+                      {progression.data.wagerLevel.nextVipTier && (
                         <p className="text-sm">
-                          {progression.data?.level.nextVipTier?.name} |{' '}
+                          {progression.data.wagerLevel.nextVipTier?.name} |{' '}
                           {(
-                            (progression.data?.level.nextVipTier?.cashback ??
-                              0) * 100
+                            (progression.data.wagerLevel.nextVipTier
+                              ?.cashback ?? 0) * 100
                           ).toFixed(0)}
                           % Cashback
                         </p>

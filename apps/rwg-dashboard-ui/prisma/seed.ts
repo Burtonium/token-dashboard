@@ -80,8 +80,8 @@ main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async (e) => {
-    console.error(e);
+  .catch(async (e: Error) => {
+    console.error(e.message);
     await prisma.$disconnect();
     process.exit(1);
   });

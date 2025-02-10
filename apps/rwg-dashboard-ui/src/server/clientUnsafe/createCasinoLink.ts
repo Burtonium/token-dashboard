@@ -39,7 +39,7 @@ export const createCasinoLink_clientUnsafe = async ({
               WalletResponseSchema.parse(await response.json()).wallets,
           )
           // eslint-disable-next-line no-console
-          .catch((err) => console.error(err))) ?? [];
+          .catch((err) => console.error((err as Error).message))) ?? [];
       const dynamicUser = await tx.dynamicUser.upsert({
         where: { id: userId },
         update: {

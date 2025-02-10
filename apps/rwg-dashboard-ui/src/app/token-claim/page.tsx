@@ -37,7 +37,7 @@ const ClaimPage = () => {
   return (
     <div className="space-y-8 p-6 md:p-5">
       <div>
-        <h2 className="text-heading mb-3">
+        <h2 className="mb-3 text-heading">
           <HandCoins className="mb-1 inline size-7 stroke-1" /> Token Claim
         </h2>
         <p className="mb-4 leading-tight text-white/90">
@@ -53,7 +53,7 @@ const ClaimPage = () => {
             <div className="flex items-center gap-3 md:gap-5">
               <RealIcon size="lg" />
               <div>
-                <div className="md:text-heading text-xl">
+                <div className="text-xl md:text-heading">
                   {token.isLoading ? (
                     <Skeleton className="-mb-1 inline-block h-6 w-24 rounded-full" />
                   ) : (
@@ -143,7 +143,7 @@ const ClaimPage = () => {
                           </PopoverContent>
                         </Popover>
                       </div>
-                      <h3 className="text-heading flex items-center gap-1 text-right">
+                      <h3 className="flex items-center gap-1 text-right text-heading">
                         {formatBalance(claims.data?.amounts.claimed ?? 0n)}{' '}
                         <RealIcon size="sm" />
                       </h3>
@@ -162,7 +162,7 @@ const ClaimPage = () => {
                           </PopoverContent>
                         </Popover>
                       </div>
-                      <h3 className="text-heading flex items-center gap-1 text-right">
+                      <h3 className="flex items-center gap-1 text-right text-heading">
                         {formatBalance(claims.data?.amounts.claimedBonus ?? 0n)}{' '}
                         <RealIcon size="sm" />
                       </h3>
@@ -186,7 +186,7 @@ const ClaimPage = () => {
                             </PopoverContent>
                           </Popover>
                         </div>
-                        <h3 className="text-heading flex items-center gap-1 text-right">
+                        <h3 className="flex items-center gap-1 text-right text-heading">
                           {formatBalance(claims.data?.amounts.claimable ?? 0n)}{' '}
                           <RealIcon size="sm" />
                         </h3>
@@ -205,7 +205,7 @@ const ClaimPage = () => {
                             </PopoverContent>
                           </Popover>
                         </div>
-                        <h3 className="text-heading flex items-center gap-1 text-right">
+                        <h3 className="flex items-center gap-1 text-right text-heading">
                           {formatBalance(claims.data?.amounts.bonus ?? 0n)}{' '}
                           <RealIcon size="sm" />
                         </h3>

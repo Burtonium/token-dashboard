@@ -1,0 +1,17 @@
+manifestVersion: subsquid.io/v0.1
+name: real-tracker
+version: 1
+description: ERC20 token tracker for the REAL token
+build:
+deploy:
+  addons:
+    rpc:
+      - eth.http
+  processor:
+    cmd:
+      - sqd
+      - process:prod
+  api:
+    cmd:
+      - sqd
+      - serve:prod

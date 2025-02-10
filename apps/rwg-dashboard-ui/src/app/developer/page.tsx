@@ -220,7 +220,7 @@ const DeveloperPage = () => {
 
   return (
     <div className="p-5">
-      <h2 className="text-heading mb-3 font-medium">Developer Tools</h2>
+      <h2 className="mb-3 text-heading font-medium">Developer Tools</h2>
       <div className="flex flex-wrap gap-5">
         <div>
           <h3>Casino Link:</h3>

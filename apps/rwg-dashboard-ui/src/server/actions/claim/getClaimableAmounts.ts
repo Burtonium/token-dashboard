@@ -18,7 +18,7 @@ export const getClaimableAmounts = authGuard(
           claims: {
             where: {
               address: {
-                in: user.addresses.map((addr) => addr.toLowerCase()),
+                in: user.addresses.map((addr) => addr),
                 mode: 'insensitive',
               },
             },

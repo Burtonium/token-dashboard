@@ -11,3 +11,5 @@ export const TIERS = [
   { status: 'Black', rakeback: 9, tier: 250000 },
   { status: 'Black+', rakeback: 10, tier: 500000 },
 ] as const;
+
+export const REAL_TOKEN_PRICE = 0.03;
