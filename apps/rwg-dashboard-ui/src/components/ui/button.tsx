@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg text-sm ring-offset-background transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -22,13 +22,15 @@ const buttonVariants = cva(
           'border-0 bg-light text-foreground hover:bg-light/80 hover:text-primary',
         ghost:
           'bg-transparent text-primary hover:bg-primary hover:text-primary-foreground hover:drop-shadow-primary',
+        unset: '',
       },
       size: {
-        default: 'h-9 min-w-32 px-3 py-4',
+        default: 'h-9 min-w-40 px-3 py-5',
         sm: 'h-8 px-4 text-sm',
         lg: 'h-10 px-8 text-lg',
         xl: 'h-11 px-8 text-xl',
         icon: 'size-9',
+        unset: '',
       },
       loading: {
         true: 'animate-pulse pointer-events-none',
@@ -56,7 +58,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className, loading }))}
+        className={cn(buttonVariants({ variant, size, loading }), className)}
         ref={ref}
         disabled={props.disabled}
         {...props}

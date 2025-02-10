@@ -3,10 +3,27 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import dayjs from '@/dayjs';
 import { useToken } from '@/hooks/useToken';
-import { useStakingVault } from '@/hooks/useStakingVault';
+import {
+  type TierWithDecimalMult,
+  useStakingVault,
+} from '@/hooks/useStakingVault';
 import { cn } from '@/lib/cn';
 import { formatBalance } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
+
+const depositTierClasses = (tier: TierWithDecimalMult | undefined) =>
+  tier
+    ? {
+        'text-primary': tier.decimalMult < 0.5,
+        'text-primary-intermediate-1':
+          tier.decimalMult >= 0.5 && tier.decimalMult < 1,
+        'text-primary-intermediate-2':
+          tier.decimalMult >= 1 && tier.decimalMult < 1.5,
+        'text-primary-intermediate-3':
+          tier.decimalMult >= 1.5 && tier.decimalMult < 2,
+        'text-accent': tier.decimalMult >= 2,
+      }
+    : {};
 
 export const PreviousStakes = () => {
   const { deposits, claim, unstake, currentEpoch } = useStakingVault();
@@ -40,19 +57,16 @@ export const PreviousStakes = () => {
 
   return (
     <>
-      <div className="mb-2 mt-5 text-2xl text-lightest md:hidden">
-        Previous Stakes
-      </div>
       <div className="mb-2 mt-5 hidden w-full flex-col gap-3 md:col-span-2 md:grid md:grid-cols-6 md:gap-5">
-        <div className="grid-cols-subgrid gap-5 px-5 text-xl text-lightest md:col-span-6 md:grid">
+        <div className="grid-cols-subgrid gap-5 px-5 text-xs text-lightest md:col-span-6 md:grid">
           <h3>Amount</h3>
-          <h3>Lock Term</h3>
+          <h3>Lock term</h3>
           <h3>Reward</h3>
           <h3>Remaining</h3>
           <h3>Progress</h3>
         </div>
       </div>
-      <div className="flex flex-col gap-3 md:grid md:grid-cols-6 md:gap-5">
+      <div className="mt-4 flex flex-col gap-2 md:mt-0 md:grid md:grid-cols-6 md:gap-5">
         {deposits.data
           .filter((dep) => dep.amount > 0n)
           .map((deposit) => {
@@ -66,47 +80,40 @@ export const PreviousStakes = () => {
               <Card
                 key={`${deposit.startTime}-${deposit.amount}`}
                 className={cn(
-                  'items-center gap-2 px-5 py-3 text-center md:col-span-6 md:grid md:grid-cols-subgrid md:gap-5 md:text-left',
-                  {
-                    'border bg-lighter/80': remaining <= 0,
-                  },
+                  'grid grid-cols-3 items-center gap-2 px-5 py-3 md:col-span-6 md:grid-cols-subgrid md:gap-5 md:text-left',
                 )}
               >
-                <div className="text-lg font-medium">
+                <div className="col-span-2 md:col-span-1">
+                  <div className="text-xs text-muted md:hidden">Amount</div>
                   {formatBalance(deposit.amount)} {token.symbol}
                 </div>
-                <div className="text-lg">
+                <div className="text-right text-xs md:text-left">
+                  <div className="text-muted md:hidden">Lock term</div>
                   {deposit.tier
                     ? dayjs
                         .duration(Number(deposit.tier.lockPeriod), 'seconds')
                         .humanize()
                         .replace('a ', '1 ')
-                    : '—'}
+                    : '—'}{' '}
+                  <span
+                    className={cn(
+                      'md:hidden',
+                      depositTierClasses(deposit.tier),
+                    )}
+                  >
+                    ({deposit.tier?.decimalMult}x)
+                  </span>
                 </div>
                 <div
                   className={cn(
-                    'text-xl font-medium',
-                    deposit.tier
-                      ? {
-                          'text-primary': deposit.tier.decimalMult < 0.5,
-                          'text-primary-intermediate-1':
-                            deposit.tier.decimalMult >= 0.5 &&
-                            deposit.tier.decimalMult < 1,
-                          'text-primary-intermediate-2':
-                            deposit.tier.decimalMult >= 1 &&
-                            deposit.tier.decimalMult < 1.5,
-                          'text-primary-intermediate-3':
-                            deposit.tier.decimalMult >= 1.5 &&
-                            deposit.tier.decimalMult < 2,
-                          'text-accent': deposit.tier.decimalMult >= 2,
-                        }
-                      : {},
+                    'hidden md:block',
+                    depositTierClasses(deposit.tier),
                   )}
                 >
                   {deposit.tier?.decimalMult}x
                 </div>
                 <div
-                  className={cn('text-lg', {
+                  className={cn({
                     'text-accent': remaining <= 0,
                   })}
                 >
@@ -114,17 +121,25 @@ export const PreviousStakes = () => {
                     ? 'Unlocked'
                     : `Unlocks in ${dayjs.duration(remaining, 'seconds').humanize()}`}{' '}
                 </div>
-                <div>
+                <div
+                  className={cn('col-span-3 md:col-span-1', {
+                    'hidden md:block': remaining <= 0,
+                  })}
+                >
                   <Progress
                     className="mt-1.5 h-3"
                     value={progress}
                     variant={remaining <= 0 ? 'accent' : 'lightest'}
                   />
                 </div>
-                <div className="align-right">
+                <div
+                  className={cn('col-span-3 text-right md:col-span-1', {
+                    'hidden md:block': remaining > 0,
+                  })}
+                >
                   <Button
-                    variant="outline"
-                    className="border-none bg-teal-500 text-black"
+                    variant="neutral"
+                    size="sm"
                     onClick={() =>
                       unstakeDeposit.mutateAsync({
                         depositIndex: BigInt(deposit.depositIndex),
@@ -133,6 +148,7 @@ export const PreviousStakes = () => {
                     }
                     disabled={remaining > 0}
                     loading={unstakeDeposit.isPending}
+                    className="w-full px-4 py-2 md:w-auto"
                   >
                     Unstake
                   </Button>

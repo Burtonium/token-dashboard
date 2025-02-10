@@ -89,7 +89,7 @@ export default function DepositsIndicator() {
     <div>
       <div
         className={cn(
-          'flex h-4 w-full overflow-hidden rounded-full bg-lighter',
+          'flex h-3 w-full overflow-hidden rounded-full bg-lighter md:h-4',
           {
             'animate-pulse': !sdkHasLoaded || depositsResult.isLoading,
           },
@@ -102,7 +102,7 @@ export default function DepositsIndicator() {
           className="flex shrink-0 items-center justify-center overflow-hidden text-nowrap bg-primary transition-all duration-1000"
         >
           {groupedDeposits[0] && (
-            <span className="max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground">
+            <span className="hidden max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground md:inline">
               {formatBalance(groupedDeposits[0].amount)} {symbol}
             </span>
           )}
@@ -114,7 +114,7 @@ export default function DepositsIndicator() {
           className="flex shrink-0 items-center justify-center overflow-hidden text-nowrap bg-primary/75 transition-all delay-100 duration-1000"
         >
           {groupedDeposits[1] && (
-            <span className="max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground">
+            <span className="hidden max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground md:inline">
               {formatBalance(groupedDeposits[1].amount)} {symbol}
             </span>
           )}
@@ -126,7 +126,7 @@ export default function DepositsIndicator() {
           className="flex shrink-0 items-center justify-center overflow-hidden text-nowrap bg-primary/50 transition-all delay-200 duration-1000"
         >
           {groupedDeposits[2] && (
-            <span className="max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground">
+            <span className="hidden max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground md:inline">
               {formatBalance(groupedDeposits[2].amount)} {symbol}
             </span>
           )}
@@ -138,7 +138,7 @@ export default function DepositsIndicator() {
           className="flex shrink-0 items-center justify-center overflow-hidden text-nowrap bg-primary/25 transition-all delay-300 duration-1000"
         >
           {groupedDeposits[3] && (
-            <span className="max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground">
+            <span className="hidden max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground md:inline">
               {formatBalance(groupedDeposits[3].amount)} {symbol}
             </span>
           )}
@@ -150,18 +150,18 @@ export default function DepositsIndicator() {
           className="flex shrink-0 items-center justify-center overflow-hidden text-nowrap transition-all delay-400 duration-1000"
         >
           {groupedDeposits[4] && (
-            <span className="max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground">
+            <span className="hidden max-w-full overflow-hidden text-ellipsis px-1 text-xs text-primary-foreground md:inline">
               {formatBalance(groupedDeposits[4].amount)} {symbol}
             </span>
           )}
         </div>
       </div>
 
-      <p className="mt-1 flex flex-wrap gap-x-2 text-xs">
+      <p className="mt-2 flex flex-col flex-wrap gap-x-2 text-xs md:mt-1 md:flex-row">
         {groupedDeposits.map((deposit, index) => (
           <span key={index}>
             <span
-              className={`inline-block size-2 rounded-full ${colors[index]}`}
+              className={`inline-block size-2 rounded-full ${colors[index]} mr-1 md:mr-0`}
             />{' '}
             {`${deposit.percentage.toFixed(0)}% unlockable ${isPast(deposit.unlockTime) ? 'now' : `in ${dayjs.duration(toDurationSeconds(deposit.unlockTime), 'seconds').humanize()}`}`}
             <strong>{deposit.combined && index >= 3 ? '+' : ' '}</strong>

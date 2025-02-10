@@ -58,7 +58,7 @@ export default function Styleguide() {
   return (
     <div className="space-y-8 p-3 sm:p-5">
       <div>
-        <h2 className="mb-3 text-[2rem] font-medium">
+        <h2 className="mb-3 text-heading">
           <Paintbrush className="mb-1 inline size-9" /> Page Title
         </h2>
         <p className="mb-4 text-xl font-medium leading-tight text-white/80">

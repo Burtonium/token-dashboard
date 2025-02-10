@@ -173,7 +173,7 @@ export default function StakePreview() {
   return (
     <div className="grid grid-cols-1 gap-3 p-3 sm:gap-5 sm:p-5 md:grid-cols-2">
       <div className="w-full md:col-span-2">
-        <h2 className="mb-3 text-[2rem] font-medium">
+        <h2 className="mb-3 text-heading">
           <CalculatorIcon className="mb-1 inline" /> Staking Simulator
         </h2>
         <p className="mb-4 text-xl font-medium leading-tight text-white/80">
@@ -355,7 +355,7 @@ export default function StakePreview() {
                   <span>the rewards</span>
                 </div>
               )}
-              <div className="text-[2rem] font-medium">{animatedAPY}% APY</div>
+              <div className="text-heading font-medium">{animatedAPY}% APY</div>
               <div className="text-xl">
                 ~{anticipatedMonthlyRewardAnimated}
                 <span className="inline-flex items-center gap-1">

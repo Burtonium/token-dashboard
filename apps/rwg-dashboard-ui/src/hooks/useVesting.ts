@@ -9,6 +9,7 @@ import { tokenVestingAbi, tokenVestingConfig } from '@/contracts/generated';
 import assert from 'assert';
 import useNetworkId from './useNetworkId';
 import { encodePacked, keccak256 } from 'viem';
+import { hashFn } from '@wagmi/core/query';
 
 export const useVesting = () => {
   const { primaryWallet } = useDynamicContext();
@@ -32,15 +33,15 @@ export const useVesting = () => {
     ],
     enabled: !!primaryWallet && !!vestingContractAddress,
     queryFn: async () => {
+      assert(primaryWallet, 'Wallet required');
       assert(vestingContractAddress, 'Vesting contract address required');
-      const count = primaryWallet?.address
-        ? await readContract(config, {
-            abi: tokenVestingAbi,
-            address: vestingContractAddress,
-            functionName: 'getVestingSchedulesCountByBeneficiary',
-            args: [primaryWallet.address as `0x${string}`],
-          })
-        : Promise.resolve(0n);
+
+      const count = await readContract(config, {
+        abi: tokenVestingAbi,
+        address: vestingContractAddress,
+        functionName: 'getVestingSchedulesCountByBeneficiary',
+        args: [primaryWallet.address as `0x${string}`],
+      });
 
       return Number(count);
     },
@@ -129,17 +130,37 @@ export const useVesting = () => {
     },
   });
 
-  const vestingSchedulesWithAmounts = useMemo(() => {
-    return (
-      vestingSchedules.data?.map((schedule, index) => {
+  const vestingSchedulesWithAmounts = useQuery({
+    queryKey: [
+      'vestingSchedulesWithAmounts',
+      vestingSchedules.data,
+      releasableAmounts.data,
+    ],
+    queryKeyHashFn: hashFn,
+    enabled: !!vestingSchedules.data && !!releasableAmounts.data,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      assert(vestingSchedules.data, 'Vesting schedule data required');
+      assert(releasableAmounts.data, 'Releasable amounts required');
+      return vestingSchedules.data.map((schedule, index) => {
         return {
           ...schedule,
           id: releasableAmounts.data?.[index]?.id,
           releasableAmount: releasableAmounts.data?.[index]?.amount ?? 0n,
+          remaining: Math.max(
+            Number(schedule.start + schedule.duration) - Date.now() / 1000,
+            0,
+          ),
+          vestedPercentage:
+            Math.min(
+              (Date.now() / 1000 - Number(schedule.start)) /
+                Number(schedule.duration),
+              1,
+            ) * 100,
         };
-      }) ?? []
-    );
-  }, [vestingSchedules.data, releasableAmounts.data]);
+      });
+    },
+  });
 
   const withdrawableAmount = useMemo(
     () => releasableAmounts.data?.reduce((a, b) => a + b.amount, 0n) ?? 0n,
@@ -164,19 +185,6 @@ export const useVesting = () => {
     },
   });
 
-  const nextWithdrawal = useMemo(() => {
-    if (!vestingSchedulesWithAmounts?.length) {
-      return undefined;
-    }
-
-    // The oldest vesting from vestingSchedulesWithAmounts that has a releasable amount
-    const oldestReleasable = vestingSchedulesWithAmounts.find(
-      (schedule) => schedule.releasableAmount > 0n,
-    );
-
-    return oldestReleasable;
-  }, [vestingSchedulesWithAmounts]);
-
   const release = useMutation({
     mutationFn: async ({
       amount,
@@ -198,7 +206,11 @@ export const useVesting = () => {
 
       await waitForTransactionReceipt(config, { hash: tx });
     },
-    onSuccess: () => [vestingSchedules.refetch(), releasableAmounts.refetch()],
+    onSuccess: () => [
+      vestingSchedules.refetch(),
+      releasableAmounts.refetch(),
+      vestingSchedulesWithAmounts.refetch(),
+    ],
   });
 
   return {
@@ -208,7 +220,6 @@ export const useVesting = () => {
     withdrawableAmount,
     vestingSchedules: vestingSchedules.data ?? [],
     vestingSchedulesWithAmounts,
-    nextWithdrawal,
     release,
   };
 };

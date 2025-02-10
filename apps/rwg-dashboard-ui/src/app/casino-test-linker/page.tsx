@@ -50,7 +50,7 @@ export default function CasinoTestLinkerPage() {
         throw new Error('Failed to link account');
       }
 
-      router.push('/link-to-win');
+      router.push('/link-realbet');
     },
   });
 
@@ -69,7 +69,7 @@ export default function CasinoTestLinkerPage() {
           <p className="text-primary empty:hidden">
             {existingLink.data?.realbetUsername} linked.&nbsp;
             <Button asChild>
-              <Link className="font-bold text-primary" href="/link-to-win">
+              <Link className="font-bold text-primary" href="/link-realbet">
                 Go Back
               </Link>
             </Button>

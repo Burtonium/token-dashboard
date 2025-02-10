@@ -1,7 +1,6 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import RealIcon from '@/assets/images/R.svg';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
@@ -13,12 +12,13 @@ import AnimatedNumber from '@/components/ui/animated-number';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StakeComponent from './components/stake-component';
 import RewardComponent from './components/reward-component';
-import { Info } from 'lucide-react';
+import { Info, PackagePlus } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import RealIcon from '@/components/real-icon';
 
 export default function Stake() {
   const token = useToken();
@@ -70,26 +70,27 @@ export default function Stake() {
   ]);
 
   return (
-    <div className="w-full p-3 sm:p-5">
+    <div className="w-full p-6 md:p-5">
       <div className="w-full">
-        <h2 className="mb-3 text-[2rem] font-medium">REAL Staking Dashboard</h2>
-        <p className="text-lg leading-tight text-white/90">
+        <h2 className="mb-3 text-heading">
+          <PackagePlus className="mb-1 inline size-7 stroke-1" /> REAL Staking
+          Dashboard
+        </h2>
+        <p className="leading-tight text-white/90">
           Stake REAL tokens, earn rewards, and participate in platform
           governance
         </p>
       </div>
-      <div className="grid grid-cols-1 gap-3 py-3 sm:gap-5 md:grid-cols-3 md:py-5">
-        <Card className="flex flex-col justify-center gap-6 rounded-2xl border border-primary/15 p-8">
-          <h2>{token.symbol} balance</h2>
+      <div className="mt-3 grid grid-cols-1 gap-3 py-3 sm:gap-5 md:grid-cols-3 md:py-5">
+        <Card className="flex flex-col justify-center gap-2 rounded-2xl border border-primary/15 px-3 py-4 md:gap-4 md:p-6">
+          <h2 className="text-sm">{token.symbol} balance</h2>
           <p
             className={cn('flex items-center gap-3 text-xl', {
               'animate-pulse': !sdkHasLoaded || deposits.isLoading,
             })}
           >
-            <span className="inline-flex size-8 flex-col items-center justify-center rounded-full border-2 border-primary bg-black p-1.5 text-primary">
-              <RealIcon className="inline size-5" />
-            </span>
-            <span className="mb-1 text-3xl font-medium leading-none">
+            <RealIcon size="sm" className="ml-0 mt-0" />
+            <span className="mb-1 text-3xl leading-none">
               <AnimatedNumber
                 value={formatBalance(token.balance.data ?? 0n)}
                 decimals={2}
@@ -97,13 +98,13 @@ export default function Stake() {
             </span>
           </p>
         </Card>
-        <Card className="flex flex-col justify-center gap-6 rounded-2xl border border-primary/15 p-8">
+        <Card className="flex flex-col justify-center gap-2 rounded-2xl border border-primary/15 px-3 py-4 md:gap-4 md:p-6">
           <div className="flex items-center justify-between">
-            <h2>{shareSymbol} balance</h2>
+            <h2 className="text-sm">{shareSymbol} balance</h2>
 
             <Popover>
               <PopoverTrigger>
-                <Info className="text-muted-foreground" />
+                <Info className="text-muted-foreground" strokeWidth={1} />
               </PopoverTrigger>
               <PopoverContent align="start">
                 <div className="leading-tight">
@@ -117,10 +118,8 @@ export default function Stake() {
               'animate-pulse': !sdkHasLoaded || deposits.isLoading,
             })}
           >
-            <span className="inline-flex size-8 flex-col items-center justify-center rounded-full border-2 border-primary bg-black p-1.5 text-primary">
-              <RealIcon className="inline size-5" />
-            </span>
-            <span className="mb-1 text-3xl font-medium leading-none">
+            <RealIcon size="sm" className="ml-0 mt-0" />
+            <span className="mb-1 text-3xl leading-none">
               <AnimatedNumber
                 value={formatBalance(stakedBalance)}
                 decimals={2}
@@ -128,12 +127,12 @@ export default function Stake() {
             </span>
           </p>
         </Card>
-        <Card className="flex flex-col justify-center gap-6 rounded-2xl border border-primary/15 p-8">
+        <Card className="flex flex-col justify-center gap-2 rounded-2xl border border-primary/15 px-3 py-4 md:gap-4 md:p-6">
           <div className="flex items-center justify-between">
-            <h2>{token.symbol} rewards</h2>
+            <h2 className="text-sm">{token.symbol} rewards</h2>
             <Popover>
               <PopoverTrigger>
-                <Info className="text-muted-foreground" />
+                <Info className="text-muted-foreground" strokeWidth={1} />
               </PopoverTrigger>
               <PopoverContent align="start">
                 <div className="leading-tight">
@@ -148,17 +147,15 @@ export default function Stake() {
                 !sdkHasLoaded || deposits.isLoading || merkleProofs.isLoading,
             })}
           >
-            <span className="inline-flex size-8 flex-col items-center justify-center rounded-full border-2 border-primary bg-black p-1.5 text-primary">
-              <RealIcon className="inline size-5" />
-            </span>
-            <span className="mb-1 text-3xl font-medium leading-none">
+            <RealIcon size="sm" className="ml-0 mt-0" />
+            <span className="mb-1 text-3xl leading-none">
               <AnimatedNumber
                 value={formatBalance(rewards ?? 0n)}
                 decimals={2}
               />
             </span>
             <Button
-              className="rounded-lg"
+              size="sm"
               onClick={() =>
                 claim.mutateAsync(undefined, {
                   onSuccess: () => [token.balance.refetch()],
@@ -173,13 +170,19 @@ export default function Stake() {
         </Card>
       </div>
 
-      <div>
+      <div className="mt-2 md:mt-0">
         <Tabs defaultValue="stake">
-          <TabsList className="w-60">
-            <TabsTrigger value="stake" className="w-full text-lg font-normal">
+          <TabsList className="h-auto w-60 p-[5px]">
+            <TabsTrigger
+              value="stake"
+              className="w-full py-[6px] text-sm font-normal"
+            >
               Stake
             </TabsTrigger>
-            <TabsTrigger value="rewards" className="w-full text-lg font-normal">
+            <TabsTrigger
+              value="rewards"
+              className="w-full py-[6px] text-sm font-normal"
+            >
               Rewards
             </TabsTrigger>
           </TabsList>

@@ -26,6 +26,7 @@ import {
   Ticket,
   Trophy,
   Wallet2,
+  Frown,
 } from 'lucide-react';
 import RealIcon from '@/assets/images/R.svg';
 import GiftBoxes from '../../components/gift-boxes';
@@ -44,7 +45,7 @@ import {
 } from '@/components/ui/popover';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 
-export default function LinkToWinPage() {
+export default function LinkRealbetPage() {
   const token = useToken();
   const casinoLink = useCasinoLink();
   const { sdkHasLoaded } = useDynamicContext();
@@ -83,23 +84,23 @@ export default function LinkToWinPage() {
       <Banner frog={false}>
         <div className="flex flex-col items-start justify-between gap-5 md:flex-row">
           <div className="space-y-5">
-            <div className="inline-block rounded-sm bg-accent-2/80 px-5 py-2 font-monoline text-4xl text-accent-2-foreground xl:text-5xl">
+            <div className="inline-block rounded-sm bg-accent-2/80 px-5 py-2 font-monoline text-2xl text-accent-2-foreground">
               Link to Win
             </div>
             {showLinkPrompt && (
-              <p className="text-lg md:max-w-[66%] xl:text-xl">
+              <p className="text-sm md:max-w-full md:text-lg">
                 Link your wallet with your RealBet account to check your VIP
                 status!
               </p>
             )}
-            <p className="text-lg md:max-w-[66%] xl:text-xl">
+            <p className="text-sm md:max-w-full md:text-lg">
               VIPs get {currentWave.data?.ticketsPerMember} tickets to win.
               Prizes include {token.symbol} public sale bonuses and free RealBet
               credits.
             </p>
             {showLinkButton && (
               <Button
-                size="lg"
+                size="sm"
                 onClick={() => linkCasinoAccount.mutate()}
                 loading={
                   linkCasinoAccount.isPending ||
@@ -119,8 +120,8 @@ export default function LinkToWinPage() {
             <div>
               {showConnectButton && (
                 <Button
-                  className="py-6"
-                  size="lg"
+                  className="py-5"
+                  size="sm"
                   onClick={authHandler}
                   variant="default"
                 >
@@ -131,14 +132,14 @@ export default function LinkToWinPage() {
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-5 self-stretch text-center">
             <div>
-              <p className="text-2xl font-medium">
+              <p className="text-xl font-medium">
                 {currentWave.isLoading ? (
                   <Skeleton className="mx-auto mb-3 h-8 w-48 rounded-full" />
                 ) : (
                   (currentWave.data?.label ?? <>No current wave.</>)
                 )}
               </p>
-              <p>
+              <p className="font-sans text-sm">
                 {currentWave.isLoading ? (
                   <Skeleton className="mx-auto h-4 w-64 rounded-full" />
                 ) : (
@@ -163,13 +164,18 @@ export default function LinkToWinPage() {
                     <span>{currentWave.data?.totalSeats ?? 0}</span>
                   )}
                 </div>
-                <p className="font-medium text-muted">VIP spots remaining</p>
+                <p className="text-xs font-medium text-muted">
+                  VIP spots remaining
+                </p>
               </div>
             )}
             {showNotWhitelistedMessage && (
               <p className="mt-3">
-                <span className="bg-black/50 p-3 text-warning empty:hidden">
-                  Cannot yet join VIP.
+                <span className="p-3 empty:hidden">
+                  Cannot yet join{' '}
+                  <span className="text-accent">
+                    VIP <Frown className="mr-2 inline" />
+                  </span>
                 </span>
               </p>
             )}
@@ -227,8 +233,8 @@ export default function LinkToWinPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              <div className="flex items-center gap-2">
-                <Trophy className="inline size-6" /> Prize Pool
+              <div className="flex items-center gap-2 text-sm">
+                <Trophy className="inline size-4" /> Prize Pool
               </div>
             </CardTitle>
             <CardDescription>
@@ -240,7 +246,7 @@ export default function LinkToWinPage() {
               <div className="space-y-2">
                 <div className="flex w-full justify-between">
                   <div>
-                    <h3 className="text-md font-medium sm:text-lg">
+                    <h3 className="text-xl font-medium sm:text-lg">
                       <Rocket className="mb-1 inline size-4 text-primary md:size-6" />{' '}
                       Token Sale Bonus<span className="text-muted">*</span>
                     </h3>
@@ -249,7 +255,7 @@ export default function LinkToWinPage() {
                     </p>
                   </div>
 
-                  <div className="mt-1 text-right">
+                  <div className="mt-1 text-right text-sm">
                     {currentWave.data?.prizePools.TokenBonus ?? '0'} /{' '}
                     {currentWave.data?.totals.TokenBonus ?? '0'}{' '}
                     <small>remaining</small>
@@ -262,7 +268,7 @@ export default function LinkToWinPage() {
                     100
                   }
                 />
-                <p className="!mt-0.5 text-right text-xs text-muted">
+                <p className="!mt-0.5 text-left text-xs text-muted">
                   * must buy minimum public sale amount = total bonus amount
                   <br />
                   i.e. Win 500, spend 500 to unlock your 500
@@ -272,7 +278,7 @@ export default function LinkToWinPage() {
                 <div className="flex w-full justify-between">
                   <div>
                     <h3 className="text-md font-medium sm:text-lg">
-                      <Diamond className="mb-1 inline size-4 text-primary md:size-6" />{' '}
+                      <Diamond className="mb-1 inline size-4 text-xl text-primary md:size-6" />{' '}
                       Realbet Credits
                     </h3>
                     <p className="text-sm text-lightest">
@@ -280,7 +286,7 @@ export default function LinkToWinPage() {
                       Casino.
                     </p>
                   </div>
-                  <div className="mt-1 text-right">
+                  <div className="mt-1 text-right text-sm">
                     {currentWave.data?.prizePools.RealBetCredit ?? '0'} /{' '}
                     {currentWave.data?.totals.RealBetCredit ?? '0'}{' '}
                     <small>remaining</small>

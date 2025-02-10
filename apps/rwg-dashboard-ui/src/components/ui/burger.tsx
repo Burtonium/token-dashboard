@@ -12,7 +12,7 @@ const Burger = forwardRef<
   <button
     ref={ref}
     className={cn(
-      'relative flex size-12 items-center justify-center transition-all',
+      'relative flex size-6 items-center justify-center transition-all',
       className,
     )}
     id="icon"

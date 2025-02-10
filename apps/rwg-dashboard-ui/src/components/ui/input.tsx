@@ -36,7 +36,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div
         className={cn(
           'flex items-center rounded-md border border-input-border bg-transparent shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 has-[:focus-visible]:border-primary',
-          className,
           { 'animate-pulse': loading },
           {
             'h-8': size === 'sm',
@@ -44,6 +43,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             'h-16': size === 'lg',
           },
           error && 'border-destructive',
+          className,
         )}
       >
         {startAdornment && (

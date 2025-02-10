@@ -27,7 +27,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('flex flex-col space-y-1.5 p-5', className)}
+    className={cn('flex flex-col space-y-1.5 p-6 pb-4', className)}
     {...props}
   />
 ));
@@ -69,7 +69,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, loading = false, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('relative grow p-5 pt-0', className)}
+      className={cn('relative grow p-6 pt-0', className)}
       {...props}
     >
       {loading && (

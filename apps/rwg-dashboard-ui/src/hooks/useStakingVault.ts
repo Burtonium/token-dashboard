@@ -26,6 +26,8 @@ export type Tier = {
   multiplier: bigint;
 };
 
+export type TierWithDecimalMult = Tier & { decimalMult: number };
+
 export const useStakingVault = () => {
   const { isSuccess } = useNetworkId();
   const {
@@ -48,10 +50,13 @@ export const useStakingVault = () => {
         functionName: 'getTiers',
       });
 
-      return tiers.map((tier) => ({
-        ...tier,
-        decimalMult: parseFloat(formatEther(tier.multiplier)),
-      }));
+      return tiers.map(
+        (tier) =>
+          ({
+            ...tier,
+            decimalMult: parseFloat(formatEther(tier.multiplier)),
+          }) satisfies TierWithDecimalMult,
+      );
     },
   });
 
