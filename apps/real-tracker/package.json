@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "build": "rm -rf lib && tsc",
-    "start": "node -r dotenv/config lib/main.js"
+    "start": "node -r dotenv/config lib/main.js",
+    "deploy": "fly deploy --build-arg NPM_TOKEN=$(flyctl secrets list | grep NPM_TOKEN | awk '{print $2}')"
   },
   "dependencies": {
     "@bltzr-gg/realbet-api": "^1.2.1",
