@@ -9,6 +9,30 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { parseEther } from 'viem';
+import { useVesting } from '@/hooks/useVesting';
+import { CheckCircle2, Loader2, XCircleIcon } from 'lucide-react';
+import { UseQueryResult } from '@tanstack/react-query';
+import { CreateVestingSchedule } from './components/create-vesting-schedule';
+
+const PermissionIcon = ({
+  queryResult,
+}: {
+  queryResult: UseQueryResult<boolean, Error>;
+}) => {
+  if (queryResult.isLoading) {
+    return <Loader2 className="inline animate-spin" />;
+  }
+
+  if (queryResult.data) {
+    return (
+      <CheckCircle2 className="ml-2 inline size-4 fill-green-500 stroke-black" />
+    );
+  }
+
+  return (
+    <XCircleIcon className="ml-2 inline size-4 fill-red-500 stroke-black" />
+  );
+};
 
 const TierRow = ({ tier, index }: { tier: Tier; index: number }) => {
   const vault = useStakingVault();
@@ -60,12 +84,13 @@ const AdminPage: React.FC = () => {
 
   const { sdkHasLoaded } = useDynamicContext();
   const vault = useStakingVault();
+  const vesting = useVesting();
 
   if (!sdkHasLoaded || !vault.isAdmin.isSuccess) {
     return <Loading />;
   }
 
-  if (!vault.isAdmin.data) {
+  if (!vault.isAdmin.data && !vesting.isAdmin.data) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-5 p-5">
         <img className="w-[480px]" src={youGotMe.src} alt="You got me" />
@@ -89,8 +114,9 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl space-y-5 p-5">
-      <h1 className="text-3xl font-semibold">Admin Page</h1>
-      <h2 className="text-2xl">Tiers</h2>
+      <h1 className="text-3xl font-semibold">Admin</h1>
+      <h2 className="text-2xl">Staking</h2>
+      <h3 className="text-xl">Tiers</h3>
       <div className="grid grid-cols-3 gap-3">
         <div>Lockup time</div>
         <div>Multiplier</div>
@@ -99,7 +125,10 @@ const AdminPage: React.FC = () => {
           <TierRow key={index} tier={tier} index={index} />
         ))}
       </div>
-      <h2 className="text-2xl">Set reward for epoch</h2>
+      <h2 className="text-2xl">
+        Set reward for epoch
+        <PermissionIcon queryResult={vault.isAdmin} />
+      </h2>
       <div className="grid grid-cols-3 gap-3">
         <div>Epoch</div>
         <div>Reward (in ether REAL)</div>
@@ -143,6 +172,14 @@ const AdminPage: React.FC = () => {
           </Button>
         </div>
       </div>
+      <hr className="mb-3 w-full border-lighter" />
+      <h2 className="text-2xl">
+        Vesting
+        <PermissionIcon queryResult={vesting.isAdmin} />
+      </h2>
+
+      <h3 className="text-xl">Create schedule</h3>
+      <CreateVestingSchedule />
     </div>
   );
 };
