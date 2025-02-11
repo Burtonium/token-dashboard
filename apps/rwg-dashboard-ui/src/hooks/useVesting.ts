@@ -216,6 +216,63 @@ export const useVesting = () => {
     ],
   });
 
+  const createVestingSchedule = useMutation({
+    mutationFn: async ({
+      beneficiary,
+      start,
+      cliff,
+      duration,
+      slicePeriodSeconds,
+      revocable,
+      amount,
+    }: {
+      beneficiary: `0x${string}`;
+      start: bigint;
+      cliff: bigint;
+      duration: bigint;
+      slicePeriodSeconds: bigint;
+      revocable: boolean;
+      amount: bigint;
+    }) => {
+      if (!vestingContractAddress) {
+        throw new Error('Vesting contract required');
+      }
+
+      const tx = await writeContractAsync({
+        address: vestingContractAddress,
+        abi: tokenVestingConfig.abi,
+        functionName: 'createVestingSchedule',
+        args: [
+          beneficiary,
+          start,
+          cliff,
+          duration,
+          slicePeriodSeconds,
+          revocable,
+          amount,
+        ],
+      });
+
+      await waitForTransactionReceipt(config, { hash: tx });
+    },
+  });
+
+  const isAdmin = useQuery({
+    queryKey: ['isAdmin', primaryWallet?.address],
+    queryFn: async () => {
+      assert(vestingContractAddress, 'Vesting contract required');
+      assert(primaryWallet?.address, 'Wallet required');
+
+      const owner = await readContract(config, {
+        abi: tokenVestingAbi,
+        address: vestingContractAddress,
+        functionName: 'owner',
+      });
+
+      return owner === primaryWallet.address;
+    },
+  });
+
   return {
     vestingSchedulesCount: vestingSchedulesCount.data ?? 0n,
     releasableAmounts,
@@ -224,5 +281,7 @@ export const useVesting = () => {
     vestingSchedules: vestingSchedules.data ?? [],
     vestingSchedulesWithAmounts,
     release,
+    createVestingSchedule,
+    isAdmin,
   };
 };
