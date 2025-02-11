@@ -14,6 +14,7 @@ import {
 } from './schemas';
 import { upsertDynamicUser_clientUnsafe } from '@/server/clientUnsafe/upsertDynamicUser';
 import prisma from '@/server/prisma/client';
+import { updateRakebacks } from '@/server/actions/realbet/updateRakebacks';
 
 const verifySignature = ({
   secret,
@@ -50,6 +51,9 @@ const handleUserCreatedEvent = async (
       name: vc.walletName,
       id: vc.id,
     })),
+  }).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('Error creating user:', (e as Error).message);
   });
 
   return Response.json({
@@ -70,14 +74,18 @@ const handleUserUpdatedEvent = async (
       name: vc.walletName,
       id: vc.id,
     })),
-  });
+  })
+    .then(() => updateRakebacks(event.userId))
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.error('Error updating user:', (e as Error).message);
+    });
 
   return Response.json({
     success: true,
     message: 'User updated event processed',
   });
 };
-// Logic for handling 'user.updated' event
 
 const handleUserDeletedEvent = async (
   event: z.infer<typeof UserDeletedEventSchema>,
@@ -91,8 +99,10 @@ const handleUserDeletedEvent = async (
         deleted: true,
       },
     })
-    .catch(() => {
-      // ignore
+    .then(() => updateRakebacks(event.userId))
+    .catch((error: Error) => {
+      // eslint-disable-next-line no-console
+      console.error('Error deleting user:', error.message);
     });
   return Response.json({
     success: true,
@@ -114,9 +124,9 @@ const handleWalletCreatedEvent = async (
       ],
     },
     { deleteWallets: false },
-  ).catch((error) => {
+  ).catch((error: Error) => {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.log('Error handling wallet created event:', error.message);
   });
   return Response.json({
     success: true,
@@ -138,10 +148,12 @@ const handleWalletLinkedEvent = async (
       ],
     },
     { deleteWallets: false },
-  ).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.log(error);
-  });
+  )
+    .then(() => updateRakebacks(event.userId))
+    .catch((error: Error) => {
+      // eslint-disable-next-line no-console
+      console.log('Error handling wallet linked event:', error.message);
+    });
 
   return Response.json({
     success: true,
@@ -160,6 +172,7 @@ const handleWalletUnlinkedEvent = async (
         address: event.data.address,
       },
     })
+    .then(() => updateRakebacks(event.userId))
     .catch((e) => {
       // eslint-disable-next-line no-console
       console.error('Error unlinking wallet:', (e as Error).message);
@@ -183,6 +196,7 @@ const handleWalletTransferredEvent = async (
         dynamicUserId: event.userId,
       },
     })
+    .then(() => updateRakebacks(event.userId))
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.log(error);

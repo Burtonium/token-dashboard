@@ -116,7 +116,8 @@ export default function HomePage() {
                   ) : (
                     progression.isSuccess && (
                       <>
-                        {progression.data.rakeback.nextLevel === undefined ? (
+                        {progression.data.rakeback.level &&
+                        progression.data.rakeback.nextLevel === undefined ? (
                           <span className="text-accent">MAX LEVEL</span>
                         ) : (
                           <>

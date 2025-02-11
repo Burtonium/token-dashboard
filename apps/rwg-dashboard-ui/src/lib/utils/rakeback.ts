@@ -1,4 +1,5 @@
 import { REAL_TOKEN_PRICE } from '@/constants';
+import assert from 'assert';
 import { formatUnits } from 'viem';
 
 export const rakebackTiers = [
@@ -31,8 +32,10 @@ export const calculateRakebackFromReal = (amount: bigint) => {
   const index = tiers.findIndex((item) => item.threshold <= balance);
   const nextTier = tiers[index - 1];
 
+  assert(index >= 0, 'No rakeback tier found. This shouldnt happen.');
+
   return {
-    tier: tiers[index],
+    tier: tiers[index]!,
     nextTier,
   };
 };
