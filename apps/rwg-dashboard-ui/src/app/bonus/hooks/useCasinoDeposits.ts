@@ -3,7 +3,7 @@ import { useAuthenticatedQuery } from '@/hooks/useAuthenticatedQuery';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { calculateCasinoDepositTotals } from '@/server/actions/casino-deposits/calculateCasinoDepositTotals';
 import { claimCasinoDepositReward } from '@/server/actions/casino-deposits/claimCasinoDepositReward';
-import { fetchCasinoDepositTotals } from '@/server/actions/casino-deposits/fetchStoredCasinoDepositTotals';
+import { fetchCasinoDepositTotals } from '@/server/actions/casino-deposits/fetchCasinoDepositTotals';
 import { useMemo } from 'react';
 
 export const useCasinoDeposits = () => {

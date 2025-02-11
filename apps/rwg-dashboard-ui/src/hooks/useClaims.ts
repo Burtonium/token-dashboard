@@ -66,7 +66,9 @@ export const useClaims = () => {
           txs.push(
             (async () => {
               await publicClient.waitForTransactionReceipt({ hash: tx });
-              await updateClaimStatus(token, claim.id, 'Claimed', tx);
+              await serverActionErrorGuard(
+                updateClaimStatus(token, claim.id, 'Claimed', tx),
+              );
             })(),
           );
         }

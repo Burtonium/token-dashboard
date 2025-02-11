@@ -2,15 +2,11 @@
 
 import Banner from '@/components/banner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import brawlersPoster from '@/assets/images/brawlers-poster.png';
-import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToken } from '@/hooks/useToken';
 import { Button } from '@/components/ui/button';
-import stakingPoster from '@/assets/images/staking-poster.png';
-import linkToWinPoster from '@/assets/images/link-to-win-poster.png';
-import bonusChecker from '@/assets/images/bonus-checker-poster.png';
 import { formatBalance } from '@/utils';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import RealIcon from '@/components/real-icon';
@@ -20,11 +16,11 @@ import StakingTiers from '@/components/modals/RealTokenTiers';
 import { useRealbetProgression } from '@/hooks/useRealbetProgression';
 import { Progress } from '@/components/ui/progress';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
+import QuestTrack from '@/components/quest-track';
 
 export default function HomePage() {
   const token = useToken();
   const vault = useStakingVault();
-  const { sdkHasLoaded } = useDynamicContext();
   const progression = useRealbetProgression();
   const loggedIn = useIsLoggedIn();
   const casinoLink = useCasinoLink();
@@ -170,50 +166,7 @@ export default function HomePage() {
         </CardContent>
       </Card>
       <RealbetProgressionWidget />
-      <div className="z-20 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-        <Card
-          className="relative aspect-[6/7] overflow-hidden bg-cover transition-transform hover:scale-105"
-          style={{
-            backgroundImage: sdkHasLoaded ? `url(${brawlersPoster.src})` : '',
-          }}
-        >
-          <div className="absolute inset-0 z-10 flex size-full items-center justify-center bg-black/40 transition-all hover:bg-black/60">
-            <p className="font-tusker text-5xl font-semibold">Coming soon</p>
-          </div>
-        </Card>
-        <Card
-          className="relative aspect-[6/7] overflow-hidden bg-cover transition-transform hover:scale-105"
-          style={{
-            backgroundImage: sdkHasLoaded ? `url(${linkToWinPoster.src})` : '',
-          }}
-        >
-          <Link
-            className="inset-0 block size-full"
-            href="/link-realbet"
-            rel="noreferrer noopener"
-          />
-        </Card>
-        <Card
-          className="relative aspect-[6/7] overflow-hidden bg-cover"
-          style={{
-            backgroundImage: sdkHasLoaded ? `url(${stakingPoster.src})` : '',
-          }}
-        >
-          <div className="absolute inset-0 z-10 flex size-full items-center justify-center bg-black/40 transition-all hover:bg-black/60">
-            <p className="font-tusker text-5xl font-semibold">Coming soon</p>
-          </div>
-        </Card>
-        <Card
-          className="relative aspect-[6/7] overflow-hidden bg-cover"
-          style={{
-            backgroundImage: sdkHasLoaded ? `url(${bonusChecker.src})` : '',
-          }}
-        >
-          <div className="absolute inset-0 z-10 flex size-full items-center justify-center bg-black/40 transition-all hover:bg-black/60">
-            <p className="font-tusker text-5xl font-semibold">Coming soon</p>
-          </div>
-        </Card>
-      </div>
+      <QuestTrack />
     </main>
   );
 }

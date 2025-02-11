@@ -16,7 +16,7 @@ export const useCurrentWaveMembership = () => {
   const currentWave = useCurrentTicketWave();
 
   const membership = useAuthenticatedQuery({
-    enabled: loggedIn && accountLinked,
+    enabled: accountLinked,
     queryKey: ['currentWaveMembership', addresses],
     queryFn: getCurrentWaveMembership,
   });
@@ -87,6 +87,9 @@ export const useCurrentWaveMembership = () => {
     ...membership,
     canSubscribe,
     subscribe,
+    reedeemedTickets: rewardTotals
+      ? Object.values(rewardTotals).reduce((v, c) => v + c, 0)
+      : 0,
     hasMembership:
       currentWave.isSuccess && membership.isSuccess && !!membership.data,
     hasTicketsRemaining:

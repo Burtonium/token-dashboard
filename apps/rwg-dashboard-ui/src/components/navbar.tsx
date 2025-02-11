@@ -8,7 +8,8 @@ import React, {
   useState,
 } from 'react';
 import Link from 'next/link';
-import Logo from '@/assets/images/logo.svg';
+import logo from '@/assets/images/logo.png';
+import Icon from '@/assets/icons/realbet-face.svg';
 import { Burger } from './ui/burger';
 import { cn } from '@/lib/cn';
 import {
@@ -94,8 +95,13 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           isNavOpen={isNavOpen}
           setNavOpen={setNavOpen}
         />
-        <Link className="text-white hover:text-gray-300" href="/">
-          <Logo
+        <Link
+          className="flex items-center gap-3 text-white hover:text-gray-300"
+          href="/"
+        >
+          <Icon />
+          <img
+            src={logo.src}
             className="w-[106px] transition-colors hover:text-primary hover:drop-shadow-primary"
             aria-label="Real World Gaming Logo"
           />
