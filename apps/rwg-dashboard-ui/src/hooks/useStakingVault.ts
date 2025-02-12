@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import { useToken } from './useToken';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
-import { testTokenAbi, tokenStakingConfig } from '@/contracts/generated';
+import { tokenStakingConfig } from '@/contracts/generated';
 import { erc20Abi, formatEther } from 'viem';
 import assert from 'assert';
 import { isDev } from '@/env';
@@ -234,7 +234,7 @@ export const useStakingVault = () => {
       assert(contractAddress, 'Contract address not found');
 
       return readContract(config, {
-        abi: testTokenAbi,
+        abi: erc20Abi,
         address: tokenAddress,
         functionName: 'allowance',
         args: [primaryAddress as `0x${string}`, contractAddress],
