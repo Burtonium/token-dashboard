@@ -28,7 +28,7 @@ const QuestTrack = () => {
   return (
     <>
       <h2 className="text-2xl">Getting Started</h2>
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid items-center gap-5 lg:grid-cols-2 2xl:grid-cols-3">
         <Quest
           className="flex items-center justify-center p-5"
           completed={casinoLink.isSuccess && !!casinoLink.data}
