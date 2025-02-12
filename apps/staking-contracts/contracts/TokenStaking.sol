@@ -151,7 +151,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
     }
 
     // This function is for unstaking only. It does not claim rewards.
-    function unstake(uint256 stakeIndex) external nonReentrant whenNotPaused {
+    function _unstake(uint256 stakeIndex) internal {
         if (stakeIndex >= userStakes[msg.sender].length) {
             revert InvalidStakeIndex();
         }
@@ -184,6 +184,10 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
         emit Unstaked(msg.sender, amount);
     }
 
+    function unstake(uint256 stakeIndex) external nonReentrant whenNotPaused {
+        _unstake(stakeIndex);
+    }
+
     // Check if the stake is locked
     function isLocked(uint256 stakeIndex) public view returns (bool) {
         if (stakeIndex >= userStakes[msg.sender].length) {
@@ -213,9 +217,14 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
     function claimRewards(
         uint256 stakeIndex,
         uint32[] calldata epochs,
-        bytes32[][] calldata merkleProofs
+        bytes32[][] calldata merkleProofs,
+        bool unstakeAfterClaim
     ) external nonReentrant whenNotPaused {
         _claimRewards(stakeIndex, epochs, merkleProofs);
+
+        if (unstakeAfterClaim) {
+            _unstake(stakeIndex);
+        }
     }
 
     function calculateRewards(

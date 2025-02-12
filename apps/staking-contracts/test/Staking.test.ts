@@ -247,7 +247,7 @@ describe("TokenStaking", function () {
 
       // Claim rewards
       const claimTx = await staking.write.claimRewards(
-        [0n, [Number(previousEpoch)], [merkleTree.proofs[0].proof as `0x${string}`[]]],
+        [0n, [Number(previousEpoch)], [merkleTree.proofs[0].proof as `0x${string}`[]], false],
         {
           account: addr1.account,
         },
@@ -360,7 +360,58 @@ describe("TokenStaking", function () {
       // Default epoch rewards x 3
       const expectedBalance = parseEther("100") * numberOfEpochs;
 
-      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs], { account: addr1.account });
+      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs, false], { account: addr1.account });
+      await client.waitForTransactionReceipt({ hash: tx });
+
+      const logs = await client.getContractEvents({
+        address: staking.address,
+        abi: staking.abi,
+        eventName: "RewardClaimed",
+      });
+
+      expect(logs[0].args.user).to.equal(getAddress(addr1.account.address));
+      expect(logs[0].args.amount).to.equal(expectedBalance);
+    });
+
+    it("should allow user to unstake while claiming rewards", async function () {
+      const numberOfEpochs = 104n;
+
+      const client = await viem.getPublicClient();
+      const [admin, addr1, addr2] = await viem.getWalletClients();
+      const { staking, realToken } = await loadFixture(stakingModuleFixture);
+
+      await realToken.write.mint([staking.address, parseEther("1000000")]);
+      await realToken.write.mint([addr1.account.address, parseEther("1000")]);
+      await realToken.write.approve([staking.address, parseEther("100")], {
+        account: addr1.account,
+      });
+
+      await realToken.write.mint([staking.address, parseEther("10000")]);
+
+      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+
+      // Fast forward time
+      const epochDuration = await staking.read.epochDuration();
+      await time.increase(epochDuration * numberOfEpochs); // 3 epochs
+
+      const userStakes = await staking.read.getUserStakes([addr1.account.address]);
+
+      // Set Merkle root for epochs
+      const merkleTree = generateEpochMerkleTree([addr1.account.address, addr2.account.address]);
+
+      const epochs = [];
+      const merkleProofs = [];
+      for (var i = 0; i < Number(numberOfEpochs); i++) {
+        const thisEpoch = BigInt(userStakes[0].lastClaimEpoch) + BigInt(i + 1);
+        await staking.write.setMerkleRoot([thisEpoch, merkleTree.root]);
+        epochs.push(thisEpoch);
+        merkleProofs.push(merkleTree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? []);
+      }
+
+      // Default epoch rewards x 3
+      const expectedBalance = parseEther("100") * numberOfEpochs;
+
+      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs, true], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       const logs = await client.getContractEvents({
@@ -516,7 +567,7 @@ describe("TokenStaking", function () {
 
       // const hasVoted = await staking.read.hasVoted([15n, addr1.account.address, merkleProofs[0]]);
       // false
-      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs], { account: addr1.account });
+      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs, false], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       // Check rewards claimed

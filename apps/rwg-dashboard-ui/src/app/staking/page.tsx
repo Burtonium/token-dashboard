@@ -28,7 +28,7 @@ export default function Stake() {
     shareSymbol,
     currentEpoch,
     calculateRewards,
-    claim,
+    claimAll,
     merkleProofs,
   } = useStakingVault();
   const { sdkHasLoaded, primaryWallet } = useDynamicContext();
@@ -72,7 +72,7 @@ export default function Stake() {
   return (
     <div className="w-full p-6 md:p-5">
       <div className="w-full">
-        <h2 className="mb-3 text-heading">
+        <h2 className="text-heading mb-3">
           <PackagePlus className="mb-1 inline size-7 stroke-1" /> REAL Staking
           Dashboard
         </h2>
@@ -157,12 +157,12 @@ export default function Stake() {
             <Button
               size="sm"
               onClick={() =>
-                claim.mutateAsync(undefined, {
+                claimAll.mutateAsync(undefined, {
                   onSuccess: () => [token.balance.refetch()],
                 })
               }
               disabled={rewards === 0n}
-              loading={claim.isPending}
+              loading={claimAll.isPending}
             >
               Claim
             </Button>

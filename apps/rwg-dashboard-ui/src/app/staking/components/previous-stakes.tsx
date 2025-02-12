@@ -42,12 +42,15 @@ export const PreviousStakes = () => {
       }
 
       if (lastClaimEpoch < currentEpoch.epoch - 1) {
-        await claim.mutateAsync();
+        return claim.mutateAsync({
+          stakeIndex: depositIndex,
+          unstake: true,
+        });
+      } else {
+        return unstake.mutateAsync({
+          stakeIndex: depositIndex,
+        });
       }
-
-      await unstake.mutateAsync({
-        stakeIndex: depositIndex,
-      });
     },
   });
 
