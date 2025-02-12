@@ -36,12 +36,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useToken } from '@/hooks/useToken';
+import { formatUnixDate } from '@/utils/formatUnixDate';
 
 const space = env.NEXT_PUBLIC_SNAPSHOT_SPACE;
 const client = new snapshot.Client712(snapshotApiUrl);
-
-const formatDate = (unixMillis: number) =>
-  new Date(unixMillis * 1000).toLocaleString();
 
 const RewardComponent = () => {
   const token = useToken();
@@ -268,13 +266,13 @@ const RewardComponent = () => {
             <p className="flex w-full justify-between">
               <span>Start date:</span>
               <span>
-                {latestProposal ? formatDate(latestProposal.start) : ''}
+                {latestProposal ? formatUnixDate(latestProposal.start) : ''}
               </span>
             </p>
             <p className="flex w-full justify-between">
               <span>End date:</span>
               <span>
-                {latestProposal ? formatDate(latestProposal.end) : ''}
+                {latestProposal ? formatUnixDate(latestProposal.end) : ''}
               </span>
             </p>
             <p className="flex w-full justify-between">
@@ -342,7 +340,7 @@ const RewardComponent = () => {
                     {proposal.title}
                   </a>
                 </TableCell>
-                <TableCell>{formatDate(proposal.end)}</TableCell>
+                <TableCell>{formatUnixDate(proposal.end)}</TableCell>
                 <TableCell className="text-center md:text-left">
                   {userProposalVotes.data &&
                     (!!proposal.userVote || idx !== 0) && (

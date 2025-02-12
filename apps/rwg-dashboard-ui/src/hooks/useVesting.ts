@@ -27,9 +27,23 @@ export const useVesting = () => {
     ];
   }, [networkId]);
 
-  const vestingSchedulesCount = useQuery({
+  const totalVestingSchedulesCount = useQuery({
+    queryKey: ['totalVestingSchedulesCount', vestingContractAddress],
+    enabled: !!vestingContractAddress,
+    queryFn: () => {
+      assert(vestingContractAddress, 'Vesting contract address required');
+
+      return readContract(config, {
+        abi: tokenVestingAbi,
+        address: vestingContractAddress,
+        functionName: 'getVestingSchedulesCount',
+      });
+    },
+  });
+
+  const userVestingSchedulesCount = useQuery({
     queryKey: [
-      'vestingSchedulesCount',
+      'userVestingSchedulesCount',
       vestingContractAddress,
       primaryWallet?.address,
     ],
@@ -54,17 +68,17 @@ export const useVesting = () => {
       'vestingSchedules',
       vestingContractAddress,
       primaryWallet?.address,
-      vestingSchedulesCount.data,
+      userVestingSchedulesCount.data,
     ],
     enabled:
       !!primaryWallet &&
       !!vestingContractAddress &&
-      !!vestingSchedulesCount.data,
+      !!userVestingSchedulesCount.data,
     queryFn: async () => {
       assert(vestingContractAddress, 'Vesting contract required');
       assert(primaryWallet?.address, 'Wallet required');
 
-      const count = vestingSchedulesCount.data!;
+      const count = userVestingSchedulesCount.data!;
       const contracts = Array.from({ length: count }).map(
         (_, index: number) =>
           ({
@@ -88,9 +102,9 @@ export const useVesting = () => {
     queryKey: [
       'vestingReleasableAmounts',
       vestingContractAddress,
-      vestingSchedulesCount.data,
+      userVestingSchedulesCount.data,
     ],
-    enabled: !!vestingContractAddress && !!vestingSchedulesCount.data,
+    enabled: !!vestingContractAddress && !!userVestingSchedulesCount.data,
     refetchInterval: 60_000,
     queryFn: async () => {
       assert(primaryWallet?.address, 'Wallet required');
@@ -98,7 +112,7 @@ export const useVesting = () => {
       assert(tokenVestingConfig.abi, 'Vesting contract ABI required');
 
       const vestingScheduleIds = Array.from(
-        { length: vestingSchedulesCount.data! },
+        { length: userVestingSchedulesCount.data! },
         (_, index) =>
           keccak256(
             encodePacked(
@@ -257,6 +271,24 @@ export const useVesting = () => {
     },
   });
 
+  const revoke = useMutation({
+    mutationKey: ['revoke', vestingContractAddress],
+    mutationFn: async (id: `0x${string}`) => {
+      if (!vestingContractAddress) {
+        throw new Error('Vesting contract required');
+      }
+
+      const tx = await writeContractAsync({
+        address: vestingContractAddress,
+        abi: tokenVestingAbi,
+        functionName: 'revoke',
+        args: [id],
+      });
+
+      await waitForTransactionReceipt(config, { hash: tx });
+    },
+  });
+
   const isAdmin = useQuery({
     queryKey: ['isAdmin', primaryWallet?.address],
     queryFn: async () => {
@@ -273,8 +305,51 @@ export const useVesting = () => {
     },
   });
 
+  const getVestingIdsAtIndices = (indices: number[]) => {
+    if (!vestingContractAddress) {
+      throw new Error('Vesting contract required');
+    }
+
+    const contracts = indices.map(
+      (index) =>
+        ({
+          address: vestingContractAddress,
+          abi: tokenVestingConfig.abi,
+          functionName: 'getVestingIdAtIndex',
+          args: [index],
+        }) as const,
+    );
+
+    return multicall(config, {
+      contracts,
+      allowFailure: false,
+    });
+  };
+
+  const getVestingSchedulesByIds = (ids: `0x${string}`[]) => {
+    if (!vestingContractAddress) {
+      throw new Error('Vesting contract required');
+    }
+
+    const contracts = ids.map(
+      (id) =>
+        ({
+          address: vestingContractAddress,
+          abi: tokenVestingConfig.abi,
+          functionName: 'getVestingSchedule',
+          args: [id],
+        }) as const,
+    );
+
+    return multicall(config, {
+      contracts,
+      allowFailure: false,
+    });
+  };
+
   return {
-    vestingSchedulesCount: vestingSchedulesCount.data ?? 0n,
+    userVestingSchedulesCount: userVestingSchedulesCount.data ?? 0n,
+    totalVestingSchedulesCount: Number(totalVestingSchedulesCount.data ?? 0n),
     releasableAmounts,
     vestingAmount,
     withdrawableAmount,
@@ -282,6 +357,9 @@ export const useVesting = () => {
     vestingSchedulesWithAmounts,
     release,
     createVestingSchedule,
+    getVestingIdsAtIndices,
+    getVestingSchedulesByIds,
+    revoke,
     isAdmin,
   };
 };
