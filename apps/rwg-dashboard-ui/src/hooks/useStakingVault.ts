@@ -369,10 +369,12 @@ export const useStakingVault = () => {
       stakeIndex,
       epochs,
       merkleProofs,
+      unstake,
     }: {
       stakeIndex: bigint;
       epochs: number[];
       merkleProofs: `0x${string}`[][];
+      unstake: boolean;
     }) => {
       if (!contractAddress) {
         throw new Error('Contract address not found');
@@ -388,7 +390,7 @@ export const useStakingVault = () => {
         address: contractAddress,
         abi: tokenStakingConfig.abi,
         functionName: 'claimRewards',
-        args: [stakeIndex, epochs, merkleProofs],
+        args: [stakeIndex, epochs, merkleProofs, unstake],
         account: primaryWallet.address as `0x${string}`,
       });
 
@@ -454,6 +456,60 @@ export const useStakingVault = () => {
   });
 
   const claim = useMutation({
+    mutationFn: async ({
+      stakeIndex,
+      unstake,
+    }: {
+      stakeIndex: bigint;
+      unstake: boolean;
+    }) => {
+      if (!merkleProofs.data) {
+        return;
+      }
+      if (!currentEpoch) {
+        return;
+      }
+
+      const deposit = deposits.data?.find(
+        (d) => d.depositIndex === Number(stakeIndex),
+      );
+      if (!deposit) {
+        throw new Error('Deposit not found');
+      }
+
+      if (deposit.lastClaimEpoch === currentEpoch.epoch - 1) {
+        return;
+      }
+
+      const votedProofs = merkleProofs.data.filter(
+        (proof) => proof.epoch > deposit.lastClaimEpoch,
+      );
+      const epochs = new Array(currentEpoch.epoch - 1 - deposit.lastClaimEpoch)
+        .fill(0)
+        .map((_, i) => i + deposit.lastClaimEpoch + 1);
+
+      const proofs = epochs.map((epoch) => {
+        const proof = votedProofs.find((p) => p.epoch === epoch);
+        if (!proof) {
+          return [];
+        }
+
+        return proof.proof.split(',') as `0x${string}`[];
+      });
+
+      return claimRewards.mutateAsync({
+        stakeIndex: BigInt(deposit.depositIndex),
+        epochs,
+        merkleProofs: proofs,
+        unstake,
+      });
+    },
+  });
+
+  /**
+   * Claim all rewards, for all stakes
+   */
+  const claimAll = useMutation({
     mutationFn: async () => {
       if (!merkleProofs.data) {
         return;
@@ -495,6 +551,7 @@ export const useStakingVault = () => {
             stakeIndex: BigInt(deposit.depositIndex),
             epochs,
             merkleProofs: proofs,
+            unstake: false,
           }),
         );
       });
@@ -527,6 +584,7 @@ export const useStakingVault = () => {
     merkleProofs,
     totalStaked,
     claim,
+    claimAll,
     shareSymbol: 'sREAL',
   };
 };

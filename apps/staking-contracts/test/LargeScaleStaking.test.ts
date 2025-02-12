@@ -64,7 +64,7 @@ describe("TokenStaking Large Scale Test", function () {
         if (userStakes.length > 0) {
           const proof = merkleTree.proofs.find((x) => x.address === users[i].account.address)?.proof ?? [];
 
-          await staking.write.claimRewards([0n, [thisEpoch], [proof]], { account: users[i].account });
+          await staking.write.claimRewards([0n, [thisEpoch], [proof], false], { account: users[i].account });
         }
       }
 
