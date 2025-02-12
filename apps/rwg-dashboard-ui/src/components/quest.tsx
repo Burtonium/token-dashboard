@@ -34,7 +34,7 @@ const Quest: React.FC<
         </>
       )}
 
-      <div className="relative z-20">{!loading && children}</div>
+      <div className="relative z-20">{children}</div>
     </div>
   );
 };

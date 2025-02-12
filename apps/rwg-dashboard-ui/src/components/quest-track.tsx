@@ -32,7 +32,7 @@ const QuestTrack = () => {
         <Quest
           className="flex items-center justify-center p-5"
           completed={casinoLink.isSuccess && !!casinoLink.data}
-          loading={casinoLink.isPending}
+          loading={casinoLink.isLoading}
           image={quest1.src}
         >
           <div className="flex items-end gap-5">
@@ -57,10 +57,7 @@ const QuestTrack = () => {
         </Quest>
         <Quest
           className="flex items-center justify-center p-5"
-          loading={
-            casinoLink.isPending ||
-            (casinoLink.isLinked && membership.isPending)
-          }
+          loading={casinoLink.isLoading || membership.isLoading}
           completed={membership.isSuccess && membership.reedeemedTickets > 0}
           image={quest2.src}
         >
@@ -86,7 +83,7 @@ const QuestTrack = () => {
         </Quest>
         <Quest
           className="flex items-center justify-center p-5"
-          loading={casinoDeposits.isPending}
+          loading={casinoDeposits.isLoading}
           completed={casinoDeposits.data?.status === 'Success'}
           image={quest3.src}
         >
@@ -109,7 +106,7 @@ const QuestTrack = () => {
         </Quest>
         <Quest
           className="flex items-center justify-center p-8"
-          loading={transactions.isPending}
+          loading={transactions.isLoading}
           completed={transactions.data?.length > 0}
           image={quest4.src}
         >
@@ -138,7 +135,7 @@ const QuestTrack = () => {
         </Quest>
         <Quest
           className="flex items-center justify-center p-8"
-          loading={claims.isPending}
+          loading={claims.isLoading}
           completed={allClaimed}
           image={quest5.src}
         >
