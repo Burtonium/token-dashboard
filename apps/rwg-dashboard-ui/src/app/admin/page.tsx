@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { parseEther } from 'viem';
 import { useVesting } from '@/hooks/useVesting';
 import { CheckCircle2, Loader2, XCircleIcon } from 'lucide-react';
-import { UseQueryResult } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
 import { CreateVestingSchedule } from './components/create-vesting-schedule';
+import { VestingScheduleList } from './components/vesting-schedule-list';
 
 const PermissionIcon = ({
   queryResult,
@@ -113,63 +114,65 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl space-y-5 p-5">
+    <div className="space-y-5 p-5">
       <h1 className="text-3xl font-semibold">Admin</h1>
-      <h2 className="text-2xl">Staking</h2>
-      <h3 className="text-xl">Tiers</h3>
-      <div className="grid grid-cols-3 gap-3">
-        <div>Lockup time</div>
-        <div>Multiplier</div>
-        <div></div>
-        {vault.tiers.data?.map((tier, index) => (
-          <TierRow key={index} tier={tier} index={index} />
-        ))}
-      </div>
-      <h2 className="text-2xl">
-        Set reward for epoch
-        <PermissionIcon queryResult={vault.isAdmin} />
-      </h2>
-      <div className="grid grid-cols-3 gap-3">
-        <div>Epoch</div>
-        <div>Reward (in ether REAL)</div>
-        <div></div>
-        <div>
-          <Input
-            type="number"
-            value={epoch}
-            onChange={(e) => {
-              setEpoch(parseInt(e.target.value));
-            }}
-            className="w-full"
-          />
+      <div className="max-w-3xl">
+        <h2 className="text-2xl">Staking</h2>
+        <h3 className="text-xl">Tiers</h3>
+        <div className="grid grid-cols-3 gap-3">
+          <div>Lockup time</div>
+          <div>Multiplier</div>
+          <div></div>
+          {vault.tiers.data?.map((tier, index) => (
+            <TierRow key={index} tier={tier} index={index} />
+          ))}
         </div>
-        <div>
-          <Input
-            value={reward}
-            onChange={(e) => setReward(e.target.value)}
-            className="w-full"
-          />
-        </div>
-        <div>
-          <Button
-            onClick={() =>
-              vault.setRewardForEpoch.mutateAsync(
-                {
-                  epoch,
-                  reward: parseEther(reward),
-                },
-                {
-                  onSuccess: () => {
-                    setReward('');
-                    setEpoch(0);
+        <h2 className="text-2xl">
+          Set reward for epoch
+          <PermissionIcon queryResult={vault.isAdmin} />
+        </h2>
+        <div className="grid grid-cols-3 gap-3">
+          <div>Epoch</div>
+          <div>Reward (in ether REAL)</div>
+          <div></div>
+          <div>
+            <Input
+              type="number"
+              value={epoch}
+              onChange={(e) => {
+                setEpoch(parseInt(e.target.value));
+              }}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <Input
+              value={reward}
+              onChange={(e) => setReward(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <Button
+              onClick={() =>
+                vault.setRewardForEpoch.mutateAsync(
+                  {
+                    epoch,
+                    reward: parseEther(reward),
                   },
-                },
-              )
-            }
-            loading={vault.setRewardForEpoch.isPending}
-          >
-            Set
-          </Button>
+                  {
+                    onSuccess: () => {
+                      setReward('');
+                      setEpoch(0);
+                    },
+                  },
+                )
+              }
+              loading={vault.setRewardForEpoch.isPending}
+            >
+              Set
+            </Button>
+          </div>
         </div>
       </div>
       <hr className="mb-3 w-full border-lighter" />
@@ -178,8 +181,13 @@ const AdminPage: React.FC = () => {
         <PermissionIcon queryResult={vesting.isAdmin} />
       </h2>
 
-      <h3 className="text-xl">Create schedule</h3>
-      <CreateVestingSchedule />
+      <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-3">
+        <CreateVestingSchedule />
+        <div className="col-span-2">
+          <VestingScheduleList />
+        </div>
+        <div></div>
+      </div>
     </div>
   );
 };
