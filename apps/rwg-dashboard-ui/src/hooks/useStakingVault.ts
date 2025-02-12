@@ -504,6 +504,13 @@ export const useStakingVault = () => {
         unstake,
       });
     },
+    onSuccess: () =>
+      Promise.all([
+        deposits.refetch(),
+        shares.refetch(),
+        balance.refetch(),
+        totalStaked.refetch(),
+      ]),
   });
 
   /**
@@ -558,7 +565,13 @@ export const useStakingVault = () => {
 
       await Promise.all(promises);
     },
-    onSuccess: () => [totalStaked.refetch()],
+    onSuccess: () =>
+      Promise.all([
+        deposits.refetch(),
+        shares.refetch(),
+        balance.refetch(),
+        totalStaked.refetch(),
+      ]),
   });
 
   return {
