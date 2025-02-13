@@ -29,6 +29,7 @@ model LinkedWallet {
   dynamicUserId         String
   casinoDepositTotals   CasinoDepositTotal[]
   memberships           WaveMembership[]
+  lastSelectedAt        DateTime?                   
 
   @@unique([address, dynamicUserId, chain])
 }

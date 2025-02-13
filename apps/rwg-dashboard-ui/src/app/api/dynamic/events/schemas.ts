@@ -18,7 +18,7 @@ const GenericEventSchema = z.object({
   }),
 });
 
-const VerifiedCredentialsSchema = z.object({
+const VerifiedCredentialSchema = z.object({
   chain: z.string(),
   address: z.string(),
   walletName: z.string(),
@@ -26,17 +26,26 @@ const VerifiedCredentialsSchema = z.object({
   id: z.string().uuid(),
 });
 
+type VerifiedCredential = z.infer<typeof VerifiedCredentialSchema>;
+
+const Credentials = z.preprocess(
+  (val) =>
+    Array.isArray(val)
+      ? (val.filter(
+          (vc: { address: string }) => typeof vc.address === 'string',
+        ) as VerifiedCredential[])
+      : [],
+  z.array(VerifiedCredentialSchema),
+);
+
 export const UserCreatedEventSchema = GenericEventSchema.extend({
   eventName: z.literal('user.created'),
   data: z.object({
     projectEnvironmentId: z.string().uuid(),
     newUser: z.boolean(),
-    verifiedCredentials: z.array(VerifiedCredentialsSchema),
+    verifiedCredentials: Credentials,
     id: z.string().uuid(),
     sessionId: z.string().uuid(),
-    firstVisit: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid timestamp for firstVisit',
-    }),
     email: z.string().email(),
   }),
 });
@@ -59,7 +68,7 @@ export const UserUpdatedEventSchema = GenericEventSchema.extend({
   eventName: z.literal('user.updated'),
   data: z.object({
     projectEnvironmentId: z.string().uuid(),
-    verifiedCredentials: z.array(VerifiedCredentialsSchema),
+    verifiedCredentials: Credentials,
     id: z.string().uuid(),
     firstVisit: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid timestamp for firstVisit',

@@ -3,8 +3,8 @@ import * as crypto from 'crypto';
 import { type z } from 'zod';
 import {
   EventsSchema,
-  type TestEventSchema,
   type UserCreatedEventSchema,
+  type TestEventSchema,
   type UserUpdatedEventSchema,
   type UserDeletedEventSchema,
   type WalletCreatedEventSchema,
@@ -15,6 +15,7 @@ import {
 import { upsertDynamicUser_clientUnsafe } from '@/server/clientUnsafe/upsertDynamicUser';
 import prisma from '@/server/prisma/client';
 import { updateRakebacks } from '@/server/actions/realbet/updateRakebacks';
+import * as Sentry from '@sentry/nextjs';
 
 const verifySignature = ({
   secret,
@@ -234,6 +235,9 @@ export async function POST(request: Request) {
   const event = EventsSchema.safeParse(JSON.parse(rawBody));
 
   if (!event.success) {
+    Sentry.captureMessage(
+      `Error when processing user.created dynamic event: ${event.error.message}`,
+    );
     return Response.json(
       {
         success: false,
