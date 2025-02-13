@@ -46,12 +46,6 @@ const handleUserCreatedEvent = async (
   await upsertDynamicUser_clientUnsafe({
     id: event.userId,
     email: event.data.email,
-    wallets: event.data.verifiedCredentials.map((vc) => ({
-      chain: vc.chain,
-      address: vc.address,
-      name: vc.walletName,
-      id: vc.id,
-    })),
   }).catch((e) => {
     // eslint-disable-next-line no-console
     console.error('Error creating user:', (e as Error).message);
@@ -69,12 +63,6 @@ const handleUserUpdatedEvent = async (
   await upsertDynamicUser_clientUnsafe({
     id: event.userId,
     username: event.data.username,
-    wallets: event.data.verifiedCredentials.map((vc) => ({
-      chain: vc.chain,
-      address: vc.address,
-      name: vc.walletName,
-      id: vc.id,
-    })),
   })
     .then(() => updateRakebacks(event.userId))
     .catch((e) => {
@@ -236,7 +224,7 @@ export async function POST(request: Request) {
 
   if (!event.success) {
     Sentry.captureMessage(
-      `Error when processing user.created dynamic event: ${event.error.message}`,
+      `Error when processing dynamic event: ${event.error.message}`,
     );
     return Response.json(
       {
