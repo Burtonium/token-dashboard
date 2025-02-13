@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 'use client';
 
 import { env } from '@/env';
@@ -7,7 +8,6 @@ import {
   SolanaWalletConnectors,
   BitcoinWalletConnectors,
 } from '../lib/dynamic';
-import { addWallet } from '@/server/actions/account/addWallet';
 
 const isLocalhost =
   typeof window !== 'undefined' && window.location.hostname === 'localhost';
@@ -26,7 +26,29 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
         // in a local environment to keep the database synced
         events: isLocalhost
           ? {
-              onWalletAdded: ({ wallet }) => {
+              onAuthSuccess: async (data) => {
+                try {
+                  const { upsertSelf } = await import(
+                    '@/app/developer/upsertUser'
+                  );
+
+                  if (!data.user.userId) {
+                    // eslint-disable-next-line no-console
+                    console.error('No userId in log in event');
+                    return;
+                  }
+                  void upsertSelf({
+                    id: data.user.userId,
+                    username: data.user.username ?? undefined,
+                  });
+                } catch (e) {
+                  // eslint-disable-next-line no-console
+                  console.error('Error upserting user:', (e as Error).message);
+                }
+              },
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onWalletAdded: async ({ wallet }) => {
+                const { addWallet } = await import('@/app/developer/addWallet');
                 const token = getAuthToken();
                 if (!token) {
                   return;
@@ -36,15 +58,15 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
                   address: wallet.address,
                 });
               },
-              onWalletRemoved: ({ wallet }) => {
+              onWalletRemoved: async ({ wallet }) => {
+                const { deleteWallet } = await import(
+                  '@/app/developer/deleteWallet'
+                );
                 const token = getAuthToken();
                 if (!token) {
                   return;
                 }
-                void addWallet(token, {
-                  chain: wallet.chain,
-                  address: wallet.address,
-                });
+                void deleteWallet(token, wallet.address);
               },
               onUserProfileUpdate: (user) => {
                 const token = getAuthToken();
@@ -69,7 +91,9 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
                     // ignore, module could be deleted in prod
                   });
               },
-              onEmbeddedWalletCreated: (creds) => {
+              onEmbeddedWalletCreated: async (creds) => {
+                const { addWallet } = await import('@/app/developer/addWallet');
+
                 const token = getAuthToken();
                 if (!token || !creds?.chain || !creds.address) {
                   return;

@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env, isDev } from '@/env';
 import jwt from 'jsonwebtoken';
 import type { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
@@ -7,6 +7,8 @@ import 'server-only';
 import { z } from 'zod';
 import { constructError } from './actions/errors';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';
+import prisma from './prisma/client';
+import { uniq } from 'lodash';
 
 export const getDynamicPublicKey = cache(async () => {
   const client = jwksClient({
@@ -56,7 +58,26 @@ export const decodeUser = async (token: string) => {
           reject(new Error('JWT verification failed'));
         } else {
           if (typeof decoded === 'object' && decoded !== null) {
-            resolve(JwtPayloadSchema.parse(decoded));
+            const data = JwtPayloadSchema.parse(decoded);
+            if (isDev) {
+              // override addresses for testing
+              void prisma.linkedWallet
+                .findMany({
+                  where: {
+                    dynamicUserId: data.id,
+                  },
+                })
+                .then((wallets) => {
+                  resolve({
+                    ...data,
+                    addresses: uniq(
+                      wallets.map((w) => w.address).concat(data.addresses),
+                    ),
+                  });
+                });
+            } else {
+              resolve(data);
+            }
           } else {
             reject(new Error('Invalid token'));
           }

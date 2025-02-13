@@ -37,6 +37,7 @@ import Link from 'next/link';
 import RealIcon from '@/assets/images/R.svg';
 import ClaimCasinoDepositBonusModal from '@/components/modals/ClaimCasinoDepositBonusModal';
 import CasinoDepositRescanWarningModal from '@/components/modals/CasinoDepositRescanWarningModal';
+import BcGameLogo from '@/assets/icons/bc-game.svg';
 
 const logos: Record<string, JSX.Element> = {
   shuffle: (
@@ -151,19 +152,9 @@ const logos: Record<string, JSX.Element> = {
     </svg>
   ),
   'bc.game': (
-    <svg
-      className="absolute inline-block size-full"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M23.6383 14.9029C22.0356 21.3315 15.5244 25.2438 9.09503 23.6407C2.66833 22.038 -1.24401 15.5265 0.359382 9.09837C1.96136 2.66903 8.47253 -1.24361 14.8999 0.359081C21.3289 1.96177 25.2411 8.47393 23.6383 14.9029Z"
-        fill="#1F232F"
-      />
-    </svg>
+    <div className="flex aspect-square size-full items-center justify-center rounded-full bg-[#1F232F] p-1">
+      <BcGameLogo className="" />
+    </div>
   ),
 };
 
@@ -300,10 +291,7 @@ const BonusPage = () => {
                             >
                               <Button
                                 loading={calculateDeposits.isPending}
-                                disabled={
-                                  bonus.claimed ||
-                                  casinoDeposits.data?.status === 'Pending'
-                                }
+                                disabled={bonus.claimed}
                                 className="place-self-end focus:ring-0"
                               >
                                 Rescan Rewards

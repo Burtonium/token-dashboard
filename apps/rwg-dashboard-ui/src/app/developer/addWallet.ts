@@ -2,9 +2,10 @@
 
 import { authGuard } from '@/server/auth';
 import prisma from '@/server/prisma/client';
-import { constructError } from '../errors';
+import { constructError } from '../../server/actions/errors';
 import { isDev } from '@/env';
 import assert from 'assert';
+import { getAddress } from 'viem';
 
 export const addWallet = authGuard(
   async (user, { chain, address }: { chain: string; address: string }) => {
@@ -14,12 +15,19 @@ export const addWallet = authGuard(
       .create({
         data: {
           chain,
-          address: address,
+          address: getAddress(address),
           dynamicUserId: user.id,
         },
       })
       .catch((e) => {
-        return constructError(`Failed to add wallet: ${(e as Error).message}`);
+        const message = (e as Error).message.includes(
+          'Foreign key constraint violated',
+        )
+          ? 'Dynamic user not found'
+          : (e as Error).message?.includes('Unique constraint failed')
+            ? 'Wallet already exists'
+            : (e as Error).message;
+        return constructError(`Failed to add wallet: ${message}`);
       });
   },
 );

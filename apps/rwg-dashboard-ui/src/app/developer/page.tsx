@@ -1,12 +1,6 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import {
-  primaryWalletAddressOverrideAtom,
-  connectedAddressesOverrideAtom,
-} from '@/store/developer';
-import { useAtom } from 'jotai';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { getAuthToken, useDynamicContext } from '@/lib/dynamic';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -50,6 +44,7 @@ import {
 } from '@/components/ui/select';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { Loader2, X } from 'lucide-react';
+import { addWallet } from './addWallet';
 
 type WaveUpdate = Pick<
   RewardWave,
@@ -74,12 +69,6 @@ const DeveloperPage = () => {
   const [nonceResetAddress, setNonceResetAddress] = useState('');
   const [whitelistAddress, setWhitelistAddress] = useState('');
   const [claimId, setClaimId] = useState('');
-  const [addressOverride, setAddressOverride] = useAtom(
-    primaryWalletAddressOverrideAtom,
-  );
-  const [connectedAddressesOverride, setConnectedAddressesOverride] = useAtom(
-    connectedAddressesOverrideAtom,
-  );
   const treasury = useReadTokenMasterTreasury();
   const treasuryBalance = useReadTestTokenBalanceOf({
     args: [treasury.data ?? '0x'],
@@ -89,6 +78,13 @@ const DeveloperPage = () => {
   });
 
   const sendToken = useWriteTestTokenTransfer();
+
+  const [addressToAdd, setAddressToAdd] = useState('');
+  const [chainOfWalletToAdd, setChainOfWalletToAdd] = useState('EVM');
+  const addAddress = useAuthenticatedMutation({
+    mutationFn: (token: string) =>
+      addWallet(token, { address: addressToAdd, chain: chainOfWalletToAdd }),
+  });
 
   const fundTreasuryMutation = useMutation({
     mutationFn: () => {
@@ -255,45 +251,36 @@ const DeveloperPage = () => {
       </div>
       <div className="mt-5 grid grid-cols-2 gap-5">
         <div className="max-w-lg space-y-5">
-          <div>
-            <label className="mb-2 block">
-              Primary Wallet Address Override
-            </label>
+          <div className="space-y-3">
+            <label className="block">Add wallet to account</label>
+            <Select
+              value={chainOfWalletToAdd}
+              onValueChange={setChainOfWalletToAdd}
+            >
+              <SelectTrigger className="mb-3 w-full">
+                <SelectValue placeholder="Select Chain" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EVM">EVM</SelectItem>
+                <SelectItem value="SOL">SOL</SelectItem>
+              </SelectContent>
+            </Select>
             <Input
-              className="mb-3"
-              placeholder="0x..."
-              value={addressOverride ?? ''}
-              onChange={(e) => setAddressOverride(e.target.value)}
+              placeholder={chainOfWalletToAdd === 'EVM' ? '0x...' : 'HN7...'}
+              value={addressToAdd}
+              onChange={(e) => setAddressToAdd(e.target.value)}
             />
             <div className="flex gap-3">
-              <Button
-                variant="default"
-                onClick={() =>
-                  setAddressOverride(
-                    '0xB6b7cE10a5Aaf0B9dB80bdB8aAAc01237CB78103',
-                  )
-                }
-              >
-                Make me Admin
+              <Button variant="default" onClick={() => addAddress.mutate()}>
+                Add
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setAddressOverride(null)}
-              >
+              <Button variant="outline" onClick={() => setAddressToAdd('')}>
                 Clear
               </Button>
             </div>
-          </div>
-          <div>
-            <label htmlFor="wallet-addresses" className="mb-2 block">
-              Connected Addresses Override
-            </label>
-            <Textarea
-              value={connectedAddressesOverride ?? ''}
-              onChange={(e) => setConnectedAddressesOverride(e.target.value)}
-              id="wallet-addresses"
-              placeholder="Comma separated addresses: i.e. 0x123...,0x456..."
-            />
+            <p className="text-destructive empty:hidden">
+              {addAddress.error?.message}
+            </p>
           </div>
           <div>
             <label className="mb-2 block">Issue vesting $REAL ($vREAL)</label>

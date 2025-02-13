@@ -7,8 +7,8 @@ import { Suspense } from 'react';
 import Loading from '@/components/loading';
 
 export const metadata: Metadata = {
-  title: 'RWG',
-  description: 'Games for the real world.',
+  title: 'REAL VIP',
+  description: 'Dashboard for the Realbet Casino',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 

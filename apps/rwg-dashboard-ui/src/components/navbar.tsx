@@ -30,11 +30,6 @@ import { usePathname } from 'next/navigation';
 import { env, isDev } from '@/env';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useStakingVault } from '@/hooks/useStakingVault';
-import {
-  connectedAddressesOverrideAtom,
-  primaryWalletAddressOverrideAtom,
-} from '@/store/developer';
-import { useAtom } from 'jotai';
 import ConnectWallet from './connect-wallet';
 
 const NextLink: FC<PropsWithChildren<{ path: string; className?: string }>> = ({
@@ -60,13 +55,6 @@ const NextLink: FC<PropsWithChildren<{ path: string; className?: string }>> = ({
 };
 
 const Navbar: React.FC<{ className?: string }> = ({ className }) => {
-  const [addressOverride, setAddressOverride] = useAtom(
-    primaryWalletAddressOverrideAtom,
-  );
-  const [connectedAddressesOverride, setConnectedAddressesOverride] = useAtom(
-    connectedAddressesOverrideAtom,
-  );
-  const [hasOverride, setHasOverride] = useState(false);
   const pathname = usePathname();
   const isAuthenticated = useIsLoggedIn();
   const { user } = useDynamicContext();
@@ -74,12 +62,6 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
   const navRef = useRef<HTMLDivElement>(null);
   useClickOutside(navRef, () => setNavOpen(false));
   const vault = useStakingVault();
-
-  // address override is in localstorage which the backend is not aware of,
-  // so we need to set this variable on mount to avoid hydration issues
-  useEffect(() => {
-    setHasOverride(!!addressOverride || !!connectedAddressesOverride);
-  }, [addressOverride, connectedAddressesOverride]);
 
   useEffect(() => {
     setNavOpen(false);
@@ -120,17 +102,6 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           <hr className="mb-4 hidden h-px border-none bg-lighter lg:block" />
           <li>
             <ConnectWallet className="w-full max-w-64" />
-            {hasOverride && (
-              <button
-                className="text-accent"
-                onClick={() => {
-                  setAddressOverride(null);
-                  setConnectedAddressesOverride(null);
-                }}
-              >
-                clear overrides?
-              </button>
-            )}
             <DynamicUserProfile />
             {isAuthenticated && (
               <div className="font-regular space-y-1 text-xl">

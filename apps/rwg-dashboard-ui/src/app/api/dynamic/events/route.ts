@@ -109,6 +109,7 @@ const handleWalletCreatedEvent = async (
         {
           chain: event.data.chain,
           address: event.data.publicKey,
+          lastSelectedAt: event.data.lastSelectedAt,
         },
       ],
     },
@@ -133,6 +134,7 @@ const handleWalletLinkedEvent = async (
         {
           chain: event.data.chain,
           address: event.data.publicKey,
+          lastSelectedAt: event.data.lastSelectedAt,
         },
       ],
     },
@@ -183,6 +185,7 @@ const handleWalletTransferredEvent = async (
       },
       data: {
         dynamicUserId: event.userId,
+        lastSelectedAt: event.data.lastSelectedAt,
       },
     })
     .then(() => updateRakebacks(event.userId))

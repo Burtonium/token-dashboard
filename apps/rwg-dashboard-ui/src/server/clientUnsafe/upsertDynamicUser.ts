@@ -7,6 +7,7 @@ export type User = {
   wallets?: {
     chain: string;
     address: string;
+    lastSelectedAt?: Date;
   }[];
 };
 
@@ -40,6 +41,7 @@ export const upsertDynamicUser_clientUnsafe = async (
                   user.wallets?.map((wallet) => ({
                     chain: wallet.chain,
                     address: wallet.address,
+                    lastSelectedAt: wallet.lastSelectedAt,
                   })) ?? [],
               },
             }
@@ -53,6 +55,7 @@ export const upsertDynamicUser_clientUnsafe = async (
             user.wallets?.map((wallet) => ({
               chain: wallet.chain,
               address: wallet.address,
+              lastSelectedAt: wallet.lastSelectedAt,
             })) ?? [],
         },
       },
