@@ -276,18 +276,21 @@ const RewardComponent = () => {
                       Submit Vote
                     </Button>
                   )}
+                {primaryWallet?.address && votingPower.isPending && (
+                  <Skeleton className="h-4 w-full" />
+                )}
                 {primaryWallet?.address &&
                   votingPower.data !== undefined &&
                   !canVote && (
                     <>
                       <p className="text-xs text-muted-foreground">
-                        You do not have enough voting power to vote.
+                        You do not have enough voting power to vote in this
+                        epoch.
                         <Popover>
                           <PopoverTrigger>
                             <Info
                               width={16}
                               className="ml-1 inline-block text-muted-foreground"
-                              strokeWidth={1}
                             />
                           </PopoverTrigger>
                           <PopoverContent align="start">

@@ -63,15 +63,21 @@ const ClaimPage = () => {
                 </div>
               </div>
             </div>
-            <Button variant="neutral" asChild>
-              <a
-                href="https://app.uniswap.org"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Buy {token.symbol}
-              </a>
-            </Button>
+
+            <div className="flex flex-col items-center gap-1">
+              <Button variant="outline" asChild>
+                <a
+                  href="https://app.uniswap.org"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Buy {token.symbol}
+                </a>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={token.watchToken}>
+                Add {token.symbol} to wallet
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

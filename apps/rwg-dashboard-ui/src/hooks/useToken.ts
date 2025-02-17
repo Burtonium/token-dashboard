@@ -3,7 +3,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { readContract, waitForTransactionReceipt } from '@wagmi/core';
 import config from '@/config/wagmi';
-import { useWriteContract } from 'wagmi';
+import { useWatchAsset, useWriteContract } from 'wagmi';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
 import { erc20Abi } from 'viem';
@@ -15,6 +15,7 @@ export const useToken = () => {
   const { writeContractAsync } = useWriteContract();
   const { isSuccess } = useNetworkId();
   const primaryAddress = usePrimaryAddress();
+  const { watchAsset } = useWatchAsset();
 
   const balance = useQuery({
     queryKey: ['balance', tokenAddress, primaryAddress],
@@ -30,16 +31,15 @@ export const useToken = () => {
         : Promise.resolve(0n),
   });
 
-  const symbol = useQuery({
+  const tokenSymbol = useQuery({
     queryKey: ['symbol', tokenAddress],
     enabled: isSuccess,
     queryFn: () =>
-      // readContract(config, {
-      //   abi: erc20Abi,
-      //   address: tokenAddress,
-      //   functionName: 'symbol',
-      // }) as Promise<string>,
-      'REAL',
+      readContract(config, {
+        abi: erc20Abi,
+        address: tokenAddress,
+        functionName: 'symbol',
+      }) as Promise<string>,
   });
 
   const decimals = useQuery({
@@ -76,18 +76,37 @@ export const useToken = () => {
     onSuccess: () => balance.refetch(),
   });
 
+  const watchToken = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow(true);
+      return;
+    }
+
+    if (!tokenSymbol.data || !decimals.data) {
+      return;
+    }
+    watchAsset({
+      type: 'ERC20',
+      options: {
+        address: tokenAddress,
+        symbol: tokenSymbol.data,
+        decimals: decimals.data,
+      },
+    });
+  };
+
   return {
-    errors: [symbol.error, balance.error, decimals.error].filter((e) => !!e),
+    errors: [balance.error, decimals.error].filter((e) => !!e),
     queries: {
-      symbol,
       balance,
       decimals,
     },
-    isLoading: symbol.isLoading || balance.isLoading || decimals.isLoading,
-    symbol: `$${symbol.data ?? ''}`,
+    isLoading: balance.isLoading || decimals.isLoading,
+    symbol: '$REAL',
     balance,
     decimals: decimals.data ?? 18,
     contract: erc20Abi,
     mint,
+    watchToken,
   };
 };
