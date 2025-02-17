@@ -14,6 +14,7 @@ import { pluralize } from '@/utils';
 import {
   getProposals,
   getUserVotes,
+  getVotingPower,
   ProposalFrontMatterSchema,
 } from '@/utils/snapshot/snapshot-api';
 import { getSnapshotWeb3 } from '@/utils/snapshot/snapshot-web3';
@@ -156,6 +157,24 @@ const RewardComponent = () => {
     },
   });
 
+  const votingPower = useQuery({
+    enabled: !!primaryWallet?.address && !!latestProposal,
+    queryKey: [
+      'votingPower',
+      {
+        space,
+        proposalId: latestProposal?.id ?? '',
+        voter: primaryWallet?.address ?? '',
+      },
+    ],
+    queryFn: getVotingPower,
+  });
+
+  const canVote = useMemo(
+    () => (votingPower.data ?? 0) > 0,
+    [votingPower.data],
+  );
+
   const vote = useMutation({
     mutationFn: async () => {
       if (
@@ -232,27 +251,71 @@ const RewardComponent = () => {
                         setVotingChoice(idx + 1);
                       }}
                       disabled={
-                        !primaryWallet || latestProposal.userVote !== undefined
+                        !primaryWallet ||
+                        latestProposal.userVote !== undefined ||
+                        !canVote
                       }
                     >
                       {choice}
                     </Button>
                   ))}
                 </div>
-                {latestProposal && latestProposal.userVote === undefined && (
-                  <Button
-                    className="w-full"
-                    onClick={() => vote.mutateAsync()}
-                    disabled={
-                      !primaryWallet ||
-                      votingChoice === null ||
-                      latestProposalEndTime?.data === 'Voting ended'
-                    }
-                    loading={vote.isPending}
-                  >
-                    Submit Vote
-                  </Button>
-                )}
+                {latestProposal &&
+                  latestProposal.userVote === undefined &&
+                  (canVote || !primaryWallet?.address) && (
+                    <Button
+                      className="w-full"
+                      onClick={() => vote.mutateAsync()}
+                      disabled={
+                        !primaryWallet ||
+                        votingChoice === null ||
+                        latestProposalEndTime?.data === 'Voting ended'
+                      }
+                      loading={vote.isPending || votingPower.isLoading}
+                    >
+                      Submit Vote
+                    </Button>
+                  )}
+                {primaryWallet?.address &&
+                  votingPower.data !== undefined &&
+                  !canVote && (
+                    <>
+                      <p className="text-xs text-muted-foreground">
+                        You do not have enough voting power to vote.
+                        <Popover>
+                          <PopoverTrigger>
+                            <Info
+                              width={16}
+                              className="ml-1 inline-block text-muted-foreground"
+                              strokeWidth={1}
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent align="start">
+                            <div className="leading-tight">
+                              Voting power is determined by the amount of staked
+                              REAL tokens you have at the time of the
+                              proposal&apos;s creation.
+                              <br />
+                              If you stake REAL tokens after a proposal is
+                              created, those tokens will not contribute to your
+                              voting power until the next epoch starts.
+                              <br />
+                              Read more about voting power on{' '}
+                              <a
+                                href="https://docs.snapshot.box/user-guides/voting/vote#who-can-vote-on-proposals"
+                                target="_blank"
+                                rel="nofollow noreferrer"
+                                className="text-primary"
+                              >
+                                Snapshot
+                              </a>
+                              .
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </p>
+                    </>
+                  )}
               </>
             )}
           </div>
