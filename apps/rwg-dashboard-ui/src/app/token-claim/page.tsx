@@ -64,7 +64,7 @@ const ClaimPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-2">
               <Button variant="outline" asChild>
                 <a
                   href="https://app.uniswap.org"
@@ -75,7 +75,8 @@ const ClaimPage = () => {
                 </a>
               </Button>
               <Button variant="ghost" size="sm" onClick={token.watchToken}>
-                Add {token.symbol} to wallet
+                <RealIcon size="xs" className="ml-0" />
+                Add token to wallet
               </Button>
             </div>
           </div>
@@ -113,7 +114,7 @@ const ClaimPage = () => {
                     : process.isPending
                       ? 'Waiting for Signatures'
                       : claim.isPending
-                        ? 'Claiming'
+                        ? 'Claiming...'
                         : 'Claim'}
                 </Button>
               </ClaimWarningModal>
