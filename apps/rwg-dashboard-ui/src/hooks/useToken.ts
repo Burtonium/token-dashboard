@@ -39,7 +39,7 @@ export const useToken = () => {
         abi: erc20Abi,
         address: tokenAddress,
         functionName: 'symbol',
-      }) as Promise<string>,
+      }),
   });
 
   const decimals = useQuery({
