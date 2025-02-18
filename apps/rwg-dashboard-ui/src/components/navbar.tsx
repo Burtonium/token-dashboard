@@ -69,6 +69,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
 
   return (
     <nav ref={navRef} className={cn('relative z-50', className)}>
+      <div className="fixed right-0 top-0 h-24 w-full bg-background/25 backdrop-blur-lg lg:hidden" />
       <div className="lg:flex-start fixed top-12 z-30 flex h-0 w-full items-center justify-between gap-3 px-6 lg:top-[28px] lg:p-8 lg:py-6">
         <Burger
           className={cn('shrink-0 rounded-xl bg-light lg:hidden', {
@@ -91,7 +92,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
       </div>
       <div
         className={cn(
-          'fixed left-0 top-0 h-screen w-full bg-light px-6 py-6 pt-24 transition-transform sm:w-64',
+          'fixed left-0 top-0 h-screen w-full bg-light px-6 py-6 pt-24 backdrop-blur-lg transition-transform sm:w-64 lg:backdrop-blur-none',
           {
             'translate-x-0': isNavOpen,
             '-translate-x-full lg:translate-x-0': !isNavOpen,

@@ -30,7 +30,6 @@ const QuestTrack = () => {
       <h2 className="text-2xl">Getting Started</h2>
       <div className="grid items-center gap-5 lg:grid-cols-2 2xl:grid-cols-3">
         <Quest
-          className="flex items-center justify-center p-5"
           completed={casinoLink.isSuccess && !!casinoLink.data}
           loading={casinoLink.isLoading}
           image={quest1.src}
@@ -56,7 +55,6 @@ const QuestTrack = () => {
           </Button>
         </Quest>
         <Quest
-          className="flex items-center justify-center p-5"
           loading={casinoLink.isLoading || membership.isLoading}
           completed={membership.isSuccess && membership.reedeemedTickets > 0}
           image={quest2.src}
@@ -82,7 +80,6 @@ const QuestTrack = () => {
           </Button>
         </Quest>
         <Quest
-          className="flex items-center justify-center p-5"
           loading={casinoDeposits.isLoading}
           completed={casinoDeposits.data?.status === 'Success'}
           image={quest3.src}
@@ -105,7 +102,6 @@ const QuestTrack = () => {
           </Button>
         </Quest>
         <Quest
-          className="flex items-center justify-center p-8"
           loading={transactions.isLoading}
           completed={transactions.data?.length > 0}
           image={quest4.src}
@@ -134,7 +130,6 @@ const QuestTrack = () => {
           </Button>
         </Quest>
         <Quest
-          className="flex items-center justify-center p-8"
           loading={claims.isLoading}
           completed={allClaimed}
           image={quest5.src}
