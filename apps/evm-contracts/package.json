@@ -22,6 +22,10 @@
     "list:sepolia": "npx hardhat ignition status chain-11155111"
   },
   "devDependencies": {
+    "solc": "npm:solc@^0.8.4",
+    "solidity-coverage": "^0.7.16",
+    "solidity-docgen": "^0.5.13",
+    "surya": "^0.4.2",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.7",
     "@nomicfoundation/hardhat-ignition": "^0.15.6",
     "@nomicfoundation/hardhat-ignition-viem": "^0.15.6",
@@ -42,8 +46,16 @@
     "prettier-plugin-solidity": "^1.4.1",
     "solhint": "^5.0.3",
     "solhint-plugin-prettier": "^0.1.0",
-    "typescript": "~5.0.4",
     "rimraf": "^5.0.10",
-    "viem": "^2.20.0"
+    "hardhat-abi-exporter": "^2.2.1",
+    "hardhat-chai-matchers-viem": "^2.0.8",
+    "hardhat-docgen": "^1.1.1",
+    "hardhat-gas-reporter": "^2.2.2",
+    "hardhat-preprocessor": "^0.1.5",
+    "hardhat-tracer": "^1.0.0-alpha.6",
+    "solmate": "6.7.0",
+    "typescript": "~5.0.4",
+    "viem": "^2.21.35",
+    "@rwg-dashboard/voting": "workspace:*"
   }
 }

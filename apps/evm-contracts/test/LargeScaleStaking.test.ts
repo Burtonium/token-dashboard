@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { ignition, viem } from "hardhat";
-import { parseEther, getAddress } from "viem";
+import { parseEther } from "viem";
 import testStaking from "../ignition/modules/TestTokenStaking";
-import { generateEpochMerkleTree, type Proof } from "@rwg-dashboard/voting";
+import { generateEpochMerkleTree } from "@rwg-dashboard/voting";
 
 const stakingModuleFixture = async () => ignition.deploy(testStaking);
 
