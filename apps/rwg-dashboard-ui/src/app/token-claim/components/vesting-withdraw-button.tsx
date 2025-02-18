@@ -47,7 +47,7 @@ export const VestingWithdrawButton = ({
           <>Withdrawn {formatBalanceTruncated(schedule.amountTotal)}</>
         ) : (
           <>
-            Withdraw{' '}
+            {release.isPending ? 'Withdrawing...' : 'Withdraw'}{' '}
             {formatBalanceTruncated(schedule.releasableAmount, {
               precision: 4,
             })}

@@ -226,3 +226,44 @@ export const getUserVotes = async ({
 
   return data.votes;
 };
+
+const VotingPowerSchema = z.object({
+  vp: z.object({
+    vp: z.number(),
+  }),
+});
+
+export const getVotingPower = async ({
+  queryKey,
+}: {
+  queryKey: [
+    string,
+    {
+      space: string;
+      voter: string;
+      proposalId: string;
+    },
+  ];
+}) => {
+  const [, { space, voter, proposalId }] = queryKey;
+
+  const data = await snapshotApiFetch(
+    VotingPowerSchema,
+    `
+     query vp($voter: String!, $space: String!, $proposalId: String!) {
+       vp (
+         voter: $voter
+         space: $space
+         proposal: $proposalId
+       ) {
+         vp
+       }
+     }
+`,
+    {
+      variables: { voter, space, proposalId },
+    },
+  );
+
+  return data.vp.vp;
+};

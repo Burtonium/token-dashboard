@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority';
 import Icon from '@/assets/images/R.svg';
+import { cn } from '@/lib/cn';
 
 type Props = {
   border?: boolean;
@@ -31,7 +32,7 @@ const iconClass = cva(
 
 export default function RealIcon({ border, size, className }: Props) {
   return (
-    <span className={iconClass({ border, size, className })}>
+    <span className={cn(iconClass({ border, size }), className)}>
       <Icon className="size-full" />
     </span>
   );
