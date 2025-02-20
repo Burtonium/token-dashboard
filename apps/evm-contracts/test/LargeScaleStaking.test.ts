@@ -11,7 +11,6 @@ describe("TokenStaking Large Scale Test", function () {
   it("should handle 100 users staking and unstaking at different epochs with different tiers", async function () {
     this.timeout(600000); // Set timeout to 10 minutes
 
-    const client = await viem.getPublicClient();
     const allWallets = await viem.getWalletClients();
     const admin = allWallets[0];
     const users = allWallets.slice(1, 101); // Get 100 users
@@ -56,7 +55,7 @@ describe("TokenStaking Large Scale Test", function () {
         const userStakes = await staking.read.getUserStakes([users[i].account.address]);
         const thisEpoch = BigInt(userStakes[0].lastClaimEpoch) + 1n;
 
-        await staking.write.setMerkleRoot([BigInt(thisEpoch), merkleTree.root], { account: admin.account });
+        await staking.write.setMerkleRoot([thisEpoch, merkleTree.root], { account: admin.account });
 
         // console.log(`thisEpoch: ${thisEpoch}`);
         // console.log(`Current epoch: ${await staking.read.getCurrentEpoch()}`);
@@ -64,7 +63,7 @@ describe("TokenStaking Large Scale Test", function () {
         if (userStakes.length > 0) {
           const proof = merkleTree.proofs.find((x) => x.address === users[i].account.address)?.proof ?? [];
 
-          await staking.write.claimRewards([0n, [thisEpoch], [proof], false], { account: users[i].account });
+          await staking.write.claimRewards([0n, [Number(thisEpoch)], [proof], false], { account: users[i].account });
         }
       }
 

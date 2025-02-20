@@ -15,7 +15,7 @@ describe("TokenStaking", function () {
 
       const address = getAddress(admin.account.address);
 
-      expect(await staking.read.hasRole([await staking.read.DEFAULT_ADMIN_ROLE(), address])).to.be.true;
+      await expect(await staking.read.hasRole([await staking.read.DEFAULT_ADMIN_ROLE(), address])).to.be.true;
     });
 
     it("should set the correct staking token", async function () {
@@ -192,7 +192,6 @@ describe("TokenStaking", function () {
     });
 
     it("should not allow unstaking if rewards are not claimed, but user has not voted in the unclaimed epochs", async function () {
-      const client = await viem.getPublicClient();
       const [, addr1, addr2, addr3] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
 
@@ -326,7 +325,7 @@ describe("TokenStaking", function () {
       const numberOfEpochs = 104n;
 
       const client = await viem.getPublicClient();
-      const [admin, addr1, addr2] = await viem.getWalletClients();
+      const [, addr1, addr2] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
 
       await realToken.write.mint([staking.address, parseEther("1000000")]);
@@ -350,9 +349,9 @@ describe("TokenStaking", function () {
 
       const epochs = [];
       const merkleProofs = [];
-      for (var i = 0; i < Number(numberOfEpochs); i++) {
-        const thisEpoch = BigInt(userStakes[0].lastClaimEpoch) + BigInt(i + 1);
-        await staking.write.setMerkleRoot([thisEpoch, merkleTree.root]);
+      for (let i = 0; i < Number(numberOfEpochs); i++) {
+        const thisEpoch = userStakes[0].lastClaimEpoch + i + 1;
+        await staking.write.setMerkleRoot([BigInt(thisEpoch), merkleTree.root]);
         epochs.push(thisEpoch);
         merkleProofs.push(merkleTree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? []);
       }
@@ -377,7 +376,7 @@ describe("TokenStaking", function () {
       const numberOfEpochs = 104n;
 
       const client = await viem.getPublicClient();
-      const [admin, addr1, addr2] = await viem.getWalletClients();
+      const [, addr1, addr2] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
 
       await realToken.write.mint([staking.address, parseEther("1000000")]);
@@ -401,9 +400,9 @@ describe("TokenStaking", function () {
 
       const epochs = [];
       const merkleProofs = [];
-      for (var i = 0; i < Number(numberOfEpochs); i++) {
-        const thisEpoch = BigInt(userStakes[0].lastClaimEpoch) + BigInt(i + 1);
-        await staking.write.setMerkleRoot([thisEpoch, merkleTree.root]);
+      for (let i = 0; i < Number(numberOfEpochs); i++) {
+        const thisEpoch = userStakes[0].lastClaimEpoch + i + 1;
+        await staking.write.setMerkleRoot([BigInt(thisEpoch), merkleTree.root]);
         epochs.push(thisEpoch);
         merkleProofs.push(merkleTree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? []);
       }
@@ -550,14 +549,14 @@ describe("TokenStaking", function () {
       const merkleProofs = [];
       const thisEpoch = userStakes[0].lastClaimEpoch + 1;
 
-      for (var i = thisEpoch; i <= thisEpoch + 2; i++) {
+      for (let i = thisEpoch; i <= thisEpoch + 2; i++) {
         await staking.write.setMerkleRoot([BigInt(i), merkleTree.root], { account: admin.account });
         epochs.push(i);
         merkleProofs.push(merkleTree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? []);
       }
 
       // add remaining epochs with empty proofs
-      for (var i = thisEpoch + 3; i <= previousEpoch; i++) {
+      for (let i = thisEpoch + 3; i <= previousEpoch; i++) {
         epochs.push(i);
         merkleProofs.push([]);
       }
@@ -599,7 +598,7 @@ describe("TokenStaking", function () {
   });
   describe("withdraw", function () {
     it("should allow admin to withdraw tokens", async function () {
-      const [admin, addr1] = await viem.getWalletClients();
+      const [admin] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
 
       await realToken.write.mint([staking.address, parseEther("1000")]);
@@ -641,10 +640,10 @@ describe("TokenStaking", function () {
       const { staking } = await loadFixture(stakingModuleFixture);
 
       await staking.write.pause({ account: admin.account });
-      expect(await staking.read.paused()).to.be.true;
+      await expect(await staking.read.paused()).to.be.true;
 
       await staking.write.unpause({ account: admin.account });
-      expect(await staking.read.paused()).to.be.false;
+      await expect(await staking.read.paused()).to.be.false;
     });
 
     it("should not allow non-admin to pause or unpause the contract", async function () {
@@ -694,7 +693,7 @@ describe("TokenStaking", function () {
 
       await staking.write.pause({ account: admin.account });
 
-      await expect(staking.write.unstake([0], { account: addr1.account })).to.be.revertedWithCustomError(
+      await expect(staking.write.unstake([0n], { account: addr1.account })).to.be.revertedWithCustomError(
         staking,
         "EnforcedPause",
       );

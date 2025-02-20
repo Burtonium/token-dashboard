@@ -2,7 +2,7 @@ import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 
 export interface Proof {
   address: `0x${string}`;
-  proof: string[];
+  proof: `0x${string}`[];
 }
 
 export const generateEpochMerkleTree = (voterAddresses: string[]) => {

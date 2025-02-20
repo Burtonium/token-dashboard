@@ -1,15 +1,15 @@
 // contracts/TokenVesting.sol
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.20;
+pragma solidity 0.8.24;
 
-import "./TokenVesting.sol";
+import { TokenVesting } from "./TokenVesting.sol";
 
 /**
  * @title MockTokenVesting
  * WARNING: use only for testing and debugging purpose
  */
 contract MockTokenVesting is TokenVesting {
-    uint256 mockTime = 0;
+    uint256 private mockTime = 0;
 
     constructor(address token_) TokenVesting(token_) {}
 

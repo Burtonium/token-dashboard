@@ -15,7 +15,7 @@ describe("Voting", function () {
 
       const address = getAddress(admin.account.address);
 
-      expect(await voting.read.hasRole([await voting.read.DEFAULT_ADMIN_ROLE(), address])).to.be.true;
+      await expect(await voting.read.hasRole([await voting.read.DEFAULT_ADMIN_ROLE(), address])).to.be.true;
     });
   });
 
@@ -74,8 +74,7 @@ describe("Voting", function () {
 
       const proof = tree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? [];
 
-      const hasVoted = await voting.read.hasVoted([epoch, addr1.account.address, proof]);
-      expect(hasVoted).to.be.true;
+      await expect(await voting.read.hasVoted([epoch, addr1.account.address, proof])).to.be.true;
     });
 
     it("should return false for invalid proof", async function () {
@@ -92,8 +91,7 @@ describe("Voting", function () {
 
       const proof = tree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? [];
 
-      const hasVoted = await voting.read.hasVoted([epoch, addr3.account.address, proof]);
-      expect(hasVoted).to.be.false;
+      await expect(await voting.read.hasVoted([epoch, addr3.account.address, proof])).to.be.false;
     });
 
     it("should return false for non-existent epoch", async function () {
@@ -105,8 +103,7 @@ describe("Voting", function () {
         "0x1234567890123456789012345678901234567890123456789012345678901234",
       ];
 
-      const hasVoted = await voting.read.hasVoted([nonExistentEpoch, addr1.account.address, mockProof]);
-      expect(hasVoted).to.be.false;
+      await expect(await voting.read.hasVoted([nonExistentEpoch, addr1.account.address, mockProof])).to.be.false;
     });
   });
 });

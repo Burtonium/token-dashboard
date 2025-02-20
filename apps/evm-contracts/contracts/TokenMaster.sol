@@ -30,7 +30,7 @@ contract TokenMaster is AccessControl, ReentrancyGuard, Pausable, Multicall {
     error FailedToSendToken();
 
     constructor(address _authorizedSigner, address _treasury, ERC20 _token) {
-        if (_authorizedSigner != address(0)) {
+        if (address(_authorizedSigner) == address(0)) {
             revert InvalidSignerAddress();
         }
 
