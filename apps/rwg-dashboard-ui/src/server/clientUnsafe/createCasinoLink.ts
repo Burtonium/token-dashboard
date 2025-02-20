@@ -40,6 +40,14 @@ export const createCasinoLink_clientUnsafe = async ({
           )
           // eslint-disable-next-line no-console
           .catch((err) => console.error((err as Error).message))) ?? [];
+
+      // Delete existing links to the same realbet user
+      await tx.casinoLink.deleteMany({
+        where: {
+          realbetUserId: realbetUserId,
+        },
+      });
+
       const dynamicUser = await tx.dynamicUser.upsert({
         where: { id: userId },
         update: {
