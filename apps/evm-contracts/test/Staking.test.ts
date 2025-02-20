@@ -3,7 +3,7 @@ import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { ignition, viem } from "hardhat";
 import { parseEther, getAddress } from "viem";
 import testStaking from "../ignition/modules/TestTokenStaking";
-import { generateEpochMerkleTree, type Proof } from "@rwg-dashboard/voting";
+import { generateEpochMerkleTree, type Proof } from "../utils/generateEpochMerkleTree";
 
 const stakingModuleFixture = async () => ignition.deploy(testStaking);
 

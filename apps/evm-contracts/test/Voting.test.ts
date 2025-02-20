@@ -3,7 +3,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ignition, viem } from "hardhat";
 import { getAddress } from "viem";
 import testVoting from "../ignition/modules/TestVoting";
-import { generateEpochMerkleTree, type Proof } from "@rwg-dashboard/voting";
+import { generateEpochMerkleTree, type Proof } from "../utils/generateEpochMerkleTree";
 
 const votingModuleFixture = async () => ignition.deploy(testVoting);
 
