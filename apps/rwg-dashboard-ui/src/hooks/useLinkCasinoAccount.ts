@@ -31,6 +31,10 @@ export const useLinkCasinoAccount = () => {
       url.searchParams.append('extUserId', userId);
       url.searchParams.append('ts', ts.toString());
       url.searchParams.append('token', token);
+      url.searchParams.append(
+        'callbackUrl',
+        `${window.location.origin}/api/casino-link-callback`,
+      );
 
       window.location.href = url.toString();
     },
