@@ -2,6 +2,7 @@ import prisma from '@/server/prisma/client';
 import { subscribeToWave_clientUnsafe } from './subscribeToWave';
 import { env } from '@/env';
 import { z } from 'zod';
+import * as Sentry from '@sentry/nextjs';
 
 const WalletResponseSchema = z.object({
   wallets: z.array(
@@ -24,22 +25,28 @@ export const createCasinoLink_clientUnsafe = async ({
 }) => {
   const dynamicUser = await prisma.$transaction(
     async (tx) => {
-      const wallets =
-        (await fetch(
-          `https://app.dynamicauth.com/api/v0/users/${userId}/wallets`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${env.DYNAMIC_API_KEY}`,
-            },
+      const wallets = await fetch(
+        `https://app.dynamicauth.com/api/v0/users/${userId}/wallets`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${env.DYNAMIC_API_KEY}`,
           },
-        )
-          .then(
-            async (response) =>
-              WalletResponseSchema.parse(await response.json()).wallets,
-          )
+        },
+      ).then(async (response) => {
+        const responseJson = (await response.json()) as unknown;
+        const walletResponse = WalletResponseSchema.safeParse(responseJson);
+
+        if (!walletResponse.success) {
+          const error = `Dynamic API Response Different Than Expected: ${JSON.stringify(responseJson)}`;
+          Sentry.captureMessage(error);
           // eslint-disable-next-line no-console
-          .catch((err) => console.error((err as Error).message))) ?? [];
+          console.error(error);
+          throw new Error(error);
+        }
+
+        return walletResponse.data.wallets;
+      });
 
       // Delete existing links to the same realbet user
       await tx.casinoLink.deleteMany({
@@ -61,14 +68,15 @@ export const createCasinoLink_clientUnsafe = async ({
             deleteMany: {
               dynamicUserId: userId,
               address: {
-                notIn: wallets.map(({ publicKey }) => publicKey),
+                notIn: wallets?.map(({ publicKey }) => publicKey) ?? [],
               },
             },
             createMany: {
-              data: wallets.map(({ publicKey, chain }) => ({
-                chain,
-                address: publicKey,
-              })),
+              data:
+                wallets?.map(({ publicKey, chain }) => ({
+                  chain,
+                  address: publicKey,
+                })) ?? [],
               skipDuplicates: true,
             },
           },
@@ -84,10 +92,11 @@ export const createCasinoLink_clientUnsafe = async ({
           },
           wallets: {
             createMany: {
-              data: wallets.map(({ publicKey, chain }) => ({
-                chain,
-                address: publicKey,
-              })),
+              data:
+                wallets?.map(({ publicKey, chain }) => ({
+                  chain,
+                  address: publicKey,
+                })) ?? [],
             },
           },
         },

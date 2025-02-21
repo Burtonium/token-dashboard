@@ -21,7 +21,7 @@ export const subscribeToWave_clientUnsafe = async (user: User) => {
       }
 
       if (currentWave.memberships.length > 0) {
-        throw new Error('One or more memberships already to that address.');
+        throw new Error('Already subscribed.');
       }
 
       const waveMembership = Promise.all([
