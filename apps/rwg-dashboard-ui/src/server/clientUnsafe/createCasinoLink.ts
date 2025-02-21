@@ -26,7 +26,7 @@ export const createCasinoLink_clientUnsafe = async ({
   const dynamicUser = await prisma.$transaction(
     async (tx) => {
       const wallets = await fetch(
-        `https://app.dynamicauth.com/api/v0/users/${userId}/wallets`,
+        `https://app.dynamicauth.com/api/v0/environments/${env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID}/users/${userId}/wallets`,
         {
           method: 'GET',
           headers: {
@@ -42,6 +42,7 @@ export const createCasinoLink_clientUnsafe = async ({
           Sentry.captureMessage(error);
           // eslint-disable-next-line no-console
           console.error(error);
+
           throw new Error(error);
         }
 
