@@ -273,7 +273,9 @@ const RewardComponent = () => {
                       }
                       loading={vote.isPending || votingPower.isLoading}
                     >
-                      Submit Vote
+                      {!primaryWallet
+                        ? 'Connect your wallet to vote'
+                        : 'Submit Vote'}
                     </Button>
                   )}
                 {primaryWallet?.address && votingPower.isPending && (

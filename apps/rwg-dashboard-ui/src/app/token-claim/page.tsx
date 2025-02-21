@@ -139,14 +139,16 @@ const ClaimPage = () => {
                 {claims.data && claims.data.amounts.claimed > 0n && (
                   <>
                     <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
-                      <div>
+                      <div className="flex items-center gap-2">
                         Claimed Amount
                         <Popover>
                           <PopoverTrigger>
                             <Info className="text-muted-foreground" />
                           </PopoverTrigger>
                           <PopoverContent align="start">
-                            <div className="leading-tight">Claimed amount.</div>
+                            <div className="leading-tight">
+                              Amount of {token.symbol} that you have claimed.
+                            </div>
                           </PopoverContent>
                         </Popover>
                       </div>
@@ -156,7 +158,7 @@ const ClaimPage = () => {
                       </h3>
                     </div>
                     <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
-                      <div>
+                      <div className="flex items-center gap-2">
                         Claimed Bonus Amount
                         <Popover>
                           <PopoverTrigger>
@@ -164,7 +166,8 @@ const ClaimPage = () => {
                           </PopoverTrigger>
                           <PopoverContent align="start">
                             <div className="leading-tight">
-                              Claimed bonus amount.
+                              Amount of bonus {token.symbol} that you have
+                              claimed.
                             </div>
                           </PopoverContent>
                         </Popover>
