@@ -64,7 +64,7 @@ export const updateRakebacks = async (
         );
       } catch (e) {
         ctx.log.error(
-          `Error updating rakeback for realbet user id "${account.realbetUserId}": ${(e as Error).message}`,
+          `Error updating rakeback for realbet user id "${account.realbetUserId}": ${JSON.stringify((e as Error).message)}`,
         );
         throw e;
       }

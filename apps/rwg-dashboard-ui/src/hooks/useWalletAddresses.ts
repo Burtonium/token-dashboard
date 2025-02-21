@@ -12,15 +12,17 @@ export const useWalletAddresses = () => {
   });
 
   const addresses = useMemo(
-    () => uniq([...(wallets.data?.map((w) => w.address) ?? [])]),
+    () =>
+      wallets.data ? uniq([...wallets.data?.map((w) => w.address)]) : undefined,
     [wallets.data],
   );
 
   return {
+    ...wallets,
     addresses,
-    evm: useMemo(() => addresses.filter((a) => isAddress(a)), [addresses]),
+    evm: useMemo(() => addresses?.filter((a) => isAddress(a)), [addresses]),
     solana: useMemo(
-      () => addresses.filter((a) => isSolanaAddress(a)),
+      () => addresses?.filter((a) => isSolanaAddress(a)),
       [addresses],
     ),
   };

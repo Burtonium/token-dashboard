@@ -240,7 +240,7 @@ const BonusPage = () => {
           </div>
         </div>
       </Banner>
-      {isAuthenticated && userAddresses.length > 0 && (
+      {isAuthenticated && userAddresses && userAddresses.length > 0 && (
         <div>
           <div className="space-y-4 md:max-w-[65%]">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 px-5 py-4">
