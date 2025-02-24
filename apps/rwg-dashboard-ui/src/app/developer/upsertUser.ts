@@ -1,11 +1,11 @@
 import { isDev } from '@/env';
 import {
-  upsertDynamicUser_clientUnsafe,
+  upsertDynamicUser,
   type User,
-} from '@/server/clientUnsafe/upsertDynamicUser';
+} from '@/server/server-only/upsertDynamicUser';
 import assert from 'assert';
 
 export const upsertSelf = async (user: User) => {
   assert(isDev, 'Not in dev mode');
-  return upsertDynamicUser_clientUnsafe(user);
+  return upsertDynamicUser(user);
 };

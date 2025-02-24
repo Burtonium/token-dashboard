@@ -1,9 +1,11 @@
+import 'server-only';
+
 import prisma from '../prisma/client';
 import type { User } from '../auth';
 import { getCurrentWave } from '../actions/ticket-waves/getCurrentWave';
 import { AwardedTicketsType } from '@prisma/client';
 
-export const subscribeToWave_clientUnsafe = async (user: User) => {
+export const subscribeToWave = async (user: User) => {
   return prisma.$transaction(
     async (tx) => {
       const currentWave = await getCurrentWave(tx, user.addresses);

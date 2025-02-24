@@ -1,9 +1,10 @@
+import 'server-only';
+
 import { env, isDev } from '@/env';
 import jwt from 'jsonwebtoken';
 import type { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { cache } from 'react';
-import 'server-only';
 import { z } from 'zod';
 import { constructError } from './actions/errors';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';

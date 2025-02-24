@@ -1,7 +1,7 @@
 import { validateSignature } from '@/lib/utils/crypto';
 import { env, isDev } from '@/env';
 import { User } from '@bltzr-gg/realbet-api';
-import { getTrackedBalances } from '@/server/clientUnsafe/getTrackedBalances';
+import { getTrackedBalances } from '@/server/server-only/getTrackedBalances';
 import assert from 'assert';
 import prisma from '@/server/prisma/client';
 import { calculateRakebackFromReal } from '@/hooks/useRealbetProgression';

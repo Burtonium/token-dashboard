@@ -1,11 +1,12 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { creditUserBonus_clientUnsafe } from '../../clientUnsafe/updateRealbetCredits';
+import { creditUserBonus } from '@/server/server-only/updateRealbetCredits';
 import assert from 'assert';
 import { calculateDepositsScore } from '@/server/utils';
-import { constructError } from '../errors';
+import { constructError } from '@/server/actions/errors';
 import { authGuard } from '@/server/auth';
+import * as Sentry from '@sentry/nextjs';
 
 export const claimCasinoDepositReward = authGuard(async (user) => {
   return prisma.$transaction(
@@ -62,16 +63,15 @@ export const claimCasinoDepositReward = authGuard(async (user) => {
       assert(updatedCall?.rewardId, 'Reward id not found');
 
       try {
-        await creditUserBonus_clientUnsafe(
-          dynamicUser.casinoLink.realbetUserId,
-          {
-            name: 'Casino Deposits Bonus Claim',
-            amount: Number(amount),
-            description:
-              'You got this bonus because you deposited to eligible casinos.',
-          },
-        );
-      } catch {
+        await creditUserBonus(dynamicUser.casinoLink.realbetUserId, {
+          name: 'Casino Deposits Bonus Claim',
+          amount: Number(amount),
+          description:
+            'You got this bonus because you deposited to eligible casinos.',
+        });
+      } catch (error) {
+        Sentry.captureException(error);
+
         return constructError('Realbet API failed to credit user bonus');
       }
     },

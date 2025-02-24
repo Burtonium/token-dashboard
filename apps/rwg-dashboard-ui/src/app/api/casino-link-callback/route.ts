@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { validateSignature } from '@/lib/utils/crypto';
 import { env } from '@/env';
-import { createCasinoLink_clientUnsafe } from '@/server/clientUnsafe/createCasinoLink';
+import { createCasinoLink } from '@/server/server-only/createCasinoLink';
 
 const CasinoLinkCallbackSchema = z.object({
   ts: z.number(),
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 
   const { extUserId, userId, username } = body.data;
 
-  const { casinoLink } = await createCasinoLink_clientUnsafe({
+  const { casinoLink } = await createCasinoLink({
     userId: extUserId,
     realbetUserId: userId,
     realbetUsername: username,

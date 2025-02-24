@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { EXPIRED_HOURS, MAX_CLAIM, WAGERING_HOURS } from '@/config/realbetApi';
 import { env } from '@/env';
 import { ApiClient, Bonus } from '@bltzr-gg/realbet-api';
@@ -21,7 +23,7 @@ export const bonusIdToReward: Record<number, number> = Object.entries(
   .map(([reward, bonusId]) => [Number(bonusId), Number(reward)] as const)
   .reduce((acc, [bonusId, reward]) => ({ ...acc, [bonusId]: reward }), {});
 
-export const creditUserBonus_clientUnsafe = async (
+export const creditUserBonus = async (
   realbetUserId: number,
   bonus:
     | {

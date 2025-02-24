@@ -1,3 +1,5 @@
+import 'server-only';
+
 import prisma from '../prisma/client';
 
 export type User = {
@@ -11,7 +13,7 @@ export type User = {
   }[];
 };
 
-export const upsertDynamicUser_clientUnsafe = async (
+export const upsertDynamicUser = async (
   user: User,
   options: {
     deleteWallets?: boolean;

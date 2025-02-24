@@ -1,6 +1,6 @@
 'use server';
 
 import { authGuard } from '@/server/auth';
-import { subscribeToWave_clientUnsafe } from '@/server/clientUnsafe/subscribeToWave';
+import { subscribeToWave } from '@/server/server-only/subscribeToWave';
 
-export const subscribeToCurrentWave = authGuard(subscribeToWave_clientUnsafe);
+export const subscribeToCurrentWave = authGuard(subscribeToWave);

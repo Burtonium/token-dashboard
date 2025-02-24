@@ -6,9 +6,9 @@ import { getCurrentWave } from '../ticket-waves/getCurrentWave';
 import assert from 'assert';
 import { getRandomWeightedItem } from '@/utils';
 import {
-  creditUserBonus_clientUnsafe,
+  creditUserBonus,
   rewardToBonusId,
-} from '../../clientUnsafe/updateRealbetCredits';
+} from '../../server-only/updateRealbetCredits';
 import { constructError } from '../errors';
 
 export const awardRandomReward = authGuard(async (user, nearWins: number) => {
@@ -94,7 +94,7 @@ export const awardRandomReward = authGuard(async (user, nearWins: number) => {
         }
 
         try {
-          await creditUserBonus_clientUnsafe(casinoLink.realbetUserId, {
+          await creditUserBonus(casinoLink.realbetUserId, {
             id: bonusId,
           });
         } catch {

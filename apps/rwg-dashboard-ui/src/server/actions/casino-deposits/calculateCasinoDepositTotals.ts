@@ -3,11 +3,12 @@
 import assert from 'assert';
 import { QueryParameter, DuneClient } from '@duneanalytics/client-sdk';
 import { z } from 'zod';
-import { decodeUser } from '../../auth';
+import { decodeUser } from '@/server/auth';
+import * as Sentry from '@sentry/nextjs';
 
 import { env } from '@/env';
 import { toCamel } from '@/lib/utils';
-import prisma from '../../prisma/client';
+import prisma from '@/server/prisma/client';
 import { isAddress } from 'viem';
 import { constructError } from '../errors';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';
@@ -99,6 +100,7 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
           }),
       ),
     );
+
     // eslint-disable-next-line no-console
     console.timeEnd(`Dune.com API call for user: ${user.id}`);
 
@@ -136,8 +138,8 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       },
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error((error as Error).message);
+    Sentry.captureException(error);
+
     await prisma.casinoDepositApiCall.update({
       where: {
         id: pendingCall.id,

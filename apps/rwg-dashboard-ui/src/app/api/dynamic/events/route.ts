@@ -12,7 +12,7 @@ import {
   type WalletUnlinkedEventSchema,
   type WalletTransferredEventSchema,
 } from './schemas';
-import { upsertDynamicUser_clientUnsafe } from '@/server/clientUnsafe/upsertDynamicUser';
+import { upsertDynamicUser } from '@/server/server-only/upsertDynamicUser';
 import prisma from '@/server/prisma/client';
 import { updateRakebacks } from '@/server/actions/realbet/updateRakebacks';
 import * as Sentry from '@sentry/nextjs';
@@ -43,7 +43,7 @@ const handlePingEvent = (_event: z.infer<typeof TestEventSchema>) =>
 const handleUserCreatedEvent = async (
   event: z.infer<typeof UserCreatedEventSchema>,
 ) => {
-  await upsertDynamicUser_clientUnsafe({
+  await upsertDynamicUser({
     id: event.userId,
     email: event.data.email,
   }).catch((e) => {
@@ -60,7 +60,7 @@ const handleUserCreatedEvent = async (
 const handleUserUpdatedEvent = async (
   event: z.infer<typeof UserUpdatedEventSchema>,
 ) => {
-  await upsertDynamicUser_clientUnsafe({
+  await upsertDynamicUser({
     id: event.userId,
     username: event.data.username,
   })
@@ -102,7 +102,7 @@ const handleUserDeletedEvent = async (
 const handleWalletCreatedEvent = async (
   event: z.infer<typeof WalletCreatedEventSchema>,
 ) => {
-  await upsertDynamicUser_clientUnsafe(
+  await upsertDynamicUser(
     {
       id: event.userId,
       wallets: [
@@ -127,7 +127,7 @@ const handleWalletCreatedEvent = async (
 const handleWalletLinkedEvent = async (
   event: z.infer<typeof WalletLinkedEventSchema>,
 ) => {
-  await upsertDynamicUser_clientUnsafe(
+  await upsertDynamicUser(
     {
       id: event.userId,
       wallets: [

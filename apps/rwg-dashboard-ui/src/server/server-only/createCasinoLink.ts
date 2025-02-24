@@ -1,5 +1,7 @@
+import 'server-only';
+
 import prisma from '@/server/prisma/client';
-import { subscribeToWave_clientUnsafe } from './subscribeToWave';
+import { subscribeToWave } from './subscribeToWave';
 import { env } from '@/env';
 import { z } from 'zod';
 import * as Sentry from '@sentry/nextjs';
@@ -13,8 +15,7 @@ const WalletResponseSchema = z.object({
   ),
 });
 
-// no auth, use server side only
-export const createCasinoLink_clientUnsafe = async ({
+export const createCasinoLink = async ({
   userId,
   realbetUserId,
   realbetUsername,
@@ -112,7 +113,7 @@ export const createCasinoLink_clientUnsafe = async ({
     { isolationLevel: 'Serializable' },
   );
   try {
-    await subscribeToWave_clientUnsafe({
+    await subscribeToWave({
       id: userId,
       addresses: dynamicUser.wallets.map((w) => w.address),
     });
