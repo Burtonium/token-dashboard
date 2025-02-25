@@ -140,8 +140,8 @@ model Reward {
 }
 
 model ClaimPeriod {
-  id          Int      @id @default(autoincrement())
-  created     DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  created     DateTime  @default(now())
   end         DateTime
   claims      Claim[]
 }

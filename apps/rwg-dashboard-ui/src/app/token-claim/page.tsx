@@ -99,7 +99,7 @@ const ClaimPage = () => {
               </h3>
             ) : (
               <ClaimWarningModal
-                amount={claims.data?.amounts.total ?? 0n}
+                amount={claims.data?.amounts.claimableTotal ?? 0n}
                 onConfirm={process.mutate}
               >
                 <Button
@@ -136,7 +136,7 @@ const ClaimPage = () => {
               </>
             ) : (
               <>
-                {claims.data && claims.data.amounts.claimed > 0n && (
+                {claims.data && claims.data.amounts.claimedAmount > 0n && (
                   <>
                     <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
                       <div className="flex items-center gap-2">
@@ -153,7 +153,9 @@ const ClaimPage = () => {
                         </Popover>
                       </div>
                       <h3 className="flex items-center gap-1 text-right text-heading">
-                        {formatBalance(claims.data?.amounts.claimed ?? 0n)}{' '}
+                        {formatBalance(
+                          claims.data?.amounts.claimedAmount ?? 0n,
+                        )}{' '}
                         <RealIcon size="sm" />
                       </h3>
                     </div>
@@ -180,7 +182,8 @@ const ClaimPage = () => {
                   </>
                 )}{' '}
                 {!hasEnded &&
-                  (!claims.data || claims.data.amounts.claimable > 0n) && (
+                  (!claims.data ||
+                    claims.data.amounts.claimableAmount > 0n) && (
                     <>
                       <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
                         <div className="flex items-center gap-2">
@@ -197,7 +200,10 @@ const ClaimPage = () => {
                           </Popover>
                         </div>
                         <h3 className="flex items-center gap-1 text-right text-heading">
-                          {formatBalance(claims.data?.amounts.claimable ?? 0n)}{' '}
+                          {formatBalance(
+                            claims.data.amounts.claimableAmount +
+                              claims.data.amounts.signableAmount,
+                          )}{' '}
                           <RealIcon size="sm" />
                         </h3>
                       </div>
@@ -216,7 +222,9 @@ const ClaimPage = () => {
                           </Popover>
                         </div>
                         <h3 className="flex items-center gap-1 text-right text-heading">
-                          {formatBalance(claims.data?.amounts.bonus ?? 0n)}{' '}
+                          {formatBalance(
+                            claims.data?.amounts.claimableBonus ?? 0n,
+                          )}{' '}
                           <RealIcon size="sm" />
                         </h3>
                       </div>

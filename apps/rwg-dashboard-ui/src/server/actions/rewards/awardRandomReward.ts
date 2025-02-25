@@ -8,7 +8,7 @@ import { getRandomWeightedItem } from '@/utils';
 import {
   creditUserBonus,
   rewardToBonusId,
-} from '../../server-only/updateRealbetCredits';
+} from '../../server-only/creditUserBonus';
 import { constructError } from '../errors';
 
 export const awardRandomReward = authGuard(async (user, nearWins: number) => {

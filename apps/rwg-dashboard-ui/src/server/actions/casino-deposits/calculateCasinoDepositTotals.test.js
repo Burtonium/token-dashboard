@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import prisma from '@/server/prisma/client';
 import * as dune from '@duneanalytics/client-sdk';
 import * as Sentry from '@sentry/nextjs';
+import { calculateCasinoDepositTotals } from './calculateCasinoDepositTotals';
 
 vi.mock('server-only', () => ({}));
 
@@ -16,6 +17,9 @@ vi.mock('@/lib/serverActionErrorGuard', () => ({
 }));
 
 vi.mock('@duneanalytics/client-sdk', () => ({
+  QueryParameter: {
+    text: vi.fn(),
+  },
   DuneClient: class {
     constructor(apiKey) {
       expect(apiKey).toEqual('test-api-key');
@@ -23,7 +27,16 @@ vi.mock('@duneanalytics/client-sdk', () => ({
 
     async runQuery() {
       return {
-        result: { rows: [{ source: 'casino1', totalUsdValue: 100 }] },
+        result: {
+          rows: [
+            {
+              blockchain: 'ethereum',
+              source: 'rollbit',
+              symbol: 'ETH',
+              totalUsdValue: 1000,
+            },
+          ],
+        },
       };
     }
   },
@@ -32,10 +45,7 @@ vi.mock('@duneanalytics/client-sdk', () => ({
 vi.mock('@/server/auth', () => ({
   decodeUser: vi.fn().mockResolvedValue({
     id: 'test-user-id',
-    addresses: [
-      '0x9f5748188F887b92e9503a48B6C22043478C1597',
-      '0xB6b7cE10a5Aaf0B9dB80bdB8aAAc01237CB78103',
-    ],
+    addresses: ['0x9f5748188F887b92e9503a48B6C22043478C1597'],
   }),
 }));
 
@@ -57,9 +67,20 @@ vi.mock('@sentry/nextjs', () => ({
   captureMessage: vi.fn(),
 }));
 
-import { calculateCasinoDepositTotals } from './calculateCasinoDepositTotals';
-
 describe('calculateCasinoDepositTotals', () => {
+  it('Should not work if casino link is not found', async () => {
+    prisma.dynamicUser.findFirst.mockResolvedValue({
+      casinoLink: undefined,
+      apiCall: undefined,
+    });
+
+    expect(await calculateCasinoDepositTotals('whatever')).to.toMatchObject({
+      type: 'ServerActionError',
+      error: true,
+      message: 'Casino link required',
+    });
+  });
+
   it('Should work when api call is not found', async () => {
     prisma.dynamicUser.findFirst.mockResolvedValue({
       casinoLink: {
@@ -69,9 +90,9 @@ describe('calculateCasinoDepositTotals', () => {
       apiCall: undefined,
     });
 
-    expect(
-      async () => await calculateCasinoDepositTotals('whatever'),
-    ).not.toThrow();
+    const totals = await calculateCasinoDepositTotals('whatever');
+
+    expect(totals).not.to.have.property('type').equal('ServerActionError');
   });
 
   it('Retrying should work when api call is errored', async () => {
@@ -85,9 +106,9 @@ describe('calculateCasinoDepositTotals', () => {
       },
     });
 
-    expect(
-      async () => await calculateCasinoDepositTotals('whatever'),
-    ).not.toThrow();
+    expect(await calculateCasinoDepositTotals('whatever'))
+      .not.to.have.property('type')
+      .equal('ServerActionError');
   });
 
   it('Should return error if api call is pending and under 60 seconds old', async () => {
@@ -157,9 +178,11 @@ describe('calculateCasinoDepositTotals', () => {
       },
     });
 
-    vi.spyOn(dune.DuneClient.prototype, 'runQuery').mockResolvedValueOnce({
-      result: undefined,
-    });
+    const querySpy = vi
+      .spyOn(dune.DuneClient.prototype, 'runQuery')
+      .mockResolvedValueOnce({
+        result: undefined,
+      });
 
     const spy = vi.spyOn(Sentry, 'captureException');
 
@@ -169,6 +192,31 @@ describe('calculateCasinoDepositTotals', () => {
       message: 'Error calculating deposits.',
     });
 
-    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledOnce();
+
+    querySpy.mockRestore();
+  });
+
+  it('Should return error if DuneClient throws', async () => {
+    prisma.dynamicUser.findFirst.mockResolvedValue({
+      casinoLink: {
+        realbetUserId: 1,
+        realbetUsername: 'test-user',
+      },
+    });
+
+    const spy = vi
+      .spyOn(dune.DuneClient.prototype, 'runQuery')
+      .mockRejectedValueOnce(new Error('Test error'));
+
+    expect(await calculateCasinoDepositTotals('whatever')).to.toMatchObject({
+      type: 'ServerActionError',
+      error: true,
+      message: 'Error calculating deposits.',
+    });
+
+    expect(spy).toHaveBeenCalledOnce();
+
+    spy.mockRestore();
   });
 });

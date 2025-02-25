@@ -84,9 +84,9 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
   try {
     const client = new DuneClient(env.DUNE_API_KEY ?? '');
     const addresses = user.addresses.filter((address) => isAddress(address)); // currently only supporting evm
-    const paramsList = addresses.map((address) => ({
-      query_parameters: [QueryParameter.text('user_address', address)],
-    }));
+    const paramsList = addresses.map((address) =>
+      QueryParameter.text('user_address', address),
+    );
 
     // eslint-disable-next-line no-console
     console.time(`Dune.com API call for user: ${user.id}`);
@@ -96,7 +96,7 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
         async (params) =>
           await client.runQuery({
             queryId: QUERY_ID,
-            query_parameters: params.query_parameters,
+            query_parameters: [params],
           }),
       ),
     );
@@ -109,12 +109,12 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
         const address = addresses[i];
         assert(address, 'Something went wrong.');
         assert(response?.result?.rows, 'Rows were not found in the query');
-        return CasinoDepositTotalRowsSchema.parse(
-          response.result.rows.map((r) => ({
-            ...r,
-            address,
-          })),
-        );
+        const rowsWithAddress = response.result.rows.map((r) => ({
+          ...r,
+          address,
+        }));
+
+        return CasinoDepositTotalRowsSchema.parse(rowsWithAddress);
       })
       .flat();
 

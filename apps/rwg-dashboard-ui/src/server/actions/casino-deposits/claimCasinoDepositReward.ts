@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/server/prisma/client';
-import { creditUserBonus } from '@/server/server-only/updateRealbetCredits';
+import { creditUserBonus } from '@/server/server-only/creditUserBonus';
 import assert from 'assert';
 import { calculateDepositsScore } from '@/server/utils';
 import { constructError } from '@/server/actions/errors';
@@ -36,10 +36,8 @@ export const claimCasinoDepositReward = authGuard(async (user) => {
       }
 
       if (apiCall.status !== 'Success' || apiCall.totals.length === 0) {
-        return constructError('API Call in an invalid state to claim');
+        return constructError('API Call in an invalid state to claim.');
       }
-
-      assert(dynamicUser.casinoLink, 'Casino link not found');
 
       const amount = calculateDepositsScore(apiCall.totals);
 

@@ -1,9 +1,8 @@
 'use server';
 
-import { omit } from 'lodash';
-import { authGuard } from '../../auth';
+import { authGuard } from '@/server/auth';
 import type { Prisma } from '@prisma/client';
-import prisma from '../../prisma/client';
+import prisma from '@/server/prisma/client';
 
 const bigIntMin = (...args: bigint[]) => args.reduce((m, e) => (e < m ? e : m));
 
@@ -12,17 +11,16 @@ const calculateBonus = (amount: bigint, bonus: bigint) =>
 
 export const getClaimableAmounts = authGuard(
   async (user, tx?: Prisma.TransactionClient) => {
-    const [period, bonuses] = await Promise.all([
-      (tx ?? prisma).claimPeriod.findFirst({
-        include: {
-          claims: {
-            where: {
-              address: {
-                in: user.addresses.map((addr) => addr),
-                mode: 'insensitive',
-              },
-            },
+    const [userClaims, bonuses] = await Promise.all([
+      (tx ?? prisma).claim.findMany({
+        where: {
+          address: {
+            in: user.addresses.map((addr) => addr),
+            mode: 'insensitive',
           },
+        },
+        include: {
+          period: true,
         },
       }),
       (tx ?? prisma).reward.findMany({
@@ -56,23 +54,26 @@ export const getClaimableAmounts = authGuard(
       10n ** 18n;
 
     const claims =
-      period?.claims.map((claim) => ({
+      userClaims.map((claim) => ({
         ...claim,
         amount: BigInt(claim.amount.toFixed(0)),
         bonus: claim.bonus && BigInt(claim.bonus.toFixed(0)),
       })) ?? [];
 
     const signable = claims
-      .filter((claim) => claim.status === 'Pending')
+      .filter(
+        (claim) => claim.status === 'Pending' && claim.period?.end > new Date(),
+      )
       .map((claim) => ({
         ...claim,
         bonus: calculateBonus(claim.amount, bonusAmount),
       }));
 
-    const totalSignable = signable.reduce(
+    const signableAmount = signable.reduce(
       (sum, claim) => sum + claim.amount,
       BigInt(0),
     );
+
     const claimed = claims.filter((claim) => claim.status === 'Claimed');
     const claimedAmount = claimed.reduce(
       (sum, claim) => sum + claim.amount,
@@ -85,29 +86,32 @@ export const getClaimableAmounts = authGuard(
     const claimable = claims.filter(
       (claim) =>
         (claim.status === 'Signed' || claim.status === 'Error') &&
-        (period?.end.getTime() ?? 0) > new Date().getTime(),
+        (claim.period?.end.getTime() ?? 0) > new Date().getTime(),
     );
-    const claimableAmount =
-      claimable.reduce((sum, claim) => sum + claim.amount, BigInt(0)) +
-      totalSignable;
+    const claimableAmount = claimable.reduce(
+      (sum, claim) => sum + claim.amount,
+      BigInt(0),
+    );
 
-    const totalBonus = claimable
-      .concat(signable)
-      .reduce((sum, claim) => sum + (claim.bonus ?? 0n), 0n);
+    const claimableBonus = claimable.reduce(
+      (sum, claim) => sum + (claim.bonus ?? 0n),
+      0n,
+    );
 
     return {
       signable,
       claimable,
       claimed,
       amounts: {
-        claimed: claimedAmount,
+        signableAmount,
+        claimedAmount: claimedAmount,
         claimedBonus,
-        claimable: claimableAmount,
-        bonus: totalBonus,
-        total: claimableAmount + totalBonus,
+        claimableAmount: claimableAmount,
+        claimableBonus: claimableBonus,
+        claimableTotal: claimableAmount + claimableBonus,
       },
       claims,
-      period: omit(period, 'claims'),
+      period: claims?.[0]?.period,
     };
   },
 );

@@ -2,7 +2,7 @@ import { validateSignature } from '@/lib/utils/crypto';
 import { env, isDev } from '@/env';
 import { Bonus } from '@bltzr-gg/realbet-api';
 import { MAX_CLAIM } from '@/config/realbetApi';
-import { bonusIdToReward } from '@/server/server-only/updateRealbetCredits';
+import { bonusIdToReward } from '@/server/server-only/creditUserBonus';
 import assert from 'assert';
 
 export async function POST(request: Request) {
