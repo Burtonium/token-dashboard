@@ -1,15 +1,14 @@
 'use server';
 
-import prisma from '../../prisma/client';
+import prisma from '@/server/prisma/client';
+import { decodeUser } from '@/server/auth';
 import { constructError } from '../errors';
-import { decodeUser } from '../../auth';
 import { getClaimableAmounts } from './getClaimableAmounts';
 import { readContracts } from '@wagmi/core';
 import { tokenMasterAddress, tokenMasterAbi } from '@/contracts/generated';
 import config from '@/config/wagmi';
-import assert from 'assert';
 import { privateKeyToAccount } from 'viem/accounts';
-import { env, isDev } from '@/env';
+import { env } from '@/env';
 import { toHex } from 'viem';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';
 
@@ -21,7 +20,6 @@ export const signPublicSaleClaims = async (authToken: string) => {
     return constructError((error as Error).message);
   }
 
-  assert(isDev, 'token master not deployed to prod');
   if (!env.TOKEN_MASTER_SIGNER_PRIVATE_KEY?.startsWith('0x')) {
     return constructError('No signer key');
   }
@@ -34,6 +32,10 @@ export const signPublicSaleClaims = async (authToken: string) => {
     }
 
     const { signable } = claimable;
+
+    if (signable.length === 0) {
+      return constructError('No pending claims to sign.');
+    }
 
     const hashedMessages = (
       await readContracts(config, {
@@ -54,6 +56,7 @@ export const signPublicSaleClaims = async (authToken: string) => {
     if (hashedMessages.length !== signable.length) {
       return constructError('Found different amount of hashes than expected.');
     }
+
     if (!hashedMessages.every((result) => typeof result === 'string')) {
       return constructError('Something went wrong while signing the claims.');
     }
@@ -69,17 +72,15 @@ export const signPublicSaleClaims = async (authToken: string) => {
     );
 
     await Promise.all([
-      Promise.all(
-        signable.map((claim, index) =>
-          tx.claim.update({
-            where: { id: claim.id },
-            data: {
-              status: 'Signed',
-              signature: signatures[index],
-              bonus: claim.bonus.toString(),
-            },
-          }),
-        ),
+      ...signable.map((claim, index) =>
+        tx.claim.update({
+          where: { id: claim.id },
+          data: {
+            status: 'Signed',
+            signature: signatures[index],
+            bonus: claim.bonus.toString(),
+          },
+        }),
       ),
       tx.reward.updateMany({
         where: {

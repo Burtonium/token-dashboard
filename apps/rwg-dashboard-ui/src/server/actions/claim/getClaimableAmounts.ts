@@ -74,6 +74,11 @@ export const getClaimableAmounts = authGuard(
       BigInt(0),
     );
 
+    const signableBonus = signable.reduce(
+      (sum, claim) => sum + (claim.bonus ?? 0n),
+      0n,
+    );
+
     const claimed = claims.filter((claim) => claim.status === 'Claimed');
     const claimedAmount = claimed.reduce(
       (sum, claim) => sum + claim.amount,
@@ -104,6 +109,7 @@ export const getClaimableAmounts = authGuard(
       claimed,
       amounts: {
         signableAmount,
+        signableBonus,
         claimedAmount: claimedAmount,
         claimedBonus,
         claimableAmount: claimableAmount,
@@ -111,7 +117,7 @@ export const getClaimableAmounts = authGuard(
         claimableTotal: claimableAmount + claimableBonus,
       },
       claims,
-      period: claims?.[0]?.period,
+      period: claims.find(({ period }) => period.end > new Date()),
     };
   },
 );
