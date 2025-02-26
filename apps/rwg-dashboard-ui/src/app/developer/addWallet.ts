@@ -11,11 +11,13 @@ export const addWallet = authGuard(
   async (user, { chain, address }: { chain: string; address: string }) => {
     assert(isDev, 'addWallet is only available in dev mode');
 
+    const checksummedAddress = chain === 'EVM' ? getAddress(address) : address;
+
     return prisma.linkedWallet
       .create({
         data: {
           chain,
-          address: getAddress(address),
+          address: checksummedAddress,
           dynamicUserId: user.id,
         },
       })
