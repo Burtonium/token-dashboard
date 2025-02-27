@@ -1,3 +1,5 @@
+'use server';
+
 import { isDev } from '@/env';
 import {
   upsertDynamicUser,

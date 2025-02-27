@@ -29,7 +29,7 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
               onAuthSuccess: async (data) => {
                 try {
                   const { upsertSelf } = await import(
-                    '@/app/developer/upsertUser'
+                    '@/app/developer/upsertSelf'
                   );
 
                   if (!data.user.userId) {
@@ -74,7 +74,7 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
                   return;
                 }
 
-                void import('@/app/developer/upsertUser')
+                void import('@/app/developer/upsertSelf')
                   .then((mod) =>
                     mod.upsertSelf({
                       id: user.userId!,

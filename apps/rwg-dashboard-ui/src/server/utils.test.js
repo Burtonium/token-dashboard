@@ -5,9 +5,11 @@ describe('calculateDepositsScore', () => {
   it('Should give you 100 for any activity', () => {
     expect(calculateDepositsScore([{ amount: '1' }])).toEqual(100);
   });
+
   it('Should give you 0 for no activity', () => {
     expect(calculateDepositsScore([])).toEqual(0);
   });
+
   it('Should work correctly for other numbers', () => {
     expect(calculateDepositsScore([{ amount: '150' }])).toEqual(200);
     expect(

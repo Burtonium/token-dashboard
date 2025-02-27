@@ -117,7 +117,9 @@ export const getClaimableAmounts = authGuard(
         claimableTotal: claimableAmount + claimableBonus,
       },
       claims,
-      period: claims.find(({ period }) => period.end > new Date()),
+      period:
+        claims.find(({ period }) => period.end > new Date())?.period ??
+        claims[0]?.period,
     };
   },
 );
