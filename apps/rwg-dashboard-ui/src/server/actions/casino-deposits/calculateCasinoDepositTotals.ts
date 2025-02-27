@@ -22,6 +22,18 @@ const CasinoTotalSchema = z.object({
   address: z.string(),
 });
 
+class Timer {
+  private startTime: number;
+
+  constructor() {
+    this.startTime = Date.now();
+  }
+
+  public getElapsed(): number {
+    return Date.now() - this.startTime;
+  }
+}
+
 const CasinoDepositTotalRowsSchema = z
   .unknown()
   .transform((o) => toCamel(o))
@@ -87,20 +99,18 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       query_parameters: [QueryParameter.text('user_address', address)],
     }));
 
-    // eslint-disable-next-line no-console
-    console.time(`Dune.com API call for user: ${user.id}`);
+    const timer = new Timer();
 
     const responses = await Promise.all(
-      paramsList.map(
-        async (params) =>
-          await client.runQuery({
-            queryId: QUERY_ID,
-            query_parameters: params.query_parameters,
-          }),
+      paramsList.map((params) =>
+        client.runQuery({
+          queryId: QUERY_ID,
+          query_parameters: params.query_parameters,
+        }),
       ),
     );
-    // eslint-disable-next-line no-console
-    console.timeEnd(`Dune.com API call for user: ${user.id}`);
+
+    const elapsed = timer.getElapsed();
 
     const results = responses
       .map((response, i) => {
@@ -122,6 +132,7 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
       },
       data: {
         status: 'Success',
+        elapsed,
         totals: {
           createMany: {
             data: results.map((p) => ({

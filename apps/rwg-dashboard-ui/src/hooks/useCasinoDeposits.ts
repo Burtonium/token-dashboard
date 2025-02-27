@@ -1,6 +1,7 @@
 import { useAuthenticatedMutation } from '@/hooks/useAuthenticatedMutation';
 import { useAuthenticatedQuery } from '@/hooks/useAuthenticatedQuery';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
+import useCountdown from '@/hooks/useCountdown';
 import { calculateCasinoDepositTotals } from '@/server/actions/casino-deposits/calculateCasinoDepositTotals';
 import { claimCasinoDepositReward } from '@/server/actions/casino-deposits/claimCasinoDepositReward';
 import { fetchCasinoDepositTotals } from '@/server/actions/casino-deposits/fetchCasinoDepositTotals';
@@ -8,6 +9,7 @@ import { useMemo } from 'react';
 
 export const useCasinoDeposits = () => {
   const casinoLink = useCasinoLink();
+  const scanCountdown = useCountdown();
 
   const deposits = useAuthenticatedQuery({
     enabled: casinoLink.isSuccess && !!casinoLink.data,
@@ -19,7 +21,14 @@ export const useCasinoDeposits = () => {
 
   const calculateDeposits = useAuthenticatedMutation({
     mutationFn: calculateCasinoDepositTotals,
-    onSuccess: () => deposits.refetch(),
+    onSuccess: () => {
+      scanCountdown.stop();
+      return deposits.refetch();
+    },
+    onMutate: () => {
+      scanCountdown.start(180);
+      return deposits.refetch();
+    },
   });
 
   const totalDeposited = useMemo(
@@ -55,5 +64,6 @@ export const useCasinoDeposits = () => {
     },
     score: deposits.data?.score ?? 0,
     totalDeposited,
+    scanCountdown,
   };
 };

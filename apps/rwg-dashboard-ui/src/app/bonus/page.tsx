@@ -8,7 +8,7 @@ import {
   useIsLoggedIn,
   useDynamicModals,
 } from '@dynamic-labs/sdk-react-core';
-
+import dayjs from '@/dayjs';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -31,7 +31,7 @@ import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useToken } from '@/hooks/useToken';
 import ErrorComponent from '@/components/error';
 import { useWalletAddresses } from '@/hooks/useWalletAddresses';
-import { useCasinoDeposits } from './hooks/useCasinoDeposits';
+import { useCasinoDeposits } from '../../hooks/useCasinoDeposits';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import Link from 'next/link';
 import RealIcon from '@/assets/images/R.svg';
@@ -326,6 +326,17 @@ const BonusPage = () => {
                   You can retry in {retryInSeconds} seconds.
                 </p>
               )}
+
+              {casinoDeposits.data?.status === 'Success' &&
+                casinoDeposits.data && (
+                  <div className="w-full text-right text-sm font-normal">
+                    Last scanned:{' '}
+                    {dayjs(casinoDeposits.data?.timestamp).fromNow()}. Query
+                    took{' '}
+                    {((casinoDeposits.data?.elapsed ?? 0) / 1000).toFixed(1)}{' '}
+                    seconds.
+                  </div>
+                )}
             </div>
             {showResults && (
               <>
@@ -432,7 +443,10 @@ const BonusPage = () => {
                     {casinoDeposits.isSuccess &&
                       casinoDeposits.data?.totals.length === 0 && (
                         <TableRow>
-                          <TableCell className="flex items-center gap-2 px-5 font-normal capitalize">
+                          <TableCell
+                            colSpan={3}
+                            className="gap-2 px-5 font-normal capitalize"
+                          >
                             No deposits were detected.
                           </TableCell>
                         </TableRow>
