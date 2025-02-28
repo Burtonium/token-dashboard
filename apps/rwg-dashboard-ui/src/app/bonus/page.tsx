@@ -38,6 +38,11 @@ import RealIcon from '@/assets/images/R.svg';
 import ClaimCasinoDepositBonusModal from '@/components/modals/ClaimCasinoDepositBonusModal';
 import CasinoDepositRescanWarningModal from '@/components/modals/CasinoDepositRescanWarningModal';
 import BcGameLogo from '@/assets/icons/bc-game.svg';
+import { useEaseOut } from '@/hooks/useEaseOut';
+import { Progress } from '@/components/ui/progress';
+import useCountdown from '@/hooks/useCountdown';
+import useRandomDelay from '@/hooks/useRandomizer';
+import { cn } from '@/lib/cn';
 
 const logos: Record<string, JSX.Element> = {
   shuffle: (
@@ -160,14 +165,17 @@ const logos: Record<string, JSX.Element> = {
 
 const BonusPage = () => {
   const [_showResults, setShowResults] = useState(false);
-  const [retryInSeconds, setRetryInSeconds] = useState<number | null>(null);
+  const { remaining: retryInSeconds, start } = useCountdown();
   const {
     deposits: casinoDeposits,
     bonus,
     calculateDeposits,
     totalDeposited,
     score,
+    scanCountdown,
   } = useCasinoDeposits();
+  const easedOutCountdown = useEaseOut(scanCountdown.remainingPercentage);
+  const rancomizedEasedOut = useRandomDelay(easedOutCountdown ?? 0);
   const token = useToken();
   const isAuthenticated = useIsLoggedIn();
   const { sdkHasLoaded, setShowDynamicUserProfile } = useDynamicContext();
@@ -186,13 +194,13 @@ const BonusPage = () => {
         )
       : null;
 
-    setRetryInSeconds(retryInSeconds);
+    start(retryInSeconds ?? 0);
     if (retryInSeconds && retryInSeconds > 0) {
       return;
     }
     setShowResults(true);
     calculateDeposits.mutate();
-  }, [calculateDeposits, casinoDeposits.data]);
+  }, [calculateDeposits, casinoDeposits.data, start]);
 
   if (casinoDeposits.error) {
     return <ErrorComponent />;
@@ -243,108 +251,117 @@ const BonusPage = () => {
       {isAuthenticated && userAddresses && userAddresses.length > 0 && (
         <div>
           <div className="space-y-4 md:max-w-[65%]">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 px-5 py-4">
-              <span>
-                Connected Wallets: {userAddresses.length}
-                <div className="flex items-center gap-2">
-                  {userAddresses.slice(0, 3).map((address, i) => (
-                    <span key={`${address}-${i}`}>
-                      {shorten(address, 4)}
-                      {userAddresses[i + 1] && ','}
-                    </span>
-                  ))}
-                  {userAddresses.length > 3 && (
-                    <span className="no-wrap whitespace-nowrap">
-                      {'+ '}
-                      <a
-                        className="cursor-pointer font-semibold underline underline-offset-2 hover:text-primary"
-                        onClick={() => setShowDynamicUserProfile(true)}
-                      >
-                        {userAddresses.length - 3} more
-                      </a>
-                    </span>
-                  )}
+            <div className="rounded-xl bg-lighter/50 px-5 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline">
+                  Connected Wallets: {userAddresses.length}
+                  <div className="flex items-center gap-2">
+                    {userAddresses.slice(0, 3).map((address, i) => (
+                      <span key={`${address}-${i}`}>
+                        {shorten(address, 4)}
+                        {userAddresses[i + 1] && ','}
+                      </span>
+                    ))}
+                    {userAddresses.length > 3 && (
+                      <span className="no-wrap whitespace-nowrap">
+                        {'+ '}
+                        <a
+                          className="cursor-pointer font-semibold underline underline-offset-2 hover:text-primary"
+                          onClick={() => setShowDynamicUserProfile(true)}
+                        >
+                          {userAddresses.length - 3} more
+                        </a>
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </span>
-              <div className="flex items-center gap-3">
-                {casinoLink.isSuccess &&
-                  (casinoLink.isLinked ? (
-                    <>
-                      {!bonus.claimed && (
-                        <>
-                          <Button
-                            onClick={() => setShowLinkNewWalletModal(true)}
-                            variant="outline"
-                            className="place-self-end focus:ring-0"
-                          >
-                            + Add new crypto wallet
-                          </Button>
-                          {casinoDeposits.data?.status === 'Pending' &&
-                          new Date().getTime() -
-                            casinoDeposits.data.timestamp.getTime() >
-                            1000 * 60 ? (
-                            <CasinoDepositRescanWarningModal
-                              onConfirm={() => {
-                                setShowResults(true);
-                                calculateDeposits.mutate();
-                              }}
+                <div className="flex items-center gap-3">
+                  {casinoLink.isSuccess &&
+                    (casinoLink.isLinked ? (
+                      <>
+                        {!bonus.claimed && (
+                          <>
+                            <Button
+                              onClick={() => setShowLinkNewWalletModal(true)}
+                              variant="outline"
+                              className="place-self-end focus:ring-0"
                             >
+                              + Add new crypto wallet
+                            </Button>
+                            {casinoDeposits.data?.status === 'Pending' &&
+                            new Date().getTime() -
+                              casinoDeposits.data.timestamp.getTime() >
+                              1000 * 60 ? (
+                              <CasinoDepositRescanWarningModal
+                                onConfirm={() => {
+                                  setShowResults(true);
+                                  calculateDeposits.mutate();
+                                }}
+                              >
+                                <Button
+                                  loading={calculateDeposits.isPending}
+                                  disabled={bonus.claimed}
+                                  className="place-self-end focus:ring-0"
+                                >
+                                  Rescan Rewards
+                                </Button>
+                              </CasinoDepositRescanWarningModal>
+                            ) : (
                               <Button
                                 loading={calculateDeposits.isPending}
                                 disabled={bonus.claimed}
+                                onClick={scanRewards}
                                 className="place-self-end focus:ring-0"
                               >
-                                Rescan Rewards
+                                {casinoDeposits.data &&
+                                casinoDeposits.data.status === 'Success'
+                                  ? 'Rescan Rewards'
+                                  : casinoDeposits.data?.status === 'Pending'
+                                    ? 'In progress'
+                                    : 'Scan Rewards'}
                               </Button>
-                            </CasinoDepositRescanWarningModal>
-                          ) : (
-                            <Button
-                              loading={calculateDeposits.isPending}
-                              disabled={bonus.claimed}
-                              onClick={scanRewards}
-                              className="place-self-end focus:ring-0"
-                            >
-                              {casinoDeposits.data &&
-                              casinoDeposits.data.status === 'Success'
-                                ? 'Rescan Rewards'
-                                : casinoDeposits.data?.status === 'Pending'
-                                  ? 'In progress'
-                                  : 'Scan Rewards'}
-                            </Button>
-                          )}
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <Button asChild className="place-self-end">
-                      <Link href="/link-realbet">Link Realbet Account</Link>
-                    </Button>
-                  ))}
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <Button asChild className="place-self-end">
+                        <Link href="/link-realbet">Link Realbet Account</Link>
+                      </Button>
+                    ))}
+                </div>
               </div>
-              {retryInSeconds && retryInSeconds > 0 && (
-                <p className="w-full text-right text-warning">
-                  You can retry in {retryInSeconds} seconds.
+              {retryInSeconds !== undefined && retryInSeconds > 0 && (
+                <p className="mt-2 w-full text-right text-warning">
+                  You can retry in <strong>{retryInSeconds}</strong> seconds.
                 </p>
               )}
 
               {casinoDeposits.data?.status === 'Success' &&
                 casinoDeposits.data && (
-                  <div className="w-full text-right text-sm font-normal">
-                    Last scanned:{' '}
-                    {dayjs(casinoDeposits.data?.timestamp).fromNow()}. Query
-                    took{' '}
-                    {((casinoDeposits.data?.elapsed ?? 0) / 1000).toFixed(1)}{' '}
-                    seconds.
+                  <div className="w-full text-right font-normal">
+                    Last scanned{' '}
+                    <strong>
+                      {dayjs(casinoDeposits.data?.timestamp).fromNow()}
+                    </strong>
+                    . Query took{' '}
+                    <strong>
+                      {((casinoDeposits.data?.elapsed ?? 0) / 1000).toFixed(1)}{' '}
+                      seconds.
+                    </strong>
                   </div>
                 )}
             </div>
             {showResults && (
               <>
                 {calculateDeposits.isPending && (
-                  <div className="flex flex-wrap items-center gap-3 rounded-xl bg-lighter/50 px-5 py-4">
-                    <Loader2 className="animate-spin" />
-                    Scanning for casino deposits, this may take a while...
-                  </div>
+                  <Progress
+                    value={(rancomizedEasedOut ?? 0) * 100}
+                    variant="accent"
+                    className={cn('mt-2 h-4 transition-all', {
+                      hidden: !calculateDeposits.isPending,
+                    })}
+                  />
                 )}
                 <div className="grid grid-cols-1 gap-3 rounded-xl bg-lighter/50 px-5 py-3 sm:grid-cols-2">
                   <div className="flex flex-col items-center gap-1 rounded-xl border border-orange-100/20 bg-red-500/5 px-2 py-4">

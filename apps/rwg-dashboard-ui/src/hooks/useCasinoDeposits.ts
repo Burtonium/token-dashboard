@@ -7,6 +7,8 @@ import { claimCasinoDepositReward } from '@/server/actions/casino-deposits/claim
 import { fetchCasinoDepositTotals } from '@/server/actions/casino-deposits/fetchCasinoDepositTotals';
 import { useMemo } from 'react';
 
+export const SCAN_TIMEOUT_SECONDS = 180;
+
 export const useCasinoDeposits = () => {
   const casinoLink = useCasinoLink();
   const scanCountdown = useCountdown();
@@ -26,7 +28,7 @@ export const useCasinoDeposits = () => {
       return deposits.refetch();
     },
     onMutate: () => {
-      scanCountdown.start(180);
+      scanCountdown.start(SCAN_TIMEOUT_SECONDS);
       return deposits.refetch();
     },
   });
@@ -64,6 +66,11 @@ export const useCasinoDeposits = () => {
     },
     score: deposits.data?.score ?? 0,
     totalDeposited,
-    scanCountdown,
+    scanCountdown: {
+      ...scanCountdown,
+      remainingPercentage:
+        scanCountdown.remaining &&
+        1 - scanCountdown.remaining / SCAN_TIMEOUT_SECONDS,
+    },
   };
 };
