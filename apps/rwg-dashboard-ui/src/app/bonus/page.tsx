@@ -44,7 +44,40 @@ import useCountdown from '@/hooks/useCountdown';
 import useRandomDelay from '@/hooks/useRandomizer';
 import { cn } from '@/lib/cn';
 
-const logos: Record<string, JSX.Element> = {
+const CASINOS = ['shuffle', 'stake', 'rollbit', 'bc.game'] as const;
+
+const COINS = [
+  {
+    symbol: 'ETH',
+    blockchain: 'ethereum',
+  },
+  {
+    symbol: 'BNB',
+    blockchain: 'bnb',
+  },
+  {
+    symbol: 'SHIB',
+    blockchain: 'ethereum',
+  },
+  {
+    symbol: 'USDT',
+    blockchain: 'ethereum',
+  },
+  {
+    symbol: 'USDC',
+    blockchain: 'ethereum',
+  },
+  {
+    symbol: 'SHIB',
+    blockchain: 'bnb',
+  },
+  {
+    symbol: 'USDC',
+    blockchain: 'bnb',
+  },
+];
+
+const casinoLogos: Record<string, JSX.Element> = {
   shuffle: (
     <svg
       className="absolute inline-block size-full"
@@ -457,21 +490,10 @@ const BonusPage = () => {
                     <TableBodySkeleton rows={2} cols={4} />
                   )}
                   <TableBody>
-                    {casinoDeposits.isSuccess &&
-                      casinoDeposits.data?.totals.length === 0 && (
-                        <TableRow>
-                          <TableCell
-                            colSpan={3}
-                            className="gap-2 px-5 font-normal capitalize"
-                          >
-                            No deposits were detected.
-                          </TableCell>
-                        </TableRow>
-                      )}
                     {casinoDeposits.data?.totals
                       .filter((deposit) => deposit.amount >= 100)
                       .map((deposit) => {
-                        const logo = logos[deposit.casino];
+                        const logo = casinoLogos[deposit.casino];
 
                         return (
                           <TableRow
@@ -499,6 +521,45 @@ const BonusPage = () => {
                           </TableRow>
                         );
                       })}
+                    {CASINOS.flatMap((casino) =>
+                      COINS.map((coin) => ({ casino, coin })),
+                    )
+                      .filter(
+                        (d) =>
+                          !casinoDeposits.data?.totals.find(
+                            (t) =>
+                              t.casino === d.casino &&
+                              t.symbol === d.coin.symbol &&
+                              t.blockchain === d.coin.blockchain,
+                          ),
+                      )
+                      .map(({ casino, coin }) => (
+                        <TableRow
+                          key={`${casino}-${coin.symbol}-${coin.blockchain}`}
+                        >
+                          <TableCell className="gap-2 px-5 font-normal capitalize">
+                            <span className="flex items-center gap-2">
+                              <span className="relative size-8">
+                                {casinoLogos[casino]}
+                              </span>{' '}
+                              <span>{casino}</span>
+                            </span>
+                          </TableCell>
+                          <TableCell className="gap-2 px-5 font-normal">
+                            <img
+                              className="mr-1 inline-block"
+                              alt=""
+                              width={26}
+                              src={`/icons/${coin.symbol.toLowerCase()}.png`}
+                            />{' '}
+                            {coin.symbol}
+                          </TableCell>
+                          <TableCell className="px-5 text-right">
+                            ${0}
+                            USD
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
 
                   <TableFooter className="border-b-5 border border-lighter/50 bg-lighter/20">
