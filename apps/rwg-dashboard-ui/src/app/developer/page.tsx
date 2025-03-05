@@ -93,6 +93,7 @@ const DeveloperPage = () => {
   const addAddress = useAuthenticatedMutation({
     mutationFn: (token: string) =>
       addWallet(token, { address: addressToAdd, chain: chainOfWalletToAdd }),
+    onSuccess: () => wallets.refetch(),
   });
 
   const fundTreasuryMutation = useMutation({
@@ -675,6 +676,7 @@ const DeveloperPage = () => {
                   <SelectContent>
                     <SelectItem value="ethereum">Ethereum</SelectItem>
                     <SelectItem value="bsc">BSC</SelectItem>
+                    <SelectItem value="solana">Solana</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -702,6 +704,7 @@ const DeveloperPage = () => {
                     <SelectItem value="ETH">ETH</SelectItem>
                     <SelectItem value="USDT">USDT</SelectItem>
                     <SelectItem value="USDC">USDC</SelectItem>
+                    <SelectItem value="SHIB">SHIB</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -1,6 +1,5 @@
 'use server';
 
-import assert from 'assert';
 import { QueryParameter, DuneClient } from '@duneanalytics/client-sdk';
 import { z } from 'zod';
 import { decodeUser } from '../../auth';
@@ -11,8 +10,10 @@ import prisma from '../../prisma/client';
 import { isAddress } from 'viem';
 import { constructError } from '../errors';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';
+import { isSolanaAddress } from '@/utils';
 
-const QUERY_ID = 4537410;
+const EVM_QUERY_ID = 4537410;
+const SOL_QUERY_ID = 4805053;
 
 const CasinoTotalSchema = z.object({
   blockchain: z.string(),
@@ -21,6 +22,8 @@ const CasinoTotalSchema = z.object({
   totalUsdValue: z.number(),
   address: z.string(),
 });
+
+const client = new DuneClient(env.DUNE_API_KEY ?? '');
 
 class Timer {
   private startTime: number;
@@ -38,6 +41,38 @@ const CasinoDepositTotalRowsSchema = z
   .unknown()
   .transform((o) => toCamel(o))
   .pipe(z.array(CasinoTotalSchema));
+
+const fetchEVMDepositTotals = async (address: string) => {
+  const queryParameters = [QueryParameter.text('user_address', address)];
+  const query = await client.runQuery({
+    queryId: EVM_QUERY_ID,
+    query_parameters: queryParameters,
+  });
+
+  return CasinoDepositTotalRowsSchema.parse(
+    query.result?.rows.map((r) => ({
+      ...r,
+      address,
+    })),
+  );
+};
+
+const fetchSOLDepositTotals = async (address: string) => {
+  const queryParameters = [QueryParameter.text('user_address', address)];
+
+  const query = await client.runQuery({
+    queryId: SOL_QUERY_ID,
+    query_parameters: queryParameters,
+  });
+
+  return CasinoDepositTotalRowsSchema.parse(
+    query.result?.rows.map((r) => ({
+      ...r,
+      blockchain: 'solana',
+      address,
+    })),
+  ).filter((r) => ['SOL', 'USDC', 'USDT', 'SHIB'].includes(r.symbol));
+};
 
 export const calculateCasinoDepositTotals = async (authToken: string) => {
   if (!env.DUNE_API_KEY) {
@@ -93,38 +128,26 @@ export const calculateCasinoDepositTotals = async (authToken: string) => {
   });
 
   try {
-    const client = new DuneClient(env.DUNE_API_KEY ?? '');
-    const addresses = user.addresses.filter((address) => isAddress(address)); // currently only supporting evm
-    const paramsList = addresses.map((address) => ({
-      query_parameters: [QueryParameter.text('user_address', address)],
-    }));
+    const addresses = user.addresses.filter(
+      (address) => isAddress(address) || isSolanaAddress(address),
+    );
 
     const timer = new Timer();
 
-    const responses = await Promise.all(
-      paramsList.map((params) =>
-        client.runQuery({
-          queryId: QUERY_ID,
-          query_parameters: params.query_parameters,
+    const results = (
+      await Promise.all(
+        addresses.map((address) => {
+          if (isAddress(address)) {
+            return fetchEVMDepositTotals(address);
+          } else if (isSolanaAddress(address)) {
+            return fetchSOLDepositTotals(address);
+          }
+          throw new Error('Invalid address');
         }),
-      ),
-    );
+      )
+    ).flat();
 
     const elapsed = timer.getElapsed();
-
-    const results = responses
-      .map((response, i) => {
-        const address = addresses[i];
-        assert(address, 'Something went wrong.');
-        assert(response?.result?.rows, 'Rows were not found in the query');
-        return CasinoDepositTotalRowsSchema.parse(
-          response.result.rows.map((r) => ({
-            ...r,
-            address,
-          })),
-        );
-      })
-      .flat();
 
     return await prisma.casinoDepositApiCall.update({
       where: {

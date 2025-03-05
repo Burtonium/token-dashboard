@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const credit = Bonus.creditUserBonusResponseSchema.safeParse({
+  const data = {
     ...body.data.bonusDetail,
     amount: body.data.bonusId
       ? bonusIdToReward[Number(body.data.bonusId)]?.toString()
@@ -76,7 +76,9 @@ export async function POST(request: Request) {
     bonusId: body.data.bonusId ?? 9999999,
     bonusName: body.data.bonusDetail?.name ?? 'Unknown',
     maxClaim: (body.data.bonusDetail?.maxClaim ?? MAX_CLAIM).toString(),
-  });
+  };
+
+  const credit = Bonus.creditUserBonusResponseSchema.safeParse(data);
 
   if (credit.error) {
     // eslint-disable-next-line no-console
@@ -103,6 +105,6 @@ export async function POST(request: Request) {
     elapsed: 0,
     requestPath: '/po/bonus/external/credit-user-bonus',
     userId: body.data.userId,
-    data: credit.data,
+    data,
   });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Check, Loader2, Wallet2 } from 'lucide-react';
 import Banner from '@/components/banner';
 import {
@@ -43,39 +43,11 @@ import { Progress } from '@/components/ui/progress';
 import useCountdown from '@/hooks/useCountdown';
 import useRandomDelay from '@/hooks/useRandomizer';
 import { cn } from '@/lib/cn';
+import { sortBy } from 'lodash';
 
 const CASINOS = ['shuffle', 'stake', 'rollbit', 'bc.game'] as const;
 
-const COINS = [
-  {
-    symbol: 'ETH',
-    blockchain: 'ethereum',
-  },
-  {
-    symbol: 'BNB',
-    blockchain: 'bnb',
-  },
-  {
-    symbol: 'SHIB',
-    blockchain: 'ethereum',
-  },
-  {
-    symbol: 'USDT',
-    blockchain: 'ethereum',
-  },
-  {
-    symbol: 'USDC',
-    blockchain: 'ethereum',
-  },
-  {
-    symbol: 'SHIB',
-    blockchain: 'bnb',
-  },
-  {
-    symbol: 'USDC',
-    blockchain: 'bnb',
-  },
-];
+const COINS = ['ETH', 'BNB', 'USDT', 'USDC', 'SHIB', 'SOL'] as const;
 
 const casinoLogos: Record<string, JSX.Element> = {
   shuffle: (
@@ -235,6 +207,33 @@ const BonusPage = () => {
     calculateDeposits.mutate();
   }, [calculateDeposits, casinoDeposits.data, start]);
 
+  const combinedDeposits = useMemo(
+    () =>
+      sortBy(
+        casinoDeposits.data?.totals.reduce(
+          (acc, cur) => {
+            const existing = acc.find(
+              (a) => a.symbol === cur.symbol && a.casino === cur.casino,
+            );
+
+            if (existing) {
+              existing.amount += cur.amount;
+            } else {
+              acc.push({
+                symbol: cur.symbol,
+                casino: cur.casino,
+                amount: cur.amount,
+              });
+            }
+            return acc;
+          },
+          [] as { symbol: string; casino: string; amount: number }[],
+        ),
+        ['casino', 'amount'],
+      ).reverse(),
+    [casinoDeposits.data?.totals],
+  );
+
   if (casinoDeposits.error) {
     return <ErrorComponent />;
   }
@@ -283,7 +282,7 @@ const BonusPage = () => {
       </Banner>
       {isAuthenticated && userAddresses && userAddresses.length > 0 && (
         <div>
-          <div className="space-y-4 md:max-w-[65%]">
+          <div className="space-y-4 md:max-w-3xl">
             <div className="rounded-xl bg-lighter/50 px-5 py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline">
@@ -490,14 +489,14 @@ const BonusPage = () => {
                     <TableBodySkeleton rows={2} cols={4} />
                   )}
                   <TableBody>
-                    {casinoDeposits.data?.totals
-                      .filter((deposit) => deposit.amount >= 100)
+                    {combinedDeposits
+                      ?.filter((deposit) => deposit.amount >= 100)
                       .map((deposit) => {
                         const logo = casinoLogos[deposit.casino];
 
                         return (
                           <TableRow
-                            key={`${deposit.casino}-${deposit.blockchain}-${deposit.symbol}`}
+                            key={`${deposit.casino}-${deposit.symbol}`}
                             className="odd:bg-lighter/1 even:bg-lighter/1 border-b-5 border border-lighter/50"
                           >
                             <TableCell className="gap-2 px-5 font-normal capitalize">
@@ -508,6 +507,7 @@ const BonusPage = () => {
                             </TableCell>
                             <TableCell className="gap-2 px-5 font-normal">
                               <img
+                                className="mr-1 inline-block"
                                 alt=""
                                 width={26}
                                 src={`/icons/${deposit.symbol.toLowerCase()}.png`}
@@ -515,8 +515,7 @@ const BonusPage = () => {
                               {deposit.symbol}
                             </TableCell>
                             <TableCell className="px-5 text-right">
-                              ${deposit.amount.toLocaleString()}
-                              USD
+                              ${deposit.amount.toLocaleString()} USD
                             </TableCell>
                           </TableRow>
                         );
@@ -527,16 +526,11 @@ const BonusPage = () => {
                       .filter(
                         (d) =>
                           !casinoDeposits.data?.totals.find(
-                            (t) =>
-                              t.casino === d.casino &&
-                              t.symbol === d.coin.symbol &&
-                              t.blockchain === d.coin.blockchain,
+                            (t) => t.casino === d.casino && t.symbol === d.coin,
                           ),
                       )
                       .map(({ casino, coin }) => (
-                        <TableRow
-                          key={`${casino}-${coin.symbol}-${coin.blockchain}`}
-                        >
+                        <TableRow key={`${casino}-${coin}`}>
                           <TableCell className="gap-2 px-5 font-normal capitalize">
                             <span className="flex items-center gap-2">
                               <span className="relative size-8">
@@ -550,13 +544,12 @@ const BonusPage = () => {
                               className="mr-1 inline-block"
                               alt=""
                               width={26}
-                              src={`/icons/${coin.symbol.toLowerCase()}.png`}
+                              src={`/icons/${coin.toLowerCase()}.png`}
                             />{' '}
-                            {coin.symbol}
+                            {coin}
                           </TableCell>
                           <TableCell className="px-5 text-right">
-                            ${0}
-                            USD
+                            ${0} USD
                           </TableCell>
                         </TableRow>
                       ))}
@@ -564,10 +557,10 @@ const BonusPage = () => {
 
                   <TableFooter className="border-b-5 border border-lighter/50 bg-lighter/20">
                     <TableRow>
-                      <TableHead className="px-5 font-normal"></TableHead>
                       <TableHead className="px-5 text-sm font-normal">
                         Total
                       </TableHead>
+                      <TableHead className="px-5 text-lg font-normal text-primary"></TableHead>
                       <TableHead className="px-5 text-right text-lg font-normal text-primary">
                         +{score.toLocaleString()}{' '}
                         <span className="m-1 inline-flex size-6 flex-col items-center justify-center rounded-full border border-primary bg-black p-1 text-primary">

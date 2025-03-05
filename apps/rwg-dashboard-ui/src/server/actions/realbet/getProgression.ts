@@ -5,6 +5,7 @@ import { env } from '@/env';
 import { authGuard } from '@/server/auth';
 import prisma from '@/server/prisma/client';
 import { constructError } from '../errors';
+import { captureException } from '@sentry/nextjs';
 
 const realbetApi = new ApiClient({
   secret: env.REALBET_API_SECRET_KEY,
@@ -33,6 +34,7 @@ export const getRealbetProgression = authGuard(async (user) => {
       wagerLevel,
     };
   } catch (error) {
+    captureException(error);
     // eslint-disable-next-line no-console
     console.error((error as Error).message);
     return constructError('Something went wrong with the Realbet API');

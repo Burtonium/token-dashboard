@@ -104,6 +104,28 @@ export async function POST(request: Request) {
 
   const { tier } = calculateRakebackFromReal(trackedBalances.total);
 
+  const data = tier && {
+    userId: body.data.userId,
+    rate: tier?.rate,
+    updatedAt: new Date().toISOString(),
+    description: `Rakeback tier ${tier?.rank}`,
+  };
+
+  if (data) {
+    const parsed = User.getRakebackResponseSchema.safeParse(data);
+
+    if (parsed.error) {
+      return Response.json({
+        success: false,
+        error: parsed.error,
+        code: 9001400,
+        msg: 'Invalid request.',
+        elapsed,
+        requestPath,
+      });
+    }
+  }
+
   return Response.json({
     success: true,
     error: null,
@@ -112,13 +134,6 @@ export async function POST(request: Request) {
     elapsed,
     requestPath,
     userId: body.data.userId,
-    data:
-      tier &&
-      User.getRakebackResponseSchema.parse({
-        userId: body.data.userId,
-        rate: tier?.rate,
-        updatedAt: new Date().toISOString(),
-        description: `Rakeback tier ${tier?.rank}`,
-      }),
+    data,
   });
 }

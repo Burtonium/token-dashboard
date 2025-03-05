@@ -4,6 +4,7 @@ import { authGuard } from '../../auth';
 import prisma from '@/server/prisma/client';
 import { ClaimStatus } from '@prisma/client';
 import { constructError } from '@/server/actions/errors';
+import * as Sentry from '@sentry/nextjs';
 
 export const updateClaimStatus = authGuard(
   async (
@@ -40,8 +41,10 @@ export const updateClaimStatus = authGuard(
               },
       });
     } catch (error) {
+      Sentry.captureException(error);
       // eslint-disable-next-line no-console
       console.error(error);
+
       return constructError('An unexpected error occurred');
     }
   },
