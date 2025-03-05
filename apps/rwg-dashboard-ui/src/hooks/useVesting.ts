@@ -273,6 +273,8 @@ export const useVesting = () => {
       });
 
       await waitForTransactionReceipt(config, { hash: tx });
+
+      return tx;
     },
   });
 

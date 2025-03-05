@@ -332,7 +332,7 @@ export const useStakingVault = () => {
         args: [contractAddress, amount],
       });
 
-      await waitForTransactionReceipt(config, { hash: tx });
+      await waitForTransactionReceipt(config, { hash: tx, confirmations: 2 });
     },
     onSuccess: async () => allowance.refetch(),
   });

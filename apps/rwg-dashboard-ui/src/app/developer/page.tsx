@@ -255,7 +255,7 @@ const DeveloperPage = () => {
             <TabsTrigger value="token">Token</TabsTrigger>
             <TabsTrigger value="rewards">Rewards</TabsTrigger>
             <TabsTrigger value="bonus">Switch Bonus</TabsTrigger>
-            <TabsTrigger value="vesting">Vesting & Claims</TabsTrigger>
+            <TabsTrigger value="vesting">Vesting &amp; Claims</TabsTrigger>
             <TabsTrigger value="debug">Debug Data</TabsTrigger>
           </TabsList>
         </div>
