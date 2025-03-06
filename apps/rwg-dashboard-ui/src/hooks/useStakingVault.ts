@@ -17,6 +17,7 @@ import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { getStakingMerkleProofs } from '@/server/actions/staking/getStakingMerkleProofs';
 import { uniqBy } from 'lodash';
 import { serverActionErrorGuard } from '@/lib/serverActionErrorGuard';
+import { useNetworkGuard } from '@/providers/network-guard';
 
 const chainId = isDev ? sepolia.id : mainnet.id;
 const contractAddress = tokenStakingConfig.address[chainId];
@@ -37,6 +38,7 @@ export const useStakingVault = () => {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   const primaryAddress = usePrimaryAddress();
+  const networkGuard = useNetworkGuard();
 
   const tiers = useQuery({
     enabled: isSuccess && !!contractAddress,
@@ -286,6 +288,8 @@ export const useStakingVault = () => {
 
   const stake = useMutation({
     mutationFn: async ({ amount, tier }: { amount: bigint; tier: number }) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!contractAddress) {
         throw new Error('Contract address not found');
       }
@@ -311,6 +315,8 @@ export const useStakingVault = () => {
 
   const increaseAllowance = useMutation({
     mutationFn: async (amount: bigint) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!primaryWallet) {
         setShowAuthFlow(true);
         return;
@@ -326,13 +332,15 @@ export const useStakingVault = () => {
         args: [contractAddress, amount],
       });
 
-      await waitForTransactionReceipt(config, { hash: tx });
+      await waitForTransactionReceipt(config, { hash: tx, confirmations: 2 });
     },
     onSuccess: async () => allowance.refetch(),
   });
 
   const unstake = useMutation({
     mutationFn: async ({ stakeIndex }: { stakeIndex: bigint }) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!publicClient) {
         throw new Error('Public client not found');
       }
@@ -376,6 +384,8 @@ export const useStakingVault = () => {
       merkleProofs: `0x${string}`[][];
       unstake: boolean;
     }) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!contractAddress) {
         throw new Error('Contract address not found');
       }
@@ -463,6 +473,8 @@ export const useStakingVault = () => {
       stakeIndex: bigint;
       unstake: boolean;
     }) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!merkleProofs.data) {
         return;
       }
@@ -518,6 +530,8 @@ export const useStakingVault = () => {
    */
   const claimAll = useMutation({
     mutationFn: async () => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!merkleProofs.data) {
         return;
       }

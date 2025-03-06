@@ -14,6 +14,8 @@ import { CheckCircle2, Loader2, XCircleIcon } from 'lucide-react';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { CreateVestingSchedule } from './components/create-vesting-schedule';
 import { VestingScheduleList } from './components/vesting-schedule-list';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ImportVestingSchedules } from './components/import-vesting-schedules';
 
 const PermissionIcon = ({
   queryResult,
@@ -87,7 +89,7 @@ const AdminPage: React.FC = () => {
   const vault = useStakingVault();
   const vesting = useVesting();
 
-  if (!sdkHasLoaded || !vault.isAdmin.isSuccess) {
+  if (!sdkHasLoaded || !vault.isAdmin.isSuccess || !vesting.isAdmin.isSuccess) {
     return <Loading />;
   }
 
@@ -116,78 +118,88 @@ const AdminPage: React.FC = () => {
   return (
     <div className="space-y-5 p-5">
       <h1 className="text-3xl font-semibold">Admin</h1>
-      <div className="max-w-3xl">
-        <h2 className="text-2xl">Staking</h2>
-        <h3 className="text-xl">Tiers</h3>
-        <div className="grid grid-cols-3 gap-3">
-          <div>Lockup time</div>
-          <div>Multiplier</div>
-          <div></div>
-          {vault.tiers.data?.map((tier, index) => (
-            <TierRow key={index} tier={tier} index={index} />
-          ))}
+      <Tabs defaultValue="staking" className="mt-5">
+        <div className="max-w-full overflow-x-auto pb-2">
+          <TabsList>
+            <TabsTrigger value="staking">
+              Staking <PermissionIcon queryResult={vault.isAdmin} />
+            </TabsTrigger>
+            <TabsTrigger value="vesting">
+              Vesting <PermissionIcon queryResult={vesting.isAdmin} />
+            </TabsTrigger>
+          </TabsList>
         </div>
-        <h2 className="text-2xl">
-          Set reward for epoch
-          <PermissionIcon queryResult={vault.isAdmin} />
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          <div>Epoch</div>
-          <div>Reward (in ether REAL)</div>
-          <div></div>
-          <div>
-            <Input
-              type="number"
-              value={epoch}
-              onChange={(e) => {
-                setEpoch(parseInt(e.target.value));
-              }}
-              className="w-full"
-            />
+        <TabsContent value="staking">
+          <h3 className="text-xl">Tiers</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div>Lockup time</div>
+            <div>Multiplier</div>
+            <div></div>
+            {vault.tiers.data?.map((tier, index) => (
+              <TierRow key={index} tier={tier} index={index} />
+            ))}
           </div>
-          <div>
-            <Input
-              value={reward}
-              onChange={(e) => setReward(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div>
-            <Button
-              onClick={() =>
-                vault.setRewardForEpoch.mutateAsync(
-                  {
-                    epoch,
-                    reward: parseEther(reward),
-                  },
-                  {
-                    onSuccess: () => {
-                      setReward('');
-                      setEpoch(0);
+          <h2 className="text-2xl">
+            Set reward for epoch
+            <PermissionIcon queryResult={vault.isAdmin} />
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div>Epoch</div>
+            <div>Reward (in ether REAL)</div>
+            <div></div>
+            <div>
+              <Input
+                type="number"
+                value={epoch}
+                onChange={(e) => {
+                  setEpoch(parseInt(e.target.value));
+                }}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Input
+                value={reward}
+                onChange={(e) => setReward(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Button
+                onClick={() =>
+                  vault.setRewardForEpoch.mutateAsync(
+                    {
+                      epoch,
+                      reward: parseEther(reward),
                     },
-                  },
-                )
-              }
-              loading={vault.setRewardForEpoch.isPending}
-            >
-              Set
-            </Button>
+                    {
+                      onSuccess: () => {
+                        setReward('');
+                        setEpoch(0);
+                      },
+                    },
+                  )
+                }
+                loading={vault.setRewardForEpoch.isPending}
+              >
+                Set
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
-      <hr className="mb-3 w-full border-lighter" />
-      <h2 className="text-2xl">
-        Vesting
-        <PermissionIcon queryResult={vesting.isAdmin} />
-      </h2>
-
-      <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-3">
-        <CreateVestingSchedule />
-        <div className="col-span-2">
-          <VestingScheduleList />
-        </div>
-        <div></div>
-      </div>
+        </TabsContent>
+        <TabsContent value="vesting">
+          <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-3">
+            <div>
+              <ImportVestingSchedules />
+              <CreateVestingSchedule />
+            </div>
+            <div className="col-span-2">
+              <VestingScheduleList />
+            </div>
+            <div></div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
