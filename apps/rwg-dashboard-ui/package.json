@@ -19,7 +19,8 @@
     "db:push": "npx prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "npx prisma migrate reset --force && npx prisma db push && npx prisma generate && pnpm run db:seed",
-    "postinstall": "pnpm run db:generate"
+    "postinstall": "pnpm run db:generate",
+    "test": "vitest"
   },
   "dependencies": {
     "@bltzr-gg/realbet-api": "^1.2.1",
@@ -83,6 +84,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@solana/web3.js": "^1.98.0",
     "@svgr/webpack": "^8.1.0",
     "@types/eslint": "^8.56.12",
     "@types/jsonwebtoken": "^9.0.7",

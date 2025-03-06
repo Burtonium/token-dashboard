@@ -103,7 +103,7 @@ describe('calculateCasinoDepositTotals', () => {
     expect(await claimCasinoDepositReward('whatever')).to.toMatchObject({
       type: 'ServerActionError',
       error: true,
-      message: 'API Call in an invalid state to claim.',
+      message: 'API Call in an invalid state to claim',
     });
   });
 
@@ -122,7 +122,7 @@ describe('calculateCasinoDepositTotals', () => {
     expect(await claimCasinoDepositReward('whatever')).to.toMatchObject({
       type: 'ServerActionError',
       error: true,
-      message: 'API Call in an invalid state to claim.',
+      message: 'API Call in an invalid state to claim',
     });
   });
 
@@ -140,7 +140,7 @@ describe('calculateCasinoDepositTotals', () => {
     expect(await claimCasinoDepositReward('whatever')).to.toMatchObject({
       type: 'ServerActionError',
       error: true,
-      message: 'API Call in an invalid state to claim.',
+      message: 'API Call in an invalid state to claim',
     });
   });
 
@@ -159,7 +159,7 @@ describe('calculateCasinoDepositTotals', () => {
     expect(await claimCasinoDepositReward('whatever')).to.toMatchObject({
       type: 'ServerActionError',
       error: true,
-      message: 'API Call in an invalid state to claim.',
+      message: 'API Call in an invalid state to claim',
     });
   });
 
