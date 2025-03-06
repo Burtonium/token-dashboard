@@ -295,7 +295,7 @@ const BonusPage = () => {
                       </span>
                     ))}
                     {userAddresses.length > 3 && (
-                      <span className="no-wrap whitespace-nowrap">
+                      <span className="whitespace-nowrap">
                         {'+ '}
                         <a
                           className="cursor-pointer font-semibold underline underline-offset-2 hover:text-primary"
