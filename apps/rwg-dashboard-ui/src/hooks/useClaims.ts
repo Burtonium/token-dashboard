@@ -108,7 +108,7 @@ export const useClaims = () => {
     claim: claimTokens,
     hasEnded:
       claims.isSuccess &&
-      new Date(claims.data?.period.end ?? 0).getTime() < new Date().getTime(),
+      new Date(claims.data?.period?.end ?? 0).getTime() < new Date().getTime(),
     hasClaims,
     hasError,
     errors: claims.data?.claims

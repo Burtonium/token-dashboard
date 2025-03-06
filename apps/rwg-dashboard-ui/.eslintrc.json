@@ -20,6 +20,10 @@
         }
       },
       "rules": {
+        "no-console": "error",
+        "curly": ["error", "all"],
+        "react-hooks/exhaustive-deps": "error",
+        "@next/next/no-img-element": "off",
         "tailwindcss/no-custom-classname": "off",
         "tailwindcss/classnames-order": "off",
         "@typescript-eslint/array-type": "off",
@@ -59,13 +63,5 @@
       "rules": {}
     }
   ],
-  "rules": {
-    "@next/next/no-img-element": "off",
-    "tailwindcss/no-custom-classname": "off",
-    "tailwindcss/classnames-order": "off",
-    "no-console": "error",
-    "curly": ["error", "all"],
-    "react-hooks/exhaustive-deps": "error"
-  },
   "ignorePatterns": ["next.config.js"]
 }
