@@ -87,7 +87,7 @@ const ClaimWarningModal: FC<
         <p>
           You are about to claim{' '}
           <strong>
-            {formatBalance(amount.toLocaleString())} {token.symbol}
+            {formatBalance(amount)} {token.symbol}
           </strong>{' '}
           tokens. This action cannot be undone and will require gas fees. Are
           you sure you want to claim now?
