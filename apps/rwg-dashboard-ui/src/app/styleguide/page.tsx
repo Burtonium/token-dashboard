@@ -162,7 +162,7 @@ export default function Styleguide() {
         </div>
         <label
           htmlFor="left-align"
-          className="block text-sm font-medium text-muted-foreground"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
         >
           Small Input
         </label>
@@ -186,7 +186,7 @@ export default function Styleguide() {
         />
         <label
           htmlFor="left-align"
-          className="block text-sm font-medium text-muted-foreground"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
         >
           Left Aligned Input (Default)
         </label>
@@ -209,7 +209,7 @@ export default function Styleguide() {
         />
         <label
           htmlFor="right-align"
-          className="block text-sm font-medium text-muted-foreground"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
         >
           Right Aligned Input
         </label>
@@ -233,7 +233,7 @@ export default function Styleguide() {
         />
         <label
           htmlFor="left-align"
-          className="block text-sm font-medium text-muted-foreground"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
         >
           Large Input
         </label>
@@ -258,13 +258,19 @@ export default function Styleguide() {
 
         <label
           htmlFor="textarea"
-          className="block text-sm font-medium text-muted-foreground"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
         >
           Textarea
         </label>
         <Textarea id="textarea" placeholder="Placeholder text" />
       </div>
       <div className="max-w-xl">
+        <label
+          htmlFor="textarea"
+          className="mb-1 block text-sm font-medium text-muted-foreground"
+        >
+          Dropdown
+        </label>
         <Select>
           <SelectTrigger>
             <SelectValue placeholder="Theme" />

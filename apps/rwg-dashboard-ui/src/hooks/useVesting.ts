@@ -11,12 +11,15 @@ import useNetworkId from './useNetworkId';
 import { encodePacked, keccak256 } from 'viem';
 import { hashFn } from '@wagmi/core/query';
 import { useToken } from './useToken';
+import { useNetworkGuard } from '@/providers/network-guard';
+import { isDev } from '@/env';
 
 export const useVesting = () => {
   const token = useToken();
   const { primaryWallet } = useDynamicContext();
   const { writeContractAsync } = useWriteContract();
   const { data: networkId } = useNetworkId();
+  const networkGuard = useNetworkGuard();
 
   const vestingContractAddress = useMemo(() => {
     if (!networkId) {
@@ -209,6 +212,8 @@ export const useVesting = () => {
       amount: bigint;
       vestingScheduleId: `0x${string}`;
     }) => {
+      await networkGuard(isDev ? [11155111] : [1]);
+
       if (!vestingContractAddress) {
         throw new Error('Vesting contract required');
       }
@@ -268,6 +273,8 @@ export const useVesting = () => {
       });
 
       await waitForTransactionReceipt(config, { hash: tx });
+
+      return tx;
     },
   });
 

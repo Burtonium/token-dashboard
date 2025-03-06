@@ -42,6 +42,8 @@ export const updateClaimStatus = authGuard(
       });
     } catch (error) {
       Sentry.captureException(error);
+      // eslint-disable-next-line no-console
+      console.error(error);
 
       return constructError('An unexpected error occurred');
     }

@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-function useCountdown(targetDate: string | Date): number {
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(() => {
-    const now = new Date();
-    const target = new Date(targetDate);
-    return Math.max(0, Math.floor((target.getTime() - now.getTime()) / 1000));
-  });
+function useCountdown() {
+  const [remaining, setSecondsRemaining] = useState<number>();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setSecondsRemaining((prev) => {
+      setSecondsRemaining((prev = 0) => {
         const newCount = prev - 1;
         return Math.max(0, newCount);
       });
@@ -18,7 +14,15 @@ function useCountdown(targetDate: string | Date): number {
     return () => clearInterval(intervalId);
   }, []);
 
-  return secondsRemaining;
+  const start = useCallback((seconds: number) => {
+    setSecondsRemaining(seconds);
+  }, []);
+
+  const stop = useCallback(() => {
+    setSecondsRemaining(undefined);
+  }, []);
+
+  return { remaining, start, stop };
 }
 
 export default useCountdown;

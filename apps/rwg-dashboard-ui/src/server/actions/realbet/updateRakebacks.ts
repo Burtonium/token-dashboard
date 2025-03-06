@@ -1,3 +1,4 @@
+import 'server-only';
 import { getTrackedBalances } from '@/server/server-only/getTrackedBalances';
 import prisma from '@/server/prisma/client';
 import { User, ApiClient } from '@bltzr-gg/realbet-api';

@@ -51,11 +51,11 @@ const GiftBox = ({
       {reward && state.startsWith('reveal') && (
         <div>
           {reward.type === 'None' ? (
-            <h3 className="text-md md:text-2xl">You lose</h3>
+            <h3 className="md:text-2xl">You lose</h3>
           ) : (
             <>
               {state === 'reveal-prize' && (
-                <h3 className="text-md font-medium md:text-xl">You win!</h3>
+                <h3 className="font-medium md:text-xl">You win!</h3>
               )}
               {reward.type === RewardType.RealBetCredit && (
                 <Diamond className="inline size-6 md:size-12 xl:size-6" />

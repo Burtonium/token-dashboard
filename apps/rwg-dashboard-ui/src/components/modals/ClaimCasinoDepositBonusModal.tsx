@@ -48,10 +48,10 @@ const ClaimCasinoDepositBonusModal: FC<
           </DialogTitle>
         </DialogHeader>
         <p>
-          You are about to claim <strong>{amount}</strong> RealBet credits. This
-          action <strong>cannot be undone</strong>. Make sure you have all your
-          wallet addresses properly connected to the account. Are you sure you
-          want to claim now?
+          You are about to claim <strong>{amount.toLocaleString()}</strong>{' '}
+          RealBet credits. This action <strong>cannot be undone</strong>. Make
+          sure you have all your wallet addresses properly connected to the
+          account. Are you sure you want to claim now?
         </p>
         <div className="mt-5 flex justify-end gap-3">
           <Button variant={'outline'} onClick={() => setOpen(false)}>

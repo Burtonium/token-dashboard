@@ -67,7 +67,7 @@ export default function HomePage() {
         <CardContent>
           <div className="flex-col flex-wrap items-center gap-12 space-y-3 pb-3 md:flex md:flex-row md:space-y-0">
             <div className="space-y-3 font-medium">
-              <h3 className="text-md mb-2 text-sm">Available</h3>
+              <h3 className="mb-2 text-sm">Available</h3>
               <div className="text-3xl font-medium text-primary">
                 {token.isLoading ? (
                   <Skeleton className="inline-block h-6 w-24 rounded-full" />
@@ -80,7 +80,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="space-y-3 font-medium">
-              <h3 className="text-md mb-2 text-sm">Staked</h3>
+              <h3 className="mb-2 text-sm">Staked</h3>
               <div className="text-3xl">
                 {vault.totalStaked.isLoading ? (
                   <Skeleton className="inline-block h-6 w-24 rounded-full" />

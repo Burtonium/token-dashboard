@@ -353,7 +353,7 @@ const StakeComponent = () => {
                     <FormItem>
                       <FormLabel
                         className={cn(
-                          'text-md mt-2 flex justify-between py-2 font-normal',
+                          'mt-2 flex justify-between py-2 font-normal',
                           {
                             'text-muted': stakeFormLoading,
                           },

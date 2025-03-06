@@ -47,6 +47,7 @@ const handleUserCreatedEvent = async (
     id: event.userId,
     email: event.data.email,
   }).catch((e) => {
+    Sentry.captureException(e);
     // eslint-disable-next-line no-console
     console.error('Error creating user:', (e as Error).message);
   });
@@ -66,6 +67,7 @@ const handleUserUpdatedEvent = async (
   })
     .then(() => updateRakebacks(event.userId))
     .catch((e) => {
+      Sentry.captureException(e);
       // eslint-disable-next-line no-console
       console.error('Error updating user:', (e as Error).message);
     });
@@ -90,6 +92,7 @@ const handleUserDeletedEvent = async (
     })
     .then(() => updateRakebacks(event.userId))
     .catch((error: Error) => {
+      Sentry.captureException(error);
       // eslint-disable-next-line no-console
       console.error('Error deleting user:', error.message);
     });
@@ -115,6 +118,7 @@ const handleWalletCreatedEvent = async (
     },
     { deleteWallets: false },
   ).catch((error: Error) => {
+    Sentry.captureException(error);
     // eslint-disable-next-line no-console
     console.log('Error handling wallet created event:', error.message);
   });
@@ -142,6 +146,7 @@ const handleWalletLinkedEvent = async (
   )
     .then(() => updateRakebacks(event.userId))
     .catch((error: Error) => {
+      Sentry.captureException(error);
       // eslint-disable-next-line no-console
       console.log('Error handling wallet linked event:', error.message);
     });
@@ -165,6 +170,7 @@ const handleWalletUnlinkedEvent = async (
     })
     .then(() => updateRakebacks(event.userId))
     .catch((e) => {
+      Sentry.captureException(e);
       // eslint-disable-next-line no-console
       console.error('Error unlinking wallet:', (e as Error).message);
     });
@@ -190,6 +196,7 @@ const handleWalletTransferredEvent = async (
     })
     .then(() => updateRakebacks(event.userId))
     .catch((error) => {
+      Sentry.captureException(error);
       // eslint-disable-next-line no-console
       console.log(error);
     });

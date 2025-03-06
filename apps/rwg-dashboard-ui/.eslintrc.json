@@ -13,6 +13,12 @@
         "plugin:@typescript-eslint/stylistic-type-checked",
         "plugin:tailwindcss/recommended"
       ],
+      "settings": {
+        "tailwindcss": {
+          "config": "./tailwind.config.ts",
+          "callees": ["cn"]
+        }
+      },
       "rules": {
         "@typescript-eslint/array-type": "off",
         "@typescript-eslint/consistent-type-definitions": "off",

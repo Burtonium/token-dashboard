@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Check, Loader2, Wallet2 } from 'lucide-react';
 import Banner from '@/components/banner';
 import {
@@ -8,7 +8,7 @@ import {
   useIsLoggedIn,
   useDynamicModals,
 } from '@dynamic-labs/sdk-react-core';
-
+import dayjs from '@/dayjs';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -31,15 +31,25 @@ import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useToken } from '@/hooks/useToken';
 import ErrorComponent from '@/components/error';
 import { useWalletAddresses } from '@/hooks/useWalletAddresses';
-import { useCasinoDeposits } from './hooks/useCasinoDeposits';
+import { useCasinoDeposits } from '../../hooks/useCasinoDeposits';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import Link from 'next/link';
 import RealIcon from '@/assets/images/R.svg';
 import ClaimCasinoDepositBonusModal from '@/components/modals/ClaimCasinoDepositBonusModal';
 import CasinoDepositRescanWarningModal from '@/components/modals/CasinoDepositRescanWarningModal';
 import BcGameLogo from '@/assets/icons/bc-game.svg';
+import { useEaseOut } from '@/hooks/useEaseOut';
+import { Progress } from '@/components/ui/progress';
+import useCountdown from '@/hooks/useCountdown';
+import useRandomDelay from '@/hooks/useRandomizer';
+import { cn } from '@/lib/cn';
+import { sortBy } from 'lodash';
 
-const logos: Record<string, JSX.Element> = {
+const CASINOS = ['shuffle', 'stake', 'rollbit', 'bc.game'] as const;
+
+const COINS = ['ETH', 'BNB', 'USDT', 'USDC', 'SHIB', 'SOL'] as const;
+
+const casinoLogos: Record<string, JSX.Element> = {
   shuffle: (
     <svg
       className="absolute inline-block size-full"
@@ -160,14 +170,17 @@ const logos: Record<string, JSX.Element> = {
 
 const BonusPage = () => {
   const [_showResults, setShowResults] = useState(false);
-  const [retryInSeconds, setRetryInSeconds] = useState<number | null>(null);
+  const { remaining: retryInSeconds, start } = useCountdown();
   const {
     deposits: casinoDeposits,
     bonus,
     calculateDeposits,
     totalDeposited,
     score,
+    scanCountdown,
   } = useCasinoDeposits();
+  const easedOutCountdown = useEaseOut(scanCountdown.remainingPercentage);
+  const rancomizedEasedOut = useRandomDelay(easedOutCountdown ?? 0);
   const token = useToken();
   const isAuthenticated = useIsLoggedIn();
   const { sdkHasLoaded, setShowDynamicUserProfile } = useDynamicContext();
@@ -186,13 +199,40 @@ const BonusPage = () => {
         )
       : null;
 
-    setRetryInSeconds(retryInSeconds);
+    start(retryInSeconds ?? 0);
     if (retryInSeconds && retryInSeconds > 0) {
       return;
     }
     setShowResults(true);
     calculateDeposits.mutate();
-  }, [calculateDeposits, casinoDeposits.data]);
+  }, [calculateDeposits, casinoDeposits.data, start]);
+
+  const combinedDeposits = useMemo(
+    () =>
+      sortBy(
+        casinoDeposits.data?.totals.reduce(
+          (acc, cur) => {
+            const existing = acc.find(
+              (a) => a.symbol === cur.symbol && a.casino === cur.casino,
+            );
+
+            if (existing) {
+              existing.amount += cur.amount;
+            } else {
+              acc.push({
+                symbol: cur.symbol,
+                casino: cur.casino,
+                amount: cur.amount,
+              });
+            }
+            return acc;
+          },
+          [] as { symbol: string; casino: string; amount: number }[],
+        ),
+        ['casino', 'amount'],
+      ).reverse(),
+    [casinoDeposits.data?.totals],
+  );
 
   if (casinoDeposits.error) {
     return <ErrorComponent />;
@@ -231,7 +271,7 @@ const BonusPage = () => {
           </p>
           <div className="flex items-center gap-5 md:max-w-2xl">
             {sdkHasLoaded && !isAuthenticated && (
-              <div className="space-between no-wrap flex flex-row items-center justify-center gap-5">
+              <div className="flex flex-row items-center justify-center gap-5">
                 <Button onClick={handleDynamicAuthClick}>
                   <Wallet2 className="mr-2" /> Connect Wallet
                 </Button>
@@ -242,98 +282,118 @@ const BonusPage = () => {
       </Banner>
       {isAuthenticated && userAddresses && userAddresses.length > 0 && (
         <div>
-          <div className="space-y-4 md:max-w-[65%]">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 px-5 py-4">
-              <span>
-                Connected Wallets: {userAddresses.length}
-                <div className="flex items-center gap-2">
-                  {userAddresses.slice(0, 3).map((address, i) => (
-                    <span key={`${address}-${i}`}>
-                      {shorten(address, 4)}
-                      {userAddresses[i + 1] && ','}
-                    </span>
-                  ))}
-                  {userAddresses.length > 3 && (
-                    <span className="no-wrap whitespace-nowrap">
-                      {'+ '}
-                      <a
-                        className="cursor-pointer font-semibold underline underline-offset-2 hover:text-primary"
-                        onClick={() => setShowDynamicUserProfile(true)}
-                      >
-                        {userAddresses.length - 3} more
-                      </a>
-                    </span>
-                  )}
+          <div className="space-y-4 md:max-w-3xl">
+            <div className="rounded-xl bg-lighter/50 px-5 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline">
+                  Connected Wallets: {userAddresses.length}
+                  <div className="flex items-center gap-2">
+                    {userAddresses.slice(0, 3).map((address, i) => (
+                      <span key={`${address}-${i}`}>
+                        {shorten(address, 4)}
+                        {userAddresses[i + 1] && ','}
+                      </span>
+                    ))}
+                    {userAddresses.length > 3 && (
+                      <span className="no-wrap whitespace-nowrap">
+                        {'+ '}
+                        <a
+                          className="cursor-pointer font-semibold underline underline-offset-2 hover:text-primary"
+                          onClick={() => setShowDynamicUserProfile(true)}
+                        >
+                          {userAddresses.length - 3} more
+                        </a>
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </span>
-              <div className="flex items-center gap-3">
-                {casinoLink.isSuccess &&
-                  (casinoLink.isLinked ? (
-                    <>
-                      {!bonus.claimed && (
-                        <>
-                          <Button
-                            onClick={() => setShowLinkNewWalletModal(true)}
-                            variant="outline"
-                            className="place-self-end focus:ring-0"
-                          >
-                            + Add new crypto wallet
-                          </Button>
-                          {casinoDeposits.data?.status === 'Pending' &&
-                          new Date().getTime() -
-                            casinoDeposits.data.timestamp.getTime() >
-                            1000 * 60 ? (
-                            <CasinoDepositRescanWarningModal
-                              onConfirm={() => {
-                                setShowResults(true);
-                                calculateDeposits.mutate();
-                              }}
+                <div className="flex items-center gap-3">
+                  {casinoLink.isSuccess &&
+                    (casinoLink.isLinked ? (
+                      <>
+                        {!bonus.claimed && (
+                          <>
+                            <Button
+                              onClick={() => setShowLinkNewWalletModal(true)}
+                              variant="outline"
+                              className="place-self-end focus:ring-0"
                             >
+                              + Add new crypto wallet
+                            </Button>
+                            {casinoDeposits.data?.status === 'Pending' &&
+                            new Date().getTime() -
+                              casinoDeposits.data.timestamp.getTime() >
+                              1000 * 60 ? (
+                              <CasinoDepositRescanWarningModal
+                                onConfirm={() => {
+                                  setShowResults(true);
+                                  calculateDeposits.mutate();
+                                }}
+                              >
+                                <Button
+                                  loading={calculateDeposits.isPending}
+                                  disabled={bonus.claimed}
+                                  className="place-self-end focus:ring-0"
+                                >
+                                  Rescan Rewards
+                                </Button>
+                              </CasinoDepositRescanWarningModal>
+                            ) : (
                               <Button
                                 loading={calculateDeposits.isPending}
                                 disabled={bonus.claimed}
+                                onClick={scanRewards}
                                 className="place-self-end focus:ring-0"
                               >
-                                Rescan Rewards
+                                {casinoDeposits.data &&
+                                casinoDeposits.data.status === 'Success'
+                                  ? 'Rescan Rewards'
+                                  : casinoDeposits.data?.status === 'Pending'
+                                    ? 'In progress'
+                                    : 'Scan Rewards'}
                               </Button>
-                            </CasinoDepositRescanWarningModal>
-                          ) : (
-                            <Button
-                              loading={calculateDeposits.isPending}
-                              disabled={bonus.claimed}
-                              onClick={scanRewards}
-                              className="place-self-end focus:ring-0"
-                            >
-                              {casinoDeposits.data &&
-                              casinoDeposits.data.status === 'Success'
-                                ? 'Rescan Rewards'
-                                : casinoDeposits.data?.status === 'Pending'
-                                  ? 'In progress'
-                                  : 'Scan Rewards'}
-                            </Button>
-                          )}
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <Button asChild className="place-self-end">
-                      <Link href="/link-realbet">Link Realbet Account</Link>
-                    </Button>
-                  ))}
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <Button asChild className="place-self-end">
+                        <Link href="/link-realbet">Link Realbet Account</Link>
+                      </Button>
+                    ))}
+                </div>
               </div>
-              {retryInSeconds && retryInSeconds > 0 && (
-                <p className="w-full text-right text-warning">
-                  You can retry in {retryInSeconds} seconds.
+              {retryInSeconds !== undefined && retryInSeconds > 0 && (
+                <p className="mt-2 w-full text-right text-warning">
+                  You can retry in <strong>{retryInSeconds}</strong> seconds.
                 </p>
               )}
+
+              {casinoDeposits.data?.status === 'Success' &&
+                casinoDeposits.data && (
+                  <div className="w-full text-right font-normal">
+                    Last scanned{' '}
+                    <strong>
+                      {dayjs(casinoDeposits.data?.timestamp).fromNow()}
+                    </strong>
+                    . Query took{' '}
+                    <strong>
+                      {((casinoDeposits.data?.elapsed ?? 0) / 1000).toFixed(1)}{' '}
+                      seconds.
+                    </strong>
+                  </div>
+                )}
             </div>
             {showResults && (
               <>
                 {calculateDeposits.isPending && (
-                  <div className="flex flex-wrap items-center gap-3 rounded-xl bg-lighter/50 px-5 py-4">
-                    <Loader2 className="animate-spin" />
-                    Scanning for casino deposits, this may take a while...
-                  </div>
+                  <Progress
+                    value={(rancomizedEasedOut ?? 0) * 100}
+                    variant="accent"
+                    className={cn('mt-2 h-4 transition-all', {
+                      hidden: !calculateDeposits.isPending,
+                    })}
+                  />
                 )}
                 <div className="grid grid-cols-1 gap-3 rounded-xl bg-lighter/50 px-5 py-3 sm:grid-cols-2">
                   <div className="flex flex-col items-center gap-1 rounded-xl border border-orange-100/20 bg-red-500/5 px-2 py-4">
@@ -429,22 +489,14 @@ const BonusPage = () => {
                     <TableBodySkeleton rows={2} cols={4} />
                   )}
                   <TableBody>
-                    {casinoDeposits.isSuccess &&
-                      casinoDeposits.data?.totals.length === 0 && (
-                        <TableRow>
-                          <TableCell className="flex items-center gap-2 px-5 font-normal capitalize">
-                            No deposits were detected.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    {casinoDeposits.data?.totals
-                      .filter((deposit) => deposit.amount >= 100)
+                    {combinedDeposits
+                      ?.filter((deposit) => deposit.amount >= 100)
                       .map((deposit) => {
-                        const logo = logos[deposit.casino];
+                        const logo = casinoLogos[deposit.casino];
 
                         return (
                           <TableRow
-                            key={`${deposit.casino}-${deposit.blockchain}-${deposit.symbol}`}
+                            key={`${deposit.casino}-${deposit.symbol}`}
                             className="odd:bg-lighter/1 even:bg-lighter/1 border-b-5 border border-lighter/50"
                           >
                             <TableCell className="gap-2 px-5 font-normal capitalize">
@@ -455,6 +507,7 @@ const BonusPage = () => {
                             </TableCell>
                             <TableCell className="gap-2 px-5 font-normal">
                               <img
+                                className="mr-1 inline-block"
                                 alt=""
                                 width={26}
                                 src={`/icons/${deposit.symbol.toLowerCase()}.png`}
@@ -462,20 +515,52 @@ const BonusPage = () => {
                               {deposit.symbol}
                             </TableCell>
                             <TableCell className="px-5 text-right">
-                              ${deposit.amount.toLocaleString()}
-                              USD
+                              ${deposit.amount.toLocaleString()} USD
                             </TableCell>
                           </TableRow>
                         );
                       })}
+                    {CASINOS.flatMap((casino) =>
+                      COINS.map((coin) => ({ casino, coin })),
+                    )
+                      .filter(
+                        (d) =>
+                          !casinoDeposits.data?.totals.find(
+                            (t) => t.casino === d.casino && t.symbol === d.coin,
+                          ),
+                      )
+                      .map(({ casino, coin }) => (
+                        <TableRow key={`${casino}-${coin}`}>
+                          <TableCell className="gap-2 px-5 font-normal capitalize">
+                            <span className="flex items-center gap-2">
+                              <span className="relative size-8">
+                                {casinoLogos[casino]}
+                              </span>{' '}
+                              <span>{casino}</span>
+                            </span>
+                          </TableCell>
+                          <TableCell className="gap-2 px-5 font-normal">
+                            <img
+                              className="mr-1 inline-block"
+                              alt=""
+                              width={26}
+                              src={`/icons/${coin.toLowerCase()}.png`}
+                            />{' '}
+                            {coin}
+                          </TableCell>
+                          <TableCell className="px-5 text-right">
+                            ${0} USD
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
 
                   <TableFooter className="border-b-5 border border-lighter/50 bg-lighter/20">
                     <TableRow>
-                      <TableHead className="px-5 font-normal"></TableHead>
                       <TableHead className="px-5 text-sm font-normal">
                         Total
                       </TableHead>
+                      <TableHead className="px-5 text-lg font-normal text-primary"></TableHead>
                       <TableHead className="px-5 text-right text-lg font-normal text-primary">
                         +{score.toLocaleString()}{' '}
                         <span className="m-1 inline-flex size-6 flex-col items-center justify-center rounded-full border border-primary bg-black p-1 text-primary">

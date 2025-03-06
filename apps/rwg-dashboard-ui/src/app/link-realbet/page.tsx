@@ -277,7 +277,7 @@ export default function LinkRealbetPage() {
               <div className="space-y-2">
                 <div className="flex w-full justify-between">
                   <div>
-                    <h3 className="text-md font-medium sm:text-lg">
+                    <h3 className="font-medium sm:text-lg">
                       <Diamond className="mb-1 inline size-4 text-xl text-primary md:size-6" />{' '}
                       Realbet Credits
                     </h3>
@@ -399,7 +399,7 @@ export default function LinkRealbetPage() {
                 <div className="flex h-full flex-col justify-between gap-5">
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-2">
                     <div>
-                      <h3 className="text-md mb-2 flex items-center gap-2 font-medium md:text-xl">
+                      <h3 className="mb-2 flex items-center gap-2 font-medium md:text-xl">
                         <Rocket className="inline size-6 text-primary" /> Token
                         Sale Bonus
                       </h3>
@@ -419,7 +419,7 @@ export default function LinkRealbetPage() {
                       )}
                     </div>
                     <div>
-                      <h3 className="text-md mb-2 flex items-center gap-2 font-medium md:text-xl">
+                      <h3 className="mb-2 flex items-center gap-2 font-medium md:text-xl">
                         <Diamond className="inline size-6 text-primary" />{' '}
                         Realbet Credits
                       </h3>

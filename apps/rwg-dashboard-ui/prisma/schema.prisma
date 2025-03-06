@@ -185,6 +185,7 @@ model CasinoDepositApiCall {
   user          DynamicUser               @relation(fields: [dynamicUserId], references: [id])
   dynamicUserId String                    @unique
   timestamp     DateTime                  @default(now())
+  elapsed       Int?                      
   reward        Reward?                   @relation(fields: [rewardId], references: [id])
   rewardId      Int?                      @unique
 }

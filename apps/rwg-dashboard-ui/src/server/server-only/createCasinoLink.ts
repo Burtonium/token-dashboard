@@ -2,18 +2,7 @@ import 'server-only';
 
 import prisma from '@/server/prisma/client';
 import { subscribeToWave } from './subscribeToWave';
-import { env } from '@/env';
-import { z } from 'zod';
-import * as Sentry from '@sentry/nextjs';
-
-const WalletResponseSchema = z.object({
-  wallets: z.array(
-    z.object({
-      publicKey: z.string(),
-      chain: z.string(),
-    }),
-  ),
-});
+import { getDynamicAuthWallets } from './getDynamicAuthWallets';
 
 export const createCasinoLink = async ({
   userId,
@@ -26,29 +15,7 @@ export const createCasinoLink = async ({
 }) => {
   const dynamicUser = await prisma.$transaction(
     async (tx) => {
-      const wallets = await fetch(
-        `https://app.dynamicauth.com/api/v0/environments/${env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID}/users/${userId}/wallets`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${env.DYNAMIC_API_KEY}`,
-          },
-        },
-      ).then(async (response) => {
-        const responseJson = (await response.json()) as unknown;
-        const walletResponse = WalletResponseSchema.safeParse(responseJson);
-
-        if (!walletResponse.success) {
-          const error = `Dynamic API Response Different Than Expected: ${JSON.stringify(responseJson)}`;
-          Sentry.captureMessage(error);
-          // eslint-disable-next-line no-console
-          console.error(error);
-
-          throw new Error(error);
-        }
-
-        return walletResponse.data.wallets;
-      });
+      const wallets = await getDynamicAuthWallets(userId);
 
       // Delete existing links to the same realbet user
       await tx.casinoLink.deleteMany({
