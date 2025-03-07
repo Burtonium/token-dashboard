@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/no-contradicting-classname */
 'use client';
 
 import React, { type PropsWithChildren, useRef } from 'react';
@@ -17,8 +18,7 @@ const Banner: React.FC<
     <div
       ref={bannerRef}
       className={cn(
-        // eslint-disable-next-line tailwindcss/no-contradicting-classname
-        'relative rounded-3xl bg-[size:200%] bg-[position:center] bg-no-repeat px-4 py-4 sm:bg-[center_10%] md:px-6 md:py-8',
+        'relative rounded-3xl bg-[size:200%] bg-[position:center] bg-no-repeat p-4 sm:bg-[center_10%] md:px-6 md:py-8',
         className,
       )}
       style={{
