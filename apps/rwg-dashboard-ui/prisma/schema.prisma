@@ -169,6 +169,7 @@ model Claim {
   claimedAt   DateTime?
 
   @@unique([address, blockchain, periodId])
+  @@index([address, blockchain, periodId])
 }
 
 enum CallStatus {

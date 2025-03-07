@@ -80,6 +80,7 @@ export const getClaimableAmounts = authGuard(
     );
 
     const claimed = claims.filter((claim) => claim.status === 'Claimed');
+
     const claimedAmount = claimed.reduce(
       (sum, claim) => sum + claim.amount,
       0n,

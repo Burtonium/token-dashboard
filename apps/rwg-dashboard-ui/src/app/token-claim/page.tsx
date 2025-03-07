@@ -29,8 +29,16 @@ import RealIcon from '@/components/real-icon';
 
 const ClaimPage = () => {
   const { sdkHasLoaded } = useDynamicContext();
-  const { claims, process, claim, hasError, errors, allClaimed, hasEnded } =
-    useClaims();
+  const {
+    claims,
+    process,
+    claim,
+    hasError,
+    errors,
+    allClaimed,
+    hasEnded,
+    canClaim,
+  } = useClaims();
   const token = useToken();
   const showPeriod = claims.isLoading || claims.data?.period;
 
@@ -95,11 +103,18 @@ const ClaimPage = () => {
             ) : hasEnded ? (
               <h3 className="flex items-center text-xl text-destructive">
                 <CircleX className="mr-1 inline" />
-                Claim Period Ended
+                <span>Claim Period Ended</span>
+              </h3>
+            ) : !canClaim ? (
+              <h3 className="flex items-center text-xl text-muted">
+                <span>Nothing to claim yet.</span>
               </h3>
             ) : (
               <ClaimWarningModal
-                amount={claims.data?.amounts.claimableTotal ?? 0n}
+                amount={
+                  claims.data.amounts.claimableTotal +
+                  claims.data.amounts.signableAmount
+                }
                 onConfirm={process.mutate}
               >
                 <Button
@@ -181,55 +196,53 @@ const ClaimPage = () => {
                     </div>
                   </>
                 )}{' '}
-                {!hasEnded &&
-                  (!claims.data ||
-                    claims.data.amounts.claimableAmount > 0n) && (
-                    <>
-                      <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
-                        <div className="flex items-center gap-2">
-                          Claimable Purchased Amount
-                          <Popover>
-                            <PopoverTrigger>
-                              <Info className="stroke-1 text-muted-foreground" />
-                            </PopoverTrigger>
-                            <PopoverContent align="start">
-                              <div className="leading-tight">
-                                Claimable purchased amount.
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <h3 className="flex items-center gap-1 text-right text-heading">
-                          {formatBalance(
-                            claims.data.amounts.claimableAmount +
-                              claims.data.amounts.signableAmount,
-                          )}{' '}
-                          <RealIcon size="sm" />
-                        </h3>
+                {!hasEnded && canClaim && (
+                  <>
+                    <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                      <div className="flex items-center gap-2">
+                        Claimable Purchased Amount
+                        <Popover>
+                          <PopoverTrigger>
+                            <Info className="stroke-1 text-muted-foreground" />
+                          </PopoverTrigger>
+                          <PopoverContent align="start">
+                            <div className="leading-tight">
+                              Claimable purchased amount.
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
-                        <div className="flex items-center gap-2">
-                          Claimable Bonus
-                          <Popover>
-                            <PopoverTrigger>
-                              <Info className="stroke-1 text-muted-foreground" />
-                            </PopoverTrigger>
-                            <PopoverContent align="start">
-                              <div className="leading-tight">
-                                Claimable bonus.
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <h3 className="flex items-center gap-1 text-right text-heading">
-                          {formatBalance(
-                            claims.data?.amounts.claimableBonus ?? 0n,
-                          )}{' '}
-                          <RealIcon size="sm" />
-                        </h3>
+                      <h3 className="flex items-center gap-1 text-right text-heading">
+                        {formatBalance(
+                          claims.data.amounts.claimableAmount +
+                            claims.data.amounts.signableAmount,
+                        )}{' '}
+                        <RealIcon size="sm" />
+                      </h3>
+                    </div>
+                    <div className="flex w-full flex-col justify-center gap-4 rounded-xl border border-primary/15 bg-primary/[4%] p-6">
+                      <div className="flex items-center gap-2">
+                        Claimable Bonus
+                        <Popover>
+                          <PopoverTrigger>
+                            <Info className="stroke-1 text-muted-foreground" />
+                          </PopoverTrigger>
+                          <PopoverContent align="start">
+                            <div className="leading-tight">
+                              Claimable bonus.
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                    </>
-                  )}
+                      <h3 className="flex items-center gap-1 text-right text-heading">
+                        {formatBalance(
+                          claims.data?.amounts.claimableBonus ?? 0n,
+                        )}{' '}
+                        <RealIcon size="sm" />
+                      </h3>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>

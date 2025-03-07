@@ -49,16 +49,16 @@ export const useClaims = () => {
               claim.signature as `0x${string}`,
             ],
           })
-          .catch((err) => {
+          .catch((err: Error) => {
             // eslint-disable-next-line no-console
             console.error(err);
+
+            if (err.message.includes('User rejected')) {
+              return;
+            }
+
             return serverActionErrorGuard(
-              updateClaimStatus(
-                token,
-                claim.id,
-                'Error',
-                (err as Error).message,
-              ),
+              updateClaimStatus(token, claim.id, 'Error', err.message),
             );
           });
 
@@ -103,12 +103,20 @@ export const useClaims = () => {
     claims,
     allClaimed:
       claims.isSuccess &&
+      claims.data &&
+      claims.data.claims.length > 0 &&
       claims.data?.claims.every((claim) => claim.status === 'Claimed'),
+    canClaim:
+      claims.isSuccess &&
+      claims.data &&
+      (claims.data.amounts.claimableAmount > 0n ||
+        claims.data.amounts.signableAmount > 0n),
     process: signClaims,
     claim: claimTokens,
     hasEnded:
       claims.isSuccess &&
-      new Date(claims.data?.period?.end ?? 0).getTime() < new Date().getTime(),
+      !!claims.data.period?.end &&
+      new Date(claims.data.period.end).getTime() < new Date().getTime(),
     hasClaims,
     hasError,
     errors: claims.data?.claims

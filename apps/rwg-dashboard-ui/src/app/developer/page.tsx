@@ -8,7 +8,7 @@ import { issueVestingToken } from '@/app/developer/issueVestingToken';
 import { isDev } from '@/env';
 import assert from 'assert';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { RewardWave } from '@prisma/client';
+import { type ClaimStatus, type RewardWave } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { saveWave } from './saveWave';
 import { getCurrentWave } from './getWave';
@@ -53,6 +53,9 @@ import { deleteWallet } from './deleteWallet';
 import { useWalletAddresses } from '@/hooks/useWalletAddresses';
 import { deleteApiCall } from './deleteApiCall';
 import { deleteCasinoTotalDeposit } from './deleteCasinoDeposit';
+import { addClaim } from './addClaim';
+import { getClaims } from './getClaims';
+import { deleteClaim } from './deleteClaim';
 
 type WaveUpdate = Pick<
   RewardWave,
@@ -244,6 +247,33 @@ const DeveloperPage = () => {
       return deleteCasinoTotalDeposit(authToken, id);
     },
     onSuccess: () => casinoDeposits.deposits.refetch(),
+  });
+
+  const [claimAddress, setClaimAddress] = useState('');
+  const [claimAmount, setClaimAmount] = useState('');
+  const [claimStatus, setClaimStatus] = useState<ClaimStatus>('Pending');
+  const [claimBonus, setClaimBonus] = useState('');
+
+  const claims = useAuthenticatedQuery({
+    queryKey: ['claims'],
+    queryFn: getClaims,
+  });
+
+  const addClaimMutation = useMutation({
+    mutationFn: () => {
+      return addClaim(
+        claimAddress,
+        BigInt(claimAmount) * BigInt(10 ** 18),
+        claimStatus,
+        BigInt(claimBonus) * BigInt(10 ** 18),
+      );
+    },
+    onSuccess: () => claims.refetch(),
+  });
+
+  const deleteClaimMutation = useMutation({
+    mutationFn: deleteClaim,
+    onSuccess: () => claims.refetch(),
   });
 
   return (
@@ -771,6 +801,142 @@ const DeveloperPage = () => {
         <TabsContent value="vesting">
           <div>
             <div>
+              <h2 className="mb-3 text-2xl font-medium">Claims</h2>
+              <table
+                className={cn('mb-5 min-w-full divide-y divide-light', {
+                  'animate-pulse': claims.isLoading,
+                })}
+              >
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Address
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Blockchain
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Bonus
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                      Status
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-light">
+                  {claims.data?.map((claim) => (
+                    <tr key={claim.address}>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        <span>{shorten(claim.address, 5)}</span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        {claim.blockchain}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        {formatBalance(claim.amount)}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        {formatBalance(claim.bonus ?? 0n)}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        {claim.status}
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                        <Button
+                          variant="destructive-outline"
+                          onClick={() => deleteClaimMutation.mutate(claim.id)}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {claims.isLoading && (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="whitespace-nowrap px-6 py-4 text-sm"
+                      >
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              <p className="text-destructive empty:hidden">
+                {deleteClaimMutation.error?.message}
+                {claims.error?.message}
+              </p>
+            </div>
+            <div className="mb-5">
+              <h3 className="mb-2 font-medium">Upsert Claim</h3>
+              <label htmlFor="claim-address" className="mb-1 block">
+                Address
+              </label>
+              <Input
+                id="claim-address"
+                className="mb-2"
+                placeholder="0x..."
+                value={claimAddress}
+                onChange={(e) => setClaimAddress(e.target.value)}
+              />
+              <label htmlFor="claim-amount" className="mb-1 block">
+                Amount
+              </label>
+              <Input
+                id="claim-amount"
+                type="number"
+                className="mb-2"
+                placeholder="0"
+                value={claimAmount}
+                onChange={(e) => setClaimAmount(e.target.value)}
+              />
+              {claimStatus === 'Claimed' && (
+                <>
+                  <label htmlFor="claim-amount" className="mb-1 block">
+                    Bonus
+                  </label>
+                  <Input
+                    id="claim-amount"
+                    type="number"
+                    className="mb-2"
+                    placeholder="0"
+                    value={claimBonus}
+                    onChange={(e) => setClaimBonus(e.target.value)}
+                  />
+                </>
+              )}
+              <label className="mb-1 block">Status</label>
+              <Select
+                value={claimStatus}
+                onValueChange={(s) => setClaimStatus(s as ClaimStatus)}
+              >
+                <SelectTrigger className="mb-2 w-full">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Claimed">Claimed</SelectItem>
+                  <SelectItem value="Error">Error</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-destructive empty:hidden">
+                {addClaimMutation.error?.message}
+              </p>
+              <div>
+                <Button
+                  loading={addClaimMutation.isPending}
+                  onClick={() => addClaimMutation.mutate()}
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
+            <div>
               <h3 className="mb-2 font-medium">
                 TokenMaster Nonce{' '}
                 <span className="font-normal text-muted">
@@ -778,7 +944,7 @@ const DeveloperPage = () => {
                 </span>
                 {currentNonce.isSuccess && (
                   <span className="font-normal text-muted">
-                    (Your nonce is {currentNonce.data.toString()})
+                    &nbsp;(Your nonce is {currentNonce.data.toString()})
                   </span>
                 )}
               </h3>
@@ -813,9 +979,9 @@ const DeveloperPage = () => {
             <div>
               <h3 className="mb-2 font-medium">
                 Claimed Status{' '}
-                {claimIds.isSuccess && (
+                {claimIds.isSuccess && claimIds.data.length > 0 && (
                   <span className="font-normal text-muted">
-                    (Your claim ids are{' '}
+                    (Your claim {claimIds.data.length > 1 ? 'ids are' : 'id is'}{' '}
                     {claimIds.data?.map((d) => d.id).join(', ')})
                   </span>
                 )}

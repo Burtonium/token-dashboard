@@ -3,10 +3,21 @@ import dayjs from '@/dayjs';
 import { PublicKey as SolanaPublicKey } from '@solana/web3.js';
 import assert from 'assert';
 
+/**
+ * Formats a balance represented as a bigint to a string with specified options.
+ * The function handles localization and number formatting based on provided options.
+ *
+ * @param {bigint} balance - The balance in the smallest unit.
+ * @param {Object} [options] - Optional settings to format the balance.
+ * @param {number} [options.decimals=18] - Number of decimals to consider for the balance.
+ * @param {number} [options.precision=6] - Precision to display after the decimal point.
+ * @param {string} [options.locale='en-US'] - Locale to use for formatting the number.
+ * @returns {string} The formatted balance as a localized string.
+ */
 export const formatBalance = (
   balance: bigint,
   options?: { decimals?: number; precision?: number; locale?: string },
-) => {
+): string => {
   const optionsWithDefaults = Object.assign(
     {
       decimals: 18,
