@@ -20,7 +20,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "npx prisma migrate reset --force && npx prisma db push && npx prisma generate && pnpm run db:seed",
     "postinstall": "pnpm run db:generate",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@bltzr-gg/realbet-api": "^1.2.1",

@@ -23,32 +23,17 @@ test('should connect wallet to the MetaMask Test Dapp', async ({
 
   // Navigate to the homepage
   await page.goto('/');
-
   await expect(page).toHaveTitle(/REAL VIP/);
   const mainHeading = page.locator('h1');
   await expect(mainHeading).toBeVisible();
   await expect(mainHeading).toHaveText('Welcome to the Real World');
+  await page.locator('nav [data-testid="connect-button"]').click();
+  await page.locator('button:has-text("MetaMask")').click();
 
-  // Click the connect button
-  await page.locator('nav #connect').click();
-
-  // Connect MetaMask to the dapp
   await metamask.connectToDapp();
+  await metamask.confirmSignature();
 
-  // Verify the connected account address
-  await expect(page.locator('#accounts')).toHaveText(
-    '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+  await expect(page.locator('nav [data-testid="connect-button"]')).toHaveText(
+    '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
   );
-});
-
-test('homepage loads', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveTitle(/REAL VIP/);
-});
-
-test('main heading is visible', async ({ page }) => {
-  await page.goto('/');
-  const mainHeading = page.locator('h1');
-  await expect(mainHeading).toBeVisible();
-  await expect(mainHeading).toHaveText('Welcome to the Real World');
 });

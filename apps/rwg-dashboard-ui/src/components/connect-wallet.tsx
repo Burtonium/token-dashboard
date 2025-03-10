@@ -13,7 +13,7 @@ const ConnectWallet = ({ className }: { className?: string }) => {
 
   return (
     <Button
-      id="#connect"
+      data-testid="connect-button"
       onClick={authHandler}
       variant="default"
       className={className}
