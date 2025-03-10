@@ -92,7 +92,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
       </div>
       <div
         className={cn(
-          'fixed left-0 top-0 h-screen w-full bg-light px-6 py-6 pt-24 backdrop-blur-lg transition-transform sm:w-64 lg:backdrop-blur-none',
+          'fixed left-0 top-0 h-screen w-full bg-light p-6 pt-24 backdrop-blur-lg transition-transform sm:w-64 lg:backdrop-blur-none',
           {
             'translate-x-0': isNavOpen,
             '-translate-x-full lg:translate-x-0': !isNavOpen,

@@ -29,9 +29,9 @@ export default function HomePage() {
     <main className="relative space-y-5 p-5">
       <Banner>
         <div className="flex flex-col">
-          <h2 className="font-tusker text-6xl font-semibold uppercase leading-none md:max-w-[66%]">
+          <h1 className="font-tusker text-6xl font-semibold uppercase leading-none md:max-w-[66%]">
             Welcome to the Real World
-          </h2>
+          </h1>
           <div className="max-w-1/3 mt-6 font-sans text-base md:max-w-[66%]">
             Boost your rakeback and cashback rewards by owning and staking{' '}
             {token.symbol}

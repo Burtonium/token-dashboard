@@ -84,8 +84,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.0",
     "@solana/web3.js": "^1.98.0",
     "@svgr/webpack": "^8.1.0",
+    "@synthetixio/synpress": "^4.0.10",
     "@types/eslint": "^8.56.12",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.16.9",
@@ -118,7 +120,7 @@
   "ct3aMetadata": {
     "initVersion": "7.37.0"
   },
-  "packageManager": "pnpm@9.7.1",
+  "packageManager": "pnpm@10.6.2+sha512.47870716bea1572b53df34ad8647b42962bc790ce2bf4562ba0f643237d7302a3d6a8ecef9e4bdfc01d23af1969aa90485d4cebb0b9638fa5ef1daef656f6c1b",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",

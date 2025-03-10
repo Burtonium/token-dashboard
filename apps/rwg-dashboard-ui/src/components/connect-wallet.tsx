@@ -12,7 +12,12 @@ const ConnectWallet = ({ className }: { className?: string }) => {
   const primaryAddress = usePrimaryAddress();
 
   return (
-    <Button onClick={authHandler} variant="default" className={className}>
+    <Button
+      id="#connect"
+      onClick={authHandler}
+      variant="default"
+      className={className}
+    >
       {isAuthenticated ? (
         <>
           <Wallet2 className="size-4 shrink-0" />
