@@ -7,6 +7,7 @@
   "scripts": {
     "build": "rm -rf lib && tsc",
     "start": "node -r dotenv/config lib/main.js",
+    "start:local": "NODE_ENV=test node -r dotenv/config lib/main.js dotenv_config_path=.env.test",
     "deploy": "fly deploy --build-arg NPM_TOKEN=$(flyctl secrets list | grep NPM_TOKEN | awk '{print $2}')"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@bltzr-gg/realbet-evm-contracts": "workspace:*",
     "@flydotio/dockerfile": "^0.7.4",
     "@subsquid/evm-typegen": "^4.2.0",
     "@subsquid/typeorm-codegen": "^2.0.1",

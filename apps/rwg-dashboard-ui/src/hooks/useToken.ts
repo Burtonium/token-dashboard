@@ -1,4 +1,3 @@
-import { isDev } from '@/env';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { readContract, waitForTransactionReceipt } from '@wagmi/core';
@@ -7,7 +6,7 @@ import { useWatchAsset, useWriteContract } from 'wagmi';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
 import { erc20Abi } from 'viem';
-import { testTokenAbi } from '@/contracts/generated';
+import { tokenAbi } from '@/contracts/generated';
 import { tokenAddress } from '@/config/realToken';
 
 export const useToken = () => {
@@ -56,17 +55,9 @@ export const useToken = () => {
   const mint = useMutation({
     mutationKey: ['mint', tokenAddress],
     mutationFn: async (amount: bigint) => {
-      if (!primaryWallet) {
-        setShowAuthFlow(true);
-        return;
-      }
-      if (!isDev) {
-        return;
-      }
-
       const tx = await writeContractAsync({
         address: tokenAddress,
-        abi: testTokenAbi,
+        abi: tokenAbi,
         functionName: 'mint',
         args: [amount],
       });
@@ -85,6 +76,7 @@ export const useToken = () => {
     if (!tokenSymbol.data || !decimals.data) {
       return;
     }
+
     watchAsset({
       type: 'ERC20',
       options: {

@@ -32,7 +32,12 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID: z.string(),
-    NEXT_PUBLIC_VERCEL_ENV: z.enum(['production', 'preview', 'development']),
+    NEXT_PUBLIC_VERCEL_ENV: z.enum([
+      'production',
+      'preview',
+      'development',
+      'test',
+    ]),
     NEXT_PUBLIC_ALCHEMY_API_KEY: z.string(),
     NEXT_PUBLIC_RAW_PASS_CONTRACT_ADDRESS: z.string(),
     NEXT_PUBLIC_CASINO_URL: z.string(),
@@ -90,3 +95,4 @@ export const env = createEnv({
 });
 
 export const isDev = env.NEXT_PUBLIC_VERCEL_ENV !== 'production';
+export const isTest = env.NEXT_PUBLIC_VERCEL_ENV === 'test';

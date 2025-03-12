@@ -1,18 +1,17 @@
 import 'dotenv/config';
 import { defineConfig } from '@wagmi/cli';
-import { etherscan, react } from '@wagmi/cli/plugins';
-import { sepolia } from 'wagmi/chains';
+import { react, etherscan } from '@wagmi/cli/plugins';
+import { sepolia } from 'viem/chains';
 
 export default defineConfig({
   out: 'src/contracts/generated.ts',
-  contracts: [],
   plugins: [
     etherscan({
       apiKey: process.env.ETHERSCAN_API_KEY!,
       chainId: sepolia.id,
       contracts: [
         {
-          name: 'TestToken',
+          name: 'Token',
           address: {
             [sepolia.id]: '0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2',
           },

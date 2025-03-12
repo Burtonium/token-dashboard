@@ -11,16 +11,13 @@ import { tokenStakingConfig } from '@/contracts/generated';
 import { erc20Abi, formatEther } from 'viem';
 import assert from 'assert';
 import { isDev } from '@/env';
-import { mainnet, sepolia } from 'viem/chains';
 import { tokenAddress } from '@/config/realToken';
 import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { getStakingMerkleProofs } from '@/server/actions/staking/getStakingMerkleProofs';
 import { uniqBy } from 'lodash';
 import { serverActionErrorGuard } from '@/lib/serverActionErrorGuard';
 import { useNetworkGuard } from '@/providers/network-guard';
-
-const chainId = isDev ? sepolia.id : mainnet.id;
-const contractAddress = tokenStakingConfig.address[chainId];
+import useContractAddresses from './useContractAddresses';
 
 export type Tier = {
   lockPeriod: bigint;
@@ -30,6 +27,7 @@ export type Tier = {
 export type TierWithDecimalMult = Tier & { decimalMult: number };
 
 export const useStakingVault = () => {
+  const { tokenStaking: contractAddress } = useContractAddresses();
   const { isSuccess } = useNetworkId();
   const {
     queries: { balance },

@@ -184,6 +184,9 @@ importers:
         specifier: ^3.23.8
         version: 3.24.1
     devDependencies:
+      '@bltzr-gg/realbet-evm-contracts':
+        specifier: workspace:*
+        version: link:../evm-contracts
       '@flydotio/dockerfile':
         specifier: ^0.7.4
         version: 0.7.4

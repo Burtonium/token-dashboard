@@ -6,6 +6,7 @@ import assert from 'assert';
 import prisma from '@/server/prisma/client';
 import { calculateRakebackFromReal } from '@/hooks/useRealbetProgression';
 import { isServerActionError } from '@/lib/serverActionErrorGuard';
+import { getItem } from '../store';
 
 const requestPath = 'api/gd/user/external/get-rakeback';
 const elapsed = 0;
@@ -104,9 +105,9 @@ export async function POST(request: Request) {
 
   const { tier } = calculateRakebackFromReal(trackedBalances.total);
 
-  const data = tier && {
+  const data = (tier && getItem(body.data.userId)) ?? {
     userId: body.data.userId,
-    rate: tier?.rate,
+    rate: 0,
     updatedAt: new Date().toISOString(),
     description: `Rakeback tier ${tier?.rank}`,
   };

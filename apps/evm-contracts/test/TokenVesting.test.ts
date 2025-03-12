@@ -74,91 +74,91 @@ describe("TokenVesting", function () {
       const halfTime = baseTime + duration / 2n;
       await tokenVesting.write.setCurrentTime([halfTime]);
 
-      // check that vested amount is half the total amount to vest
       expect(
         await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
           account: beneficiary.account,
         }),
+        "check that vested amount is half the total amount to vest",
       ).to.be.equal(50);
 
-      // check that only beneficiary can try to release vested tokens
       await expect(
         tokenVesting.write.release([vestingScheduleId, 100n], {
           account: addr2.account,
         }),
+        "check that only beneficiary can try to release vested tokens",
       ).to.be.revertedWith("TokenVesting: only beneficiary and owner can release vested tokens");
 
-      // check that beneficiary cannot release more than the vested amount
       await expect(
         tokenVesting.write.release([vestingScheduleId, 100n], {
           account: beneficiary.account,
         }),
+        "check that beneficiary cannot release more than the vested amount",
       ).to.be.revertedWith("TokenVesting: cannot release tokens, not enough vested tokens");
 
-      // release 10 tokens and check that a Transfer event is emitted with a value of 10
       await expect(
         tokenVesting.write.release([vestingScheduleId, 10n], {
           account: beneficiary.account,
         }),
+        "release 10 tokens and check that a Transfer event is emitted with a value of 10",
       )
         .to.emit(token, "Transfer")
         .withArgs(tokenVesting.address, getAddress(beneficiary.account.address), 10);
 
-      // check that the vested amount is now 40
       expect(
         await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
           account: beneficiary.account,
         }),
+        "check that the vested amount is now correct",
       ).to.be.equal(40);
       let vestingSchedule = await tokenVesting.read.getVestingSchedule([vestingScheduleId]);
 
-      // check that the released amount is 10
-      expect(vestingSchedule.released).to.be.equal(10);
+      expect(vestingSchedule.released, "released amount is correct").to.be.equal(10);
 
       // set current time after the end of the vesting period
       await tokenVesting.write.setCurrentTime([baseTime + duration + 1n]);
 
-      // check that the vested amount is 90
+      //
       expect(
         await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
           account: beneficiary.account,
         }),
+        "check that the vested amount is 90",
       ).to.be.equal(90);
 
-      // beneficiary release vested tokens (45)
       await expect(
         tokenVesting.write.release([vestingScheduleId, 45n], {
           account: beneficiary.account,
         }),
+        "beneficiary release vested tokens (45)",
       )
         .to.emit(token, "Transfer")
         .withArgs(tokenVesting.address, getAddress(beneficiary.account.address), 45);
 
-      // owner release vested tokens (45)
       await expect(
         tokenVesting.write.release([vestingScheduleId, 45n], {
           account: admin.account,
         }),
+        "owner release vested tokens (45)",
       )
         .to.emit(token, "Transfer")
         .withArgs(tokenVesting.address, getAddress(beneficiary.account.address), 45);
       vestingSchedule = await tokenVesting.read.getVestingSchedule([vestingScheduleId]);
 
-      // check that the number of released tokens is 100
-      expect(vestingSchedule.released).to.be.equal(100);
+      expect(vestingSchedule.released, "check that the number of released tokens is 100").to.be.equal(100);
 
-      // check that the vested amount is 0
       expect(
         await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
           account: beneficiary.account,
         }),
+        "check that the vested amount is 0",
       ).to.be.equal(0);
 
-      // check that anyone cannot revoke a vesting
+      //
       await expect(
         tokenVesting.write.revoke([vestingScheduleId], {
           account: addr2.account,
         }),
+        "check that anyone cannot revoke a vesting",
       ).to.be.revertedWith("UNAUTHORIZED");
       await tokenVesting.write.revoke([vestingScheduleId]);
 

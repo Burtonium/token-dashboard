@@ -21,7 +21,8 @@
     "db:reset": "npx prisma migrate reset --force && npx prisma db push && npx prisma generate && pnpm run db:seed",
     "postinstall": "pnpm run db:generate",
     "test": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build-synpress-cache": "npx synpress src/test/wallet"
   },
   "dependencies": {
     "@bltzr-gg/realbet-api": "^1.2.1",

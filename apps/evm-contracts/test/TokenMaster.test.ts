@@ -12,7 +12,7 @@ describe("TokenMaster", function () {
     const { master, token } = await tokenMasterFixture();
 
     await master.write.setTreasury([getAddress(treasury.account.address)]);
-    await token.write.mint([parseUnits("1000", 18)], { account: treasury.account });
+    await token.write.mint([treasury.account.address, parseUnits("1000", 18)]);
     await token.write.approve([master.address, parseUnits("1000", 18)], { account: treasury.account });
 
     expect(await master.read.authorizedSigner()).to.equal(getAddress(admin.account.address));
@@ -32,7 +32,7 @@ describe("TokenMaster", function () {
 
     expect(recovered).to.equal(getAddress(admin.account.address));
 
-    const minted = await token.write.mint([parseUnits("1000", 18)], { account: admin.account });
+    const minted = await token.write.mint([admin.account.address, parseUnits("1000", 18)]);
     await publicClient.waitForTransactionReceipt({ hash: minted });
     await token.write.transfer([master.address, parseUnits("1000", 18)], { account: admin.account });
     const claim = await master.write.claimToken([toHex(0, { size: 16 }), parseUnits("1000", 18), signature], {

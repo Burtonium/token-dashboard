@@ -1,5 +1,3 @@
-// import { solanaMainnet, solanaDevnet } from './solana';
-// import { mainnet, polygon, polygonAmoy, sepolia } from 'viem/chains';
 import { sepolia } from 'viem/chains';
 import { type GetArrayElementType } from '@/types';
 
@@ -22,5 +20,5 @@ export const getNetworkType = (id: NetworkId): 'eip155' | 'solana' =>
   evm.some((chain) => chain.id === id) ? 'eip155' : 'solana';
 
 export const networkIdExists = (
-  id: string | number | undefined,
+  id: string | number | undefined | null,
 ): id is NetworkId => allNetworks.some((chain) => chain.id === id);

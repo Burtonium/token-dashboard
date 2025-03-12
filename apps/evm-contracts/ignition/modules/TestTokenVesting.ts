@@ -2,16 +2,18 @@
 
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 import { parseEther } from "viem";
+import testToken from "./TestToken";
 
 const testTokenVesting = buildModule("TestTokenVesting", (m) => {
-  const token = m.contract("TestRealToken");
-  m.call(token, "mint", [parseEther("1000000")]);
+  const realToken = m.useModule(testToken);
+  const signer = m.getAccount(0);
+  m.call(realToken.token, "mint", [signer, parseEther("1000000")]);
 
-  const tokenVesting = m.contract("MockTokenVesting", [token]);
+  const tokenVesting = m.contract("MockTokenVesting", [realToken.token]);
 
   return {
     tokenVesting,
-    token,
+    token: realToken.token,
   };
 });
 

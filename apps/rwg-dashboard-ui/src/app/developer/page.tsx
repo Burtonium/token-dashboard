@@ -16,11 +16,11 @@ import { useToken } from '@/hooks/useToken';
 import { useAuthenticatedQuery } from '@/hooks/useAuthenticatedQuery';
 import {
   tokenMasterAddress,
-  useReadTestTokenAllowance,
-  useReadTestTokenBalanceOf,
+  useReadTokenAllowance,
+  useReadTokenBalanceOf,
   useReadTokenMasterNonces,
   useReadTokenMasterTreasury,
-  useWriteTestTokenTransfer,
+  useWriteTokenTransfer,
   useWriteTokenMasterResetClaimed,
   useWriteTokenMasterSetNonce,
 } from '@/contracts/generated';
@@ -82,14 +82,14 @@ const DeveloperPage = () => {
   const [whitelistAddress, setWhitelistAddress] = useState('');
   const [claimId, setClaimId] = useState('');
   const treasury = useReadTokenMasterTreasury();
-  const treasuryBalance = useReadTestTokenBalanceOf({
+  const treasuryBalance = useReadTokenBalanceOf({
     args: [treasury.data ?? '0x'],
   });
-  const tokenMasterApprovedSpend = useReadTestTokenAllowance({
+  const tokenMasterApprovedSpend = useReadTokenAllowance({
     args: [treasury.data ?? '0x', tokenMasterAddress[11155111]],
   });
 
-  const sendToken = useWriteTestTokenTransfer();
+  const sendToken = useWriteTokenTransfer();
 
   const [addressToAdd, setAddressToAdd] = useState('');
   const [chainOfWalletToAdd, setChainOfWalletToAdd] = useState('EVM');
@@ -282,12 +282,24 @@ const DeveloperPage = () => {
       <Tabs defaultValue="account" className="mt-5">
         <div className="max-w-full overflow-x-auto pb-2">
           <TabsList>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="token">Token</TabsTrigger>
-            <TabsTrigger value="rewards">Rewards</TabsTrigger>
-            <TabsTrigger value="bonus">Switch Bonus</TabsTrigger>
-            <TabsTrigger value="vesting">Vesting &amp; Claims</TabsTrigger>
-            <TabsTrigger value="debug">Debug Data</TabsTrigger>
+            <TabsTrigger data-testid="account" value="account">
+              Account
+            </TabsTrigger>
+            <TabsTrigger data-testid="token" value="token">
+              Token
+            </TabsTrigger>
+            <TabsTrigger data-testid="rewards" value="rewards">
+              Rewards
+            </TabsTrigger>
+            <TabsTrigger data-testid="bonus" value="bonus">
+              Switch Bonus
+            </TabsTrigger>
+            <TabsTrigger data-testid="vesting" value="vesting">
+              Vesting &amp; Claims
+            </TabsTrigger>
+            <TabsTrigger data-testid="debug" value="debug">
+              Debug Data
+            </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="account">
@@ -406,12 +418,15 @@ const DeveloperPage = () => {
           <div>
             <label className="mb-2 block">Mint {token.symbol}</label>
             <Input
+              data-testid="mint-input"
               className="mb-3"
               placeholder=""
               value={mintAmount}
               onChange={(e) => setMintAmount(parseFloat(e.target.value))}
               endAdornment={
                 <Button
+                  disabled={!primaryWallet}
+                  data-testid="mint-button"
                   loading={token.mint.isPending}
                   onClick={() =>
                     token.mint.mutate(

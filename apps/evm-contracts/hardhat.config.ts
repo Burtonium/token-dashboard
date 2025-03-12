@@ -31,8 +31,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
+      mining: {
+        auto: false,
+        interval: [4800, 5200],
+      },
       accounts: {
-        mnemonic,
+        mnemonic: "test test test test test test test test test test test junk",
       },
       chainId: chains.hardhat.id,
     },
