@@ -1,3 +1,5 @@
+"use client";
+
 import useNetworkId from './useNetworkId';
 import { networkIdExists } from '@/config/networks';
 import {
@@ -8,21 +10,20 @@ import {
 } from '@/contracts/generated';
 import { env } from '@/env';
 import { useQuery } from '@tanstack/react-query';
+import { getLocallyDeployedAddresses } from '@/server/actions/getLocallyDeployedAddresses';
 
 export const fetchLocallyDeployedAddresses = async () => {
-  const locallyDeployedJson = await import(
-    '@bltzr-gg/realbet-evm-contracts/ignition/deployments/chain-31337/deployed_addresses.json'
-  );
+  const locallyDeployedJson = await getLocallyDeployedAddresses();
 
   return {
-    token: locallyDeployedJson.default['TestRealToken#REAL'] as `0x${string}`,
-    tokenVesting: locallyDeployedJson.default[
+    token: locallyDeployedJson['TestRealToken#REAL'] as `0x${string}`,
+    tokenVesting: locallyDeployedJson[
       'TestTokenVesting#MockTokenVesting'
     ] as `0x${string}`,
-    tokenStaking: locallyDeployedJson.default[
+    tokenStaking: locallyDeployedJson[
       'TestTokenStaking#TokenStaking'
     ] as `0x${string}`,
-    tokenMaster: locallyDeployedJson.default[
+    tokenMaster: locallyDeployedJson[
       'TestTokenMaster#TestTokenMaster'
     ] as `0x${string}`,
   };
