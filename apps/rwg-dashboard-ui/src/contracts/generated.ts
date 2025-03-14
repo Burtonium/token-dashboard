@@ -1367,6 +1367,7 @@ export const tokenStakingAbi = [
  * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xffbA2e307793896455dd7a90664ff9B2af758474)
  */
 export const tokenStakingAddress = {
+  1: '0x0',
   11155111: '0xffbA2e307793896455dd7a90664ff9B2af758474',
 } as const;
 
