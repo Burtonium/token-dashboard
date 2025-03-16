@@ -17,10 +17,7 @@ import { z } from 'zod';
 setup('Reset Token state', async () => {
   console.log('🔎 Checking for locally deployed REAL token');
   const localToken = fs.readFileSync(
-    path.resolve(
-      process.cwd(),
-      '../evm-contracts/ignition/deployments/chain-31337/deployed_addresses.json',
-    ),
+    path.resolve(process.cwd(), './public/locally_deployed_addresses.json'),
   );
   const localTokenAddress = z
     .record(z.string())
