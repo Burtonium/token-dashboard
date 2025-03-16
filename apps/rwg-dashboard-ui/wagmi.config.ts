@@ -13,7 +13,7 @@ export default defineConfig({
         {
           name: 'Token',
           address: {
-            [sepolia.id]: '0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2',
+            [sepolia.id]: '0xBE2bC88bac5F1C94360AC4Df95424529511e25E2',
           },
         },
         {

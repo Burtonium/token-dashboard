@@ -10,10 +10,17 @@ import {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const tokenAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'symbol', internalType: 'string', type: 'string' },
+    ],
+    stateMutability: 'nonpayable',
+  },
   {
     type: 'error',
     inputs: [
@@ -157,7 +164,10 @@ export const tokenAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'amount', internalType: 'uint256', type: 'uint256' }],
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
     name: 'mint',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -228,14 +238,14 @@ export const tokenAbi = [
 ] as const;
 
 /**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const tokenAddress = {
-  11155111: '0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2',
+  11155111: '0xBE2bC88bac5F1C94360AC4Df95424529511e25E2',
 } as const;
 
 /**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const tokenConfig = { address: tokenAddress, abi: tokenAbi } as const;
 
@@ -1367,7 +1377,6 @@ export const tokenStakingAbi = [
  * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xffbA2e307793896455dd7a90664ff9B2af758474)
  */
 export const tokenStakingAddress = {
-  1: '0x0',
   11155111: '0xffbA2e307793896455dd7a90664ff9B2af758474',
 } as const;
 
@@ -1646,7 +1655,7 @@ export const tokenVestingConfig = {
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadToken = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1656,7 +1665,7 @@ export const useReadToken = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"allowance"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenAllowance = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1667,7 +1676,7 @@ export const useReadTokenAllowance = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"balanceOf"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1678,7 +1687,7 @@ export const useReadTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"decimals"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenDecimals = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1689,7 +1698,7 @@ export const useReadTokenDecimals = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"name"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenName = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1700,7 +1709,7 @@ export const useReadTokenName = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"owner"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenOwner = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1711,7 +1720,7 @@ export const useReadTokenOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"symbol"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenSymbol = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1722,7 +1731,7 @@ export const useReadTokenSymbol = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"totalSupply"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useReadTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
   abi: tokenAbi,
@@ -1733,7 +1742,7 @@ export const useReadTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteToken = /*#__PURE__*/ createUseWriteContract({
   abi: tokenAbi,
@@ -1743,7 +1752,7 @@ export const useWriteToken = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"approve"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenApprove = /*#__PURE__*/ createUseWriteContract({
   abi: tokenAbi,
@@ -1754,7 +1763,7 @@ export const useWriteTokenApprove = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"mint"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenMint = /*#__PURE__*/ createUseWriteContract({
   abi: tokenAbi,
@@ -1765,7 +1774,7 @@ export const useWriteTokenMint = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenRenounceOwnership =
   /*#__PURE__*/ createUseWriteContract({
@@ -1777,7 +1786,7 @@ export const useWriteTokenRenounceOwnership =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transfer"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenTransfer = /*#__PURE__*/ createUseWriteContract({
   abi: tokenAbi,
@@ -1788,7 +1797,7 @@ export const useWriteTokenTransfer = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenTransferFrom = /*#__PURE__*/ createUseWriteContract({
   abi: tokenAbi,
@@ -1799,7 +1808,7 @@ export const useWriteTokenTransferFrom = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWriteTokenTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
@@ -1811,7 +1820,7 @@ export const useWriteTokenTransferOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateToken = /*#__PURE__*/ createUseSimulateContract({
   abi: tokenAbi,
@@ -1821,7 +1830,7 @@ export const useSimulateToken = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"approve"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenApprove = /*#__PURE__*/ createUseSimulateContract({
   abi: tokenAbi,
@@ -1832,7 +1841,7 @@ export const useSimulateTokenApprove = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"mint"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenMint = /*#__PURE__*/ createUseSimulateContract({
   abi: tokenAbi,
@@ -1843,7 +1852,7 @@ export const useSimulateTokenMint = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -1855,7 +1864,7 @@ export const useSimulateTokenRenounceOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transfer"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenTransfer = /*#__PURE__*/ createUseSimulateContract(
   { abi: tokenAbi, address: tokenAddress, functionName: 'transfer' },
@@ -1864,7 +1873,7 @@ export const useSimulateTokenTransfer = /*#__PURE__*/ createUseSimulateContract(
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transferFrom"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenTransferFrom =
   /*#__PURE__*/ createUseSimulateContract({
@@ -1876,7 +1885,7 @@ export const useSimulateTokenTransferFrom =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useSimulateTokenTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -1888,7 +1897,7 @@ export const useSimulateTokenTransferOwnership =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenAbi}__
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWatchTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: tokenAbi,
@@ -1898,7 +1907,7 @@ export const useWatchTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenAbi}__ and `eventName` set to `"Approval"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWatchTokenApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -1910,7 +1919,7 @@ export const useWatchTokenApprovalEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWatchTokenOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -1922,7 +1931,7 @@ export const useWatchTokenOwnershipTransferredEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenAbi}__ and `eventName` set to `"Transfer"`
  *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2)
+ * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xBE2bC88bac5F1C94360AC4Df95424529511e25E2)
  */
 export const useWatchTokenTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({

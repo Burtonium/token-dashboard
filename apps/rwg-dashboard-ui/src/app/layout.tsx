@@ -5,6 +5,7 @@ import Providers from '../providers';
 import Navbar from '../components/navbar';
 import { Suspense } from 'react';
 import Loading from '@/components/loading';
+import '../dynamic-intercept';
 
 export const metadata: Metadata = {
   title: 'REAL VIP',

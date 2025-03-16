@@ -37,10 +37,19 @@ export const production = createConfig({
   transports: mainnetTransports,
 });
 
+export const test = createConfig({
+  chains: [chains.hardhat],
+  multiInjectedProviderDiscovery: false,
+  transports: {
+    [chains.hardhat.id]: http('http://localhost:8545'),
+  },
+});
+
 const wagmiConfigs: Record<Environment, ReturnType<typeof createConfig>> = {
   production,
   preview,
   development,
+  test,
 };
 
 export default wagmiConfigs[

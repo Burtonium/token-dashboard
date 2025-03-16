@@ -6,13 +6,13 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev:test": "cp -r ../evm-contracts/ignition/deployments/chain-31337/deployed_addresses.json ./public/locally_deployed_addresses.json && NEXT_PUBLIC_VERCEL_ENV=test next dev",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "vercel-build": "npx prisma db push && npx prisma generate && pnpm run db:seed && next build",
     "vercel-build:prod": "rm -rf ./src/app/developer && pnpm run vercel-build",
     "start": "next start",
     "prepare": "husky",
-    "scrape-icons": "npx tsx ./scripts/scrapeCoinIcons.ts",
     "wagmi:generate": "npx wagmi generate",
     "db:pull": "npx prisma db pull",
     "db:generate": "npx prisma generate",
@@ -21,7 +21,7 @@
     "db:reset": "npx prisma migrate reset --force && npx prisma db push && npx prisma generate && pnpm run db:seed",
     "postinstall": "pnpm run db:generate",
     "test": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "pnpm run build-synpress-cache && playwright test",
     "build-synpress-cache": "npx synpress src/test/wallet"
   },
   "dependencies": {

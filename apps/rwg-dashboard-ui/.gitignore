@@ -52,3 +52,5 @@ yarn-error.log*
 .cache-synpress/
 playwright-report/
 test-results/
+
+public/locally_deployed_addresses.json

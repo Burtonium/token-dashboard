@@ -3,13 +3,14 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { readContract, waitForTransactionReceipt } from '@wagmi/core';
 import config from '@/config/wagmi';
 import { useWatchAsset, useWriteContract } from 'wagmi';
+import assert from 'assert';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
-import { erc20Abi } from 'viem';
 import { tokenAbi } from '@/contracts/generated';
-import { tokenAddress } from '@/config/realToken';
+import useContractAddresses from './useContractAddresses';
 
 export const useToken = () => {
+  const addresses = useContractAddresses();
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { writeContractAsync } = useWriteContract();
   const { isSuccess } = useNetworkId();
@@ -17,49 +18,49 @@ export const useToken = () => {
   const { watchAsset } = useWatchAsset();
 
   const balance = useQuery({
-    queryKey: ['balance', tokenAddress, primaryAddress],
-    enabled: !!primaryWallet && isSuccess,
+    queryKey: ['balance', addresses.token, primaryAddress],
+    enabled: !!primaryAddress && isSuccess && !addresses.isPending,
     queryFn: () =>
-      primaryAddress
-        ? readContract(config, {
-            abi: erc20Abi,
-            address: tokenAddress,
-            functionName: 'balanceOf',
-            args: [primaryAddress as `0x${string}`],
-          })
-        : Promise.resolve(0n),
+      readContract(config, {
+        abi: tokenAbi,
+        address: addresses.token,
+        functionName: 'balanceOf',
+        args: [primaryAddress as `0x${string}`],
+      }),
   });
 
   const tokenSymbol = useQuery({
-    queryKey: ['symbol', tokenAddress],
-    enabled: isSuccess,
+    queryKey: ['symbol', addresses.token],
+    enabled: isSuccess && !addresses.isPending,
     queryFn: () =>
       readContract(config, {
-        abi: erc20Abi,
-        address: tokenAddress,
+        abi: tokenAbi,
+        address: addresses.token,
         functionName: 'symbol',
       }),
   });
 
   const decimals = useQuery({
-    queryKey: ['decimals', tokenAddress],
-    enabled: !!primaryWallet && isSuccess,
+    queryKey: ['decimals', addresses.token],
+    enabled: !!primaryWallet && isSuccess && !addresses.isPending,
     queryFn: () =>
       readContract(config, {
-        abi: erc20Abi,
-        address: tokenAddress,
+        abi: tokenAbi,
+        address: addresses.token,
         functionName: 'decimals',
       }),
   });
 
   const mint = useMutation({
-    mutationKey: ['mint', tokenAddress],
+    mutationKey: ['mint', addresses.token, primaryAddress],
     mutationFn: async (amount: bigint) => {
+      assert(primaryAddress?.startsWith('0x'), 'No primary address');
+
       const tx = await writeContractAsync({
-        address: tokenAddress,
+        address: addresses.token,
         abi: tokenAbi,
         functionName: 'mint',
-        args: [amount],
+        args: [primaryAddress as `0x${string}`, amount],
       });
 
       await waitForTransactionReceipt(config, { hash: tx });
@@ -80,7 +81,7 @@ export const useToken = () => {
     watchAsset({
       type: 'ERC20',
       options: {
-        address: tokenAddress,
+        address: addresses.token,
         symbol: tokenSymbol.data,
         decimals: decimals.data,
       },
@@ -97,7 +98,7 @@ export const useToken = () => {
     symbol: '$REAL',
     balance,
     decimals: decimals.data ?? 18,
-    contract: erc20Abi,
+    contract: tokenAbi,
     mint,
     watchToken,
   };

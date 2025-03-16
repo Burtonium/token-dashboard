@@ -4,5 +4,6 @@
   "StakingVault#StakingVault": "0x274608045cD704A291bFF9d79453D98C4E78baA4",
   "TestTokenMaster#TestTokenMaster": "0x0f04760A2aAa8786aE633291E3a0ED40673eBaA0",
   "TokenStaking#TokenStaking": "0xffbA2e307793896455dd7a90664ff9B2af758474",
-  "TokenVesting#TokenVesting": "0xC6a6EbB044629647eb5CD2eFCC1C748c38349154"
+  "TokenVesting#TokenVesting": "0xC6a6EbB044629647eb5CD2eFCC1C748c38349154",
+  "TestRealToken#REAL": "0xBE2bC88bac5F1C94360AC4Df95424529511e25E2"
 }

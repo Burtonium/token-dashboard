@@ -1,7 +1,15 @@
 #!/bin/bash
 
 MODULES_DIR="./ignition/modules"
+DEPLOYMENTS_DIR="./ignition/modules/deployments/chain-31337"
 NETWORK="localhost"
+
+# Prompt to remove the existing modules directory if it exists
+read -p "Do you want to delete the existing deployment? (y/n): " choice
+if [ "$choice" = "y" ]; then
+  echo "Removing existing ignition modules directory: $DEPLOYMENTS_DIR"
+  rm -rf "$DEPLOYMENTS_DIR"
+fi
 
 # Check if the directory exists
 if [ ! -d "$MODULES_DIR" ]; then

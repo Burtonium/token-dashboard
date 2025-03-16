@@ -15,9 +15,16 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'Copying Locally Deployed Addresses 📦',
+      testMatch: /.*local-deployments.setup.ts/,
+    },
+    {
+      name: 'Resetting EVM State  🧹',
+      testMatch: /.*evm-state.setup.ts/,
+    },
+    {
+      name: 'Testing App 🧪',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Additional Synpress-specific configuration can be added here
 });

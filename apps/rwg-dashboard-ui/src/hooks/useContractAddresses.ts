@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import useNetworkId from './useNetworkId';
 import { networkIdExists } from '@/config/networks';
@@ -10,10 +10,12 @@ import {
 } from '@/contracts/generated';
 import { env } from '@/env';
 import { useQuery } from '@tanstack/react-query';
-import { getLocallyDeployedAddresses } from '@/server/actions/getLocallyDeployedAddresses';
+import { z } from 'zod';
 
 export const fetchLocallyDeployedAddresses = async () => {
-  const locallyDeployedJson = await getLocallyDeployedAddresses();
+  const locallyDeployedJson = z
+    .record(z.string())
+    .parse(await (await fetch('./locally_deployed_addresses.json')).json());
 
   return {
     token: locallyDeployedJson['TestRealToken#REAL'] as `0x${string}`,
@@ -35,7 +37,11 @@ const useContractAddresses = () => {
   const defaultNetwork = 11155111;
   const network = networkIdExists(data) ? data : defaultNetwork;
 
-  const { data: overrides } = useQuery({
+  const {
+    data: overrides,
+    isPending,
+    isLoading,
+  } = useQuery({
     queryKey: ['testingEnvOverride'],
     enabled: env.NEXT_PUBLIC_VERCEL_ENV === 'test',
     queryFn: fetchLocallyDeployedAddresses,
@@ -46,6 +52,8 @@ const useContractAddresses = () => {
     tokenVesting: tokenVestingAddress[network],
     tokenStaking: tokenStakingAddress[network],
     tokenMaster: tokenMasterAddress[network],
+    isPending,
+    isLoading,
     ...overrides,
   };
 };

@@ -3,6 +3,8 @@ import { testWithSynpress } from '@synthetixio/synpress';
 import { MetaMask, metaMaskFixtures } from '@synthetixio/synpress/playwright';
 import basicSetup from './wallet/basic.setup';
 import * as dynamic from './mocks/dynamic';
+import { signin } from './helpers/signin';
+import { seedBalance } from './helpers/seedBalance';
 
 const test = testWithSynpress(metaMaskFixtures(basicSetup));
 
@@ -40,23 +42,20 @@ test('should connect wallet to the MetaMask Test Dapp', async ({
   const mainHeading = page.locator('h1');
   await expect(mainHeading).toBeVisible();
   await expect(mainHeading).toHaveText('Welcome to the Real World');
-  await page.locator('nav [data-testid="connect-button"]').click();
-  await page.locator('button:has-text("MetaMask")').click();
 
-  await metamask.connectToDapp();
-  await metamask.confirmSignature();
+  await signin({ page, metamask });
 
   await expect(page.locator('nav [data-testid="connect-button"]')).toHaveText(
-    '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
   );
 
-  await page.goto('/developer');
-  await page.waitForLoadState('load');
-  await page.locator('[data-testid="token"]').click();
-  await page.locator('[data-testid="mint-input"]').fill('10000');
-  await page.locator('[data-testid="mint-input"]').blur();
-  await expect(page.locator('[data-testid="mint-button"]')).toBeEnabled();
-  await page.locator('[data-testid="mint-button"]').click();
-  await metamask.confirmSignature();
-  await page.goto('/');
+  await seedBalance({ page, metamask }, 10000);
+  await page.waitForTimeout(1000);
+  await expect(
+    page.locator('[data-testid="real-available-balance"]'),
+  ).toHaveText('10,000.00');
+
+  await expect(page.locator('[data-testid="real-staked-balance"]')).toHaveText(
+    '0.00',
+  );
 });
