@@ -18,46 +18,46 @@ export const useToken = () => {
   const { watchAsset } = useWatchAsset();
 
   const balance = useQuery({
-    queryKey: ['balance', addresses.token, primaryAddress],
-    enabled: !!primaryAddress && isSuccess && !addresses.isPending,
+    queryKey: ['balance', addresses.data.token, primaryAddress],
+    enabled: !!primaryAddress && isSuccess && addresses.isSuccess,
     queryFn: () =>
       readContract(config, {
         abi: tokenAbi,
-        address: addresses.token,
+        address: addresses.data.token,
         functionName: 'balanceOf',
         args: [primaryAddress as `0x${string}`],
       }),
   });
 
   const tokenSymbol = useQuery({
-    queryKey: ['symbol', addresses.token],
+    queryKey: ['symbol', addresses.data.token],
     enabled: isSuccess && !addresses.isPending,
     queryFn: () =>
       readContract(config, {
         abi: tokenAbi,
-        address: addresses.token,
+        address: addresses.data.token,
         functionName: 'symbol',
       }),
   });
 
   const decimals = useQuery({
-    queryKey: ['decimals', addresses.token],
-    enabled: !!primaryWallet && isSuccess && !addresses.isPending,
+    queryKey: ['decimals', addresses.data.token],
+    enabled: !!primaryWallet && isSuccess,
     queryFn: () =>
       readContract(config, {
         abi: tokenAbi,
-        address: addresses.token,
+        address: addresses.data.token,
         functionName: 'decimals',
       }),
   });
 
   const mint = useMutation({
-    mutationKey: ['mint', addresses.token, primaryAddress],
+    mutationKey: ['mint', addresses.data.token, primaryAddress],
     mutationFn: async (amount: bigint) => {
       assert(primaryAddress?.startsWith('0x'), 'No primary address');
 
       const tx = await writeContractAsync({
-        address: addresses.token,
+        address: addresses.data.token,
         abi: tokenAbi,
         functionName: 'mint',
         args: [primaryAddress as `0x${string}`, amount],
@@ -81,7 +81,7 @@ export const useToken = () => {
     watchAsset({
       type: 'ERC20',
       options: {
-        address: addresses.token,
+        address: addresses.data.token,
         symbol: tokenSymbol.data,
         decimals: decimals.data,
       },

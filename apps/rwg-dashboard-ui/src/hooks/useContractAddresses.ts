@@ -9,7 +9,7 @@ import {
   tokenVestingAddress,
 } from '@/contracts/generated';
 import { env } from '@/env';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 
 export const fetchLocallyDeployedAddresses = async () => {
@@ -37,25 +37,19 @@ const useContractAddresses = () => {
   const defaultNetwork = 11155111;
   const network = networkIdExists(data) ? data : defaultNetwork;
 
-  const {
-    data: overrides,
-    isPending,
-    isLoading,
-  } = useQuery({
-    queryKey: ['testingEnvOverride'],
-    enabled: env.NEXT_PUBLIC_VERCEL_ENV === 'test',
-    queryFn: fetchLocallyDeployedAddresses,
+  return useSuspenseQuery({
+    queryKey: ['testingEnvOverride', network],
+    queryFn: () => {
+      return env.NEXT_PUBLIC_VERCEL_ENV === 'test'
+        ? fetchLocallyDeployedAddresses()
+        : Promise.resolve({
+            token: tokenAddress[network],
+            tokenVesting: tokenVestingAddress[network],
+            tokenStaking: tokenStakingAddress[network],
+            tokenMaster: tokenMasterAddress[network],
+          });
+    },
   });
-
-  return {
-    token: tokenAddress[network],
-    tokenVesting: tokenVestingAddress[network],
-    tokenStaking: tokenStakingAddress[network],
-    tokenMaster: tokenMasterAddress[network],
-    isPending,
-    isLoading,
-    ...overrides,
-  };
 };
 
 export default useContractAddresses;
