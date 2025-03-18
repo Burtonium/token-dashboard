@@ -1,6 +1,5 @@
 'use client';
 
-import useNetworkId from './useNetworkId';
 import { networkIdExists } from '@/config/networks';
 import {
   tokenAddress,
@@ -11,11 +10,20 @@ import {
 import { env } from '@/env';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+import { hardhat } from 'viem/chains';
+import { useChainId } from 'wagmi';
 
-export const fetchLocallyDeployedAddresses = async () => {
+const fetchLocallyDeployedAddresses = async () => {
+  const response =
+    typeof window === 'undefined'
+      ? null
+      : await fetch(
+          `${window.location.origin}/locally_deployed_addresses.json`,
+        );
+
   const locallyDeployedJson = z
     .record(z.string())
-    .parse(await (await fetch('./locally_deployed_addresses.json')).json());
+    .parse((await response?.json()) ?? {});
 
   return {
     token: locallyDeployedJson['TestRealToken#REAL'] as `0x${string}`,
@@ -32,21 +40,28 @@ export const fetchLocallyDeployedAddresses = async () => {
 };
 
 const useContractAddresses = () => {
-  const { data } = useNetworkId();
-
-  const defaultNetwork = 11155111;
-  const network = networkIdExists(data) ? data : defaultNetwork;
+  const chainId = useChainId();
 
   return useSuspenseQuery({
-    queryKey: ['testingEnvOverride', network],
+    queryKey: ['testingEnvOverride', chainId],
     queryFn: () => {
-      return env.NEXT_PUBLIC_VERCEL_ENV === 'test'
+      if (!chainId || !networkIdExists(chainId)) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        return Promise.resolve({
+          token: tokenAddress[11155111],
+          tokenVesting: tokenVestingAddress[11155111],
+          tokenStaking: tokenStakingAddress[11155111],
+          tokenMaster: tokenMasterAddress[11155111],
+        });
+      }
+
+      return env.NEXT_PUBLIC_VERCEL_ENV === 'test' || chainId === hardhat.id
         ? fetchLocallyDeployedAddresses()
         : Promise.resolve({
-            token: tokenAddress[network],
-            tokenVesting: tokenVestingAddress[network],
-            tokenStaking: tokenStakingAddress[network],
-            tokenMaster: tokenMasterAddress[network],
+            token: tokenAddress[chainId],
+            tokenVesting: tokenVestingAddress[chainId],
+            tokenStaking: tokenStakingAddress[chainId],
+            tokenMaster: tokenMasterAddress[chainId],
           });
     },
   });

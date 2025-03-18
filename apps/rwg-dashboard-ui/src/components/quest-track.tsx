@@ -26,7 +26,7 @@ const QuestTrack = () => {
   const { allClaimed, claims } = useClaims();
 
   return (
-    <>
+    <div data-testid="quest-track">
       <h2 className="text-2xl">Getting Started</h2>
       <div className="grid items-center gap-5 lg:grid-cols-2 2xl:grid-cols-3">
         <Quest
@@ -160,7 +160,7 @@ const QuestTrack = () => {
           </Button>
         </Quest>
       </div>
-    </>
+    </div>
   );
 };
 

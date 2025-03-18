@@ -1,15 +1,15 @@
-import { sepolia } from 'viem/chains';
+import { hardhat, sepolia } from 'viem/chains';
 import { type GetArrayElementType } from '@/types';
 
 export * from 'viem/chains';
 
 export const evm = [sepolia] as const;
-export const allNetworks = [...evm] as const;
+export const test = [hardhat] as const;
+export const allNetworks = [...evm, ...test] as const;
 export const production = allNetworks.filter((chain) => !chain.testnet);
 export const development = allNetworks.filter(
   (chain) => chain.testnet === true,
 );
-
 export type NetworkId = GetArrayElementType<typeof allNetworks>['id'];
 export type EVMId = GetArrayElementType<typeof evm>['id'];
 

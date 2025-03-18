@@ -1,5 +1,6 @@
 import { defineWalletSetup } from '@synthetixio/synpress';
 import { MetaMask } from '@synthetixio/synpress/playwright';
+import { mnemonicToAccount } from 'viem/accounts';
 
 const SEED_PHRASE =
   'test test test test test test test test test test test junk';
@@ -17,3 +18,8 @@ export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
 
   await metamask.switchAccount('Account 2');
 });
+
+export const account = mnemonicToAccount(
+  'test test test test test test test test test test test junk',
+  { path: "m/44'/60'/0'/0/1" },
+);

@@ -60,6 +60,7 @@ export default function Stake() {
 
       setRewards(rewards);
     };
+
     void calculate();
   }, [
     primaryWallet,
@@ -72,7 +73,7 @@ export default function Stake() {
   return (
     <div className="w-full p-6 md:p-5">
       <div className="w-full">
-        <h2 className="text-heading mb-3">
+        <h2 className="mb-3 text-heading">
           <PackagePlus className="mb-1 inline size-7 stroke-1" /> REAL Staking
           Dashboard
         </h2>

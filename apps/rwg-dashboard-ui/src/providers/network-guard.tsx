@@ -20,18 +20,27 @@ import React, { createContext, useContext, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 import * as chains from 'viem/chains';
 import { cn } from '@/lib/cn';
+import { isDev, isTest } from '@/env';
+import { uniqBy } from 'lodash';
 
 type NetworkGuardContextType = (
-  acceptedChains: (number | string)[],
+  acceptedChains?: (number | string)[],
 ) => Promise<void>;
 const DialogContext = createContext<NetworkGuardContextType>(() =>
   Promise.reject(new Error('No network guard context')),
 );
 
+const defaultNetworks = isTest
+  ? [chains.hardhat.id]
+  : isDev
+    ? [chains.sepolia.id]
+    : [chains.mainnet.id];
+
 export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { data: currentNetwork, refetch } = useNetworkId();
+
   const { switchChain, isPending } = useSwitchChain();
   const [state, setState] = useState<{
     resolve: () => void;
@@ -40,7 +49,9 @@ export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
     acceptedChains: (number | string)[];
   } | null>(null);
 
-  const networkGuard: NetworkGuardContextType = async (acceptedChains) => {
+  const networkGuard: NetworkGuardContextType = async (
+    acceptedChains = defaultNetworks,
+  ) => {
     const network = (await refetch()).data;
 
     return new Promise((resolve, reject) => {
@@ -74,6 +85,17 @@ export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
   const currentNetworkValid =
     currentNetwork && state?.acceptedChains.includes(currentNetwork);
 
+  const _switchChain = async (chainId: string) => {
+    switchChain(
+      { chainId: parseInt(chainId) },
+      {
+        onSuccess: () => {
+          void refetch();
+        },
+      },
+    );
+  };
+
   return (
     <DialogContext.Provider value={networkGuard}>
       <Dialog
@@ -95,9 +117,7 @@ export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
             The functionality you are trying to access requires you to switch
             your network.
           </p>
-          <Select
-            onValueChange={(value) => switchChain({ chainId: parseInt(value) })}
-          >
+          <Select disabled={isPending} onValueChange={_switchChain}>
             <SelectTrigger className={cn('w-[180px] py-2')}>
               <SelectValue
                 placeholder={
@@ -108,7 +128,7 @@ export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
               />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(chains)
+              {uniqBy(Object.values(chains), 'id')
                 .filter((chain) => state?.acceptedChains.includes(chain.id))
                 .map((chain) => (
                   <SelectItem
@@ -122,7 +142,11 @@ export const NetworkGuard: React.FC<{ children: React.ReactNode }> = ({
             </SelectContent>
           </Select>
           <div className="mt-5 flex justify-end gap-3">
-            <Button variant="outline" onClick={handleDismiss}>
+            <Button
+              loading={isPending}
+              variant="outline"
+              onClick={handleDismiss}
+            >
               Cancel
             </Button>
             <Button

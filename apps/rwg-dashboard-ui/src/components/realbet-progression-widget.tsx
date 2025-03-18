@@ -19,7 +19,7 @@ const RealbetProgressionWidget = () => {
   const handleDynamicAuthClick = useDynamicAuthClickHandler();
 
   return (
-    <Card>
+    <Card data-testid="realbet-progression-widget">
       <CardHeader>
         <CardTitle className="flex justify-between">
           <span>
@@ -140,7 +140,11 @@ const RealbetProgressionWidget = () => {
           ) : (
             !link.isLinked &&
             link.isSuccess && (
-              <Button asChild className="ml-1">
+              <Button
+                data-testid="link-realbet-button"
+                asChild
+                className="ml-1"
+              >
                 <Link href={'/link-realbet'}>Link your account</Link>
               </Button>
             )

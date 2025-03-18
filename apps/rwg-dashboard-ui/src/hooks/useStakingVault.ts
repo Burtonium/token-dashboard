@@ -7,11 +7,9 @@ import { useMemo } from 'react';
 import { useToken } from './useToken';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
-import { tokenStakingConfig } from '@/contracts/generated';
+import { tokenAbi, tokenStakingConfig } from '@/contracts/generated';
 import { erc20Abi, formatEther } from 'viem';
 import assert from 'assert';
-import { isDev } from '@/env';
-import { tokenAddress } from '@/config/realToken';
 import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { getStakingMerkleProofs } from '@/server/actions/staking/getStakingMerkleProofs';
 import { uniqBy } from 'lodash';
@@ -27,7 +25,7 @@ export type Tier = {
 export type TierWithDecimalMult = Tier & { decimalMult: number };
 
 export const useStakingVault = () => {
-  const { tokenStaking: contractAddress } = useContractAddresses();
+  const addresses = useContractAddresses();
   const { isSuccess } = useNetworkId();
   const {
     queries: { balance },
@@ -39,14 +37,12 @@ export const useStakingVault = () => {
   const networkGuard = useNetworkGuard();
 
   const tiers = useQuery({
-    enabled: isSuccess && !!contractAddress,
-    queryKey: ['tiers', contractAddress],
+    enabled: isSuccess,
+    queryKey: ['tiers', addresses.data.tokenStaking],
     queryFn: async () => {
-      assert(contractAddress, 'Contract address not found');
-
       const tiers = await readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'getTiers',
       });
 
@@ -61,15 +57,14 @@ export const useStakingVault = () => {
   });
 
   const deposits = useQuery({
-    enabled: !!primaryWallet && isSuccess && !!tiers.data && !!contractAddress,
-    queryKey: ['getDeposits', contractAddress, primaryAddress],
+    enabled: !!primaryWallet && isSuccess && !!tiers.data,
+    queryKey: ['getDeposits', addresses.data.tokenStaking, primaryAddress],
     queryFn: async () => {
       assert(tiers.data, 'Tiers not loaded');
-      assert(contractAddress, 'Contract address not found');
 
       const amounts = await readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'getUserStakes',
         args: [primaryAddress as `0x${string}`],
       });
@@ -89,14 +84,12 @@ export const useStakingVault = () => {
   });
 
   const totalStaked = useQuery({
-    enabled: !!primaryWallet && isSuccess && !!contractAddress,
-    queryKey: ['stakedBalance', contractAddress, primaryAddress],
+    enabled: !!primaryWallet && isSuccess,
+    queryKey: ['stakedBalance', addresses.data.tokenStaking, primaryAddress],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'balanceOf',
         args: [primaryWallet!.address as `0x${string}`],
       });
@@ -109,15 +102,12 @@ export const useStakingVault = () => {
   );
 
   const isAdmin = useQuery({
-    enabled:
-      isSuccess && !!primaryAddress?.startsWith('0x') && !!contractAddress,
-    queryKey: ['admin', contractAddress, primaryAddress],
+    enabled: isSuccess && !!primaryAddress?.startsWith('0x'),
+    queryKey: ['admin', addresses.data.tokenStaking, primaryAddress],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'hasRole',
         args: [
           '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -135,12 +125,9 @@ export const useStakingVault = () => {
       if (isAdmin.isLoading || isAdmin.data === false) {
         throw new Error('Not admin');
       }
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
 
       const tx = await writeContractAsync({
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'setTier',
         args: [BigInt(index), tier.lockPeriod, tier.multiplier],
@@ -166,14 +153,12 @@ export const useStakingVault = () => {
   );
 
   const shares = useQuery({
-    enabled: !!primaryWallet && isSuccess && !!contractAddress,
-    queryKey: ['shares', contractAddress, primaryAddress],
+    enabled: !!primaryWallet && isSuccess,
+    queryKey: ['shares', addresses.data.tokenStaking, primaryAddress],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'getUserStakes',
         args: [primaryWallet!.address as `0x${string}`],
       });
@@ -181,28 +166,24 @@ export const useStakingVault = () => {
   });
 
   const epochDuration = useQuery({
-    enabled: isSuccess && !!contractAddress,
+    enabled: isSuccess,
     queryKey: ['epochDuration'],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'epochDuration',
       });
     },
   });
 
   const epochStartTime = useQuery({
-    enabled: isSuccess && !!contractAddress,
+    enabled: isSuccess,
     queryKey: ['epochStartTime'],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'epochStartTime',
       });
     },
@@ -227,29 +208,22 @@ export const useStakingVault = () => {
   }, [epochDuration.data, epochStartTime.data]);
 
   const allowance = useQuery({
-    enabled:
-      !!primaryAddress && isSuccess && !!tokenAddress && !!contractAddress,
-    queryKey: ['allowance', contractAddress, primaryAddress],
+    enabled: !!primaryAddress && isSuccess,
+    queryKey: ['allowance', addresses.data.tokenStaking, primaryAddress],
     queryFn: () => {
-      assert(contractAddress, 'Contract address not found');
-
       return readContract(config, {
         abi: erc20Abi,
-        address: tokenAddress,
+        address: addresses.data.token,
         functionName: 'allowance',
-        args: [primaryAddress as `0x${string}`, contractAddress],
+        args: [primaryAddress as `0x${string}`, addresses.data.tokenStaking],
       });
     },
   });
 
   const getRewardsForEpoch = (epoch: number) => {
-    if (!contractAddress) {
-      throw new Error('Contract address not found');
-    }
-
     return readContract(config, {
       abi: tokenStakingConfig.abi,
-      address: contractAddress,
+      address: addresses.data.tokenStaking,
       functionName: 'getRewardsForEpoch',
       args: [BigInt(epoch)],
     });
@@ -257,12 +231,8 @@ export const useStakingVault = () => {
 
   const setRewardForEpoch = useMutation({
     mutationFn: ({ epoch, reward }: { epoch: number; reward: bigint }) => {
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
-
       return writeContractAsync({
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'setRewardForEpoch',
         args: [BigInt(epoch), reward],
@@ -271,13 +241,9 @@ export const useStakingVault = () => {
   });
 
   const calculateRewards = (stakeIndex: bigint, epochs: bigint[]) => {
-    if (!contractAddress) {
-      throw new Error('Contract address not found');
-    }
-
     return readContract(config, {
       abi: tokenStakingConfig.abi,
-      address: contractAddress,
+      address: addresses.data.tokenStaking,
       functionName: 'calculateRewardsWithVoting',
       args: [stakeIndex, epochs],
       account: primaryWallet!.address as `0x${string}`,
@@ -286,14 +252,9 @@ export const useStakingVault = () => {
 
   const stake = useMutation({
     mutationFn: async ({ amount, tier }: { amount: bigint; tier: number }) => {
-      await networkGuard(isDev ? [11155111] : [1]);
-
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
-
+      await networkGuard();
       const tx = await writeContractAsync({
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'stake',
         args: [amount, tier],
@@ -313,21 +274,18 @@ export const useStakingVault = () => {
 
   const increaseAllowance = useMutation({
     mutationFn: async (amount: bigint) => {
-      await networkGuard(isDev ? [11155111] : [1]);
+      await networkGuard();
 
       if (!primaryWallet) {
         setShowAuthFlow(true);
         return;
       }
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
 
       const tx = await writeContractAsync({
-        address: tokenAddress,
-        abi: erc20Abi,
+        address: addresses.data.token,
+        abi: tokenAbi,
         functionName: 'approve',
-        args: [contractAddress, amount],
+        args: [addresses.data.tokenStaking, amount],
       });
 
       await waitForTransactionReceipt(config, { hash: tx, confirmations: 2 });
@@ -337,20 +295,18 @@ export const useStakingVault = () => {
 
   const unstake = useMutation({
     mutationFn: async ({ stakeIndex }: { stakeIndex: bigint }) => {
-      await networkGuard(isDev ? [11155111] : [1]);
+      await networkGuard();
 
       if (!publicClient) {
         throw new Error('Public client not found');
       }
+
       if (!primaryWallet) {
         throw new Error('Wallet required');
       }
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
 
       const { request } = await publicClient.simulateContract({
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'unstake',
         args: [stakeIndex],
@@ -382,20 +338,18 @@ export const useStakingVault = () => {
       merkleProofs: `0x${string}`[][];
       unstake: boolean;
     }) => {
-      await networkGuard(isDev ? [11155111] : [1]);
+      await networkGuard();
 
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
       if (!publicClient) {
         throw new Error('Public client not found');
       }
+
       if (!primaryWallet) {
         throw new Error('Wallet required');
       }
 
       const { request } = await publicClient.simulateContract({
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'claimRewards',
         args: [stakeIndex, epochs, merkleProofs, unstake],
@@ -411,24 +365,20 @@ export const useStakingVault = () => {
   const lastEpochRewards = useQuery({
     queryKey: ['getLastEpochRewards', currentEpoch?.epoch],
     queryFn: async () => {
-      if (!contractAddress) {
-        throw new Error('Contract address not found');
-      }
-
       const epoch = currentEpoch?.epoch ?? 0;
       const rewardEpoch = epoch > 0 ? epoch - 1 : 0;
 
       // Get total effective supply for the epoch
       const totalEffectiveSupply = await readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'getTotalEffectiveSupplyAtEpoch',
         args: [BigInt(rewardEpoch)],
       });
 
       const rewards = await readContract(config, {
         abi: tokenStakingConfig.abi,
-        address: contractAddress,
+        address: addresses.data.tokenStaking,
         functionName: 'getRewardsForEpoch',
         args: [BigInt(epoch)],
       });
@@ -471,7 +421,7 @@ export const useStakingVault = () => {
       stakeIndex: bigint;
       unstake: boolean;
     }) => {
-      await networkGuard(isDev ? [11155111] : [1]);
+      await networkGuard();
 
       if (!merkleProofs.data) {
         return;
@@ -528,7 +478,7 @@ export const useStakingVault = () => {
    */
   const claimAll = useMutation({
     mutationFn: async () => {
-      await networkGuard(isDev ? [11155111] : [1]);
+      await networkGuard();
 
       if (!merkleProofs.data) {
         return;
@@ -587,7 +537,12 @@ export const useStakingVault = () => {
   });
 
   return {
-    errors: [shares.error, allowance.error, deposits.error].filter((e) => !!e),
+    errors: [
+      shares.error,
+      allowance.error,
+      deposits.error,
+      increaseAllowance.error,
+    ].filter((e) => !!e),
     shares,
     allowance,
     isAdmin,

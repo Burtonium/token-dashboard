@@ -15,7 +15,7 @@ const Quest: React.FC<
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center rounded-3xl bg-cover px-4 py-12 md:px-6',
+        'relative flex items-center rounded-3xl bg-cover px-4 py-12 md:px-6',
         { 'animate-pulse': loading },
         className,
       )}

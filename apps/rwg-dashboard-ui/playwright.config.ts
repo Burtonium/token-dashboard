@@ -19,10 +19,6 @@ export default defineConfig({
       testMatch: /.*local-deployments.setup.ts/,
     },
     {
-      name: 'Resetting EVM State  🧹',
-      testMatch: /.*evm-state.setup.ts/,
-    },
-    {
       name: 'Testing App 🧪',
       use: { ...devices['Desktop Chrome'] },
     },

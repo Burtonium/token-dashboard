@@ -72,6 +72,7 @@ const StakeComponent = () => {
     shareSymbol,
     lastEpochRewards,
     totalStaked,
+    errors,
   } = useStakingVault();
   const { sdkHasLoaded, setShowAuthFlow } = useDynamicContext();
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -308,6 +309,7 @@ const StakeComponent = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="staking-input"
                         loading={stakeFormLoading}
                         startAdornment={
                           <span className="mt-px inline-flex items-center gap-1">
@@ -317,6 +319,7 @@ const StakeComponent = () => {
                         }
                         endAdornment={
                           <Button
+                            data-testid="stake-max-button"
                             type="button"
                             onClick={() => {
                               field.onChange(
@@ -389,6 +392,7 @@ const StakeComponent = () => {
                           ) : (
                             tiers.data?.map((tier, index) => (
                               <Button
+                                data-testid={`tier-${index}-button`}
                                 variant="unset"
                                 size="unset"
                                 type="button"
@@ -430,6 +434,7 @@ const StakeComponent = () => {
                 />
               </div>
               <Button
+                data-testid="stake-button"
                 loading={stakeFormLoading}
                 type="submit"
                 className="mt-5 w-64"
@@ -439,6 +444,11 @@ const StakeComponent = () => {
               </Button>
             </form>
           </Form>
+          {errors.map((e) => (
+            <p key={e.message} className="text-destructive empty:hidden">
+              {e.message}
+            </p>
+          ))}
         </Card>
         <div
           ref={parallaxRef}
