@@ -244,7 +244,7 @@ describe("TokenVesting", function () {
     });
 
     it("should check input parameters for createVestingSchedule method", async function () {
-      const [_admin, addr1] = await viem.getWalletClients();
+      const [, addr1] = await viem.getWalletClients();
       // deploy vesting contract
       const { tokenVesting, token } = await loadFixture(tokenVestingFixture);
 
