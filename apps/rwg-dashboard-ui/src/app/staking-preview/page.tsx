@@ -1,23 +1,19 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
-import RealIcon from '@/assets/images/R.svg';
-import { Button } from '@/components/ui/button';
+import { Card } from '@bltzr-gg/ui';
+import { RealIcon } from '@bltzr-gg/ui';
+import { Button } from '@bltzr-gg/ui';
 import backgroundImage from '@/assets/images/vr-guy.png';
 import { useMemo, useRef, useState } from 'react';
 import useParallaxEffect from '@/hooks/useParallax';
-import { Input } from '@/components/ui/input';
+import { Input } from '@bltzr-gg/ui';
 import { useToken } from '@/hooks/useToken';
 import React from 'react';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { CalculatorIcon } from 'lucide-react';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
-import { cn } from '@/lib/cn';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { cn } from '@bltzr-gg/ui';
+import { Popover, PopoverContent, PopoverTrigger } from '@bltzr-gg/ui';
 import { convertToReadableTime } from '@/utils';
 
 const gradientTierButtonClasses = [

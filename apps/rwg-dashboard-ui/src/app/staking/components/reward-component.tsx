@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@bltzr-gg/ui';
+import { Card } from '@bltzr-gg/ui';
+import { Progress } from '@bltzr-gg/ui';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@bltzr-gg/ui';
 import dayjs from '@/dayjs';
 import { pluralize } from '@/utils';
 import {
@@ -27,15 +27,11 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import matter from 'gray-matter';
 import { env } from '@/env';
-import { cn } from '@/lib/cn';
-import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@bltzr-gg/ui';
+import { Skeleton } from '@bltzr-gg/ui';
 import { VotingHistoryVote } from './voting-history-vote';
 import { snapshotApiUrl } from '@/config/snapshot';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@bltzr-gg/ui';
 import { useToken } from '@/hooks/useToken';
 import { formatUnixDate } from '@/utils/formatUnixDate';
 

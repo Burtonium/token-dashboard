@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@bltzr-gg/ui';
 import Quest from './quest';
 import quest1 from '@/assets/images/quests/quest-1.png';
 import quest2 from '@/assets/images/quests/quest-2.png';
@@ -12,7 +13,6 @@ import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { useClaims } from '@/hooks/useClaims';
 import { useCurrentWaveMembership } from '@/hooks/useCurrentWaveMembership';
 import getTransactions from '@/server/actions/account/getTransactions';
-import { Button } from './ui/button';
 import Link from 'next/link';
 
 const QuestTrack = () => {

@@ -1,15 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Button } from '@bltzr-gg/ui';
+import { Card, CardContent, CardTitle } from '@bltzr-gg/ui';
+import { Input } from '@bltzr-gg/ui';
 import { useRef, useState } from 'react';
 import Papa, { type ParseStepResult } from 'papaparse';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@bltzr-gg/ui';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import {
   Table,
@@ -17,7 +13,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@bltzr-gg/ui';
 import { truncateAddress } from '@/utils/truncateAddress';
 import { useVesting } from '@/hooks/useVesting';
 import { parseEther } from 'viem';

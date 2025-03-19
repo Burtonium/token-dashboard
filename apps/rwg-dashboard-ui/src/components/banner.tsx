@@ -1,4 +1,3 @@
-/* eslint-disable tailwindcss/no-contradicting-classname */
 'use client';
 
 import React, { type PropsWithChildren, useRef } from 'react';
@@ -6,7 +5,7 @@ import { motion } from 'framer-motion';
 import backgroundImage from '@/assets/images/vr-guy.png';
 import pepeAttack from '@/assets/images/pepe-attack.png';
 import useParallaxEffect from '@/hooks/useParallax';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 
 const Banner: React.FC<
   PropsWithChildren & { className?: string; frog?: boolean }

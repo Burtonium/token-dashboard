@@ -2,30 +2,28 @@
 
 import Countdown from '@/components/countdown';
 import ClaimWarningModal from '@/components/modals/ClaimWarningModal';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+  Skeleton,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  RealIcon,
+} from '@bltzr-gg/ui';
 import { useClaims } from '@/hooks/useClaims';
 import { useToken } from '@/hooks/useToken';
 import { formatBalance } from '@/utils';
 import { Calendar, Check, CircleX, HandCoins, Info } from 'lucide-react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isDev } from '@/env';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import VestingIndicator from './components/vesting-indicator';
 import { VestingSchedules } from './components/vesting-schedules';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import RealIcon from '@/components/real-icon';
 
 const ClaimPage = () => {
   const { sdkHasLoaded } = useDynamicContext();

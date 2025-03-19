@@ -1,6 +1,6 @@
 # Token Transfers
 
-This squid captures all `Transfer(address,address,uint256)` events emitted by the REAL token contract and keeps up with network updates [in real time](https://docs.subsquid.io/basics/unfinalized-blocks/). See more examples of requesting data with squids on the [showcase page](https://docs.subsquid.io/evm-indexing/configuration/showcase) of Subsquid documentation.
+This squid captures all `Transfer(address,address,uint256)` events emitted by the REAL token contract and the sREAL staked token contract, and keeps up with network updates [in real time](https://docs.subsquid.io/basics/unfinalized-blocks/). See more examples of requesting data with squids on the [showcase page](https://docs.subsquid.io/evm-indexing/configuration/showcase) of Subsquid documentation. This squid then subsquently notifies the realbet.io API about the new rakeback values.
 
 Dependencies: Node.js, Docker.
 

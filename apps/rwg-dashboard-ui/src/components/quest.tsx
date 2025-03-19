@@ -1,7 +1,7 @@
 'use client';
 
 import React, { type PropsWithChildren } from 'react';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import completedImg from '@/assets/images/quests/completed.png';
 
 const Quest: React.FC<

@@ -2,10 +2,10 @@ import { formatBalanceTruncated } from '@/utils';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useMemo } from 'react';
 import { useVesting } from '@/hooks/useVesting';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
-import RealIcon from '@/components/real-icon';
-import { Skeleton } from '@/components/ui/skeleton';
+import { RealIcon } from '@bltzr-gg/ui';
+import { Skeleton } from '@bltzr-gg/ui';
 
 const colors = {
   vesting: 'bg-primary',

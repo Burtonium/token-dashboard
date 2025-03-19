@@ -1,7 +1,7 @@
-import RealIcon from '@/components/real-icon';
-import { Button } from '@/components/ui/button';
+import { RealIcon } from '@bltzr-gg/ui';
+import { Button } from '@bltzr-gg/ui';
 import { useVesting } from '@/hooks/useVesting';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { formatBalanceTruncated } from '@/utils';
 import assert from 'assert';
 import { useMemo } from 'react';

@@ -1,15 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import {
   Table,
   TableBody,
   TableCaption,
@@ -18,23 +16,24 @@ import {
   TableHeader,
   TableRow,
   TableSkeleton,
-} from '@/components/ui/table';
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+  Checkbox,
+  Skeleton,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Progress,
+  Indicator,
+  Input,
+  Textarea,
+  RealIcon,
+} from '@bltzr-gg/ui';
 import { useEffect, useState } from 'react';
-import { Progress, Indicator } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
 import { Paintbrush } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
-import RealIcon from '@/components/real-icon';
 
 export default function Styleguide() {
   const [isLoading, setIsLoading] = useState(false);

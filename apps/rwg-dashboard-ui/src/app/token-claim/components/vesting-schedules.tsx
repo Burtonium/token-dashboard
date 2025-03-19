@@ -1,12 +1,12 @@
-import { Card } from '@/components/ui/card';
-import { Indicator, Progress } from '@/components/ui/progress';
+import { Card } from '@bltzr-gg/ui';
+import { Indicator, Progress } from '@bltzr-gg/ui';
 import dayjs from '@/dayjs';
 import { useToken } from '@/hooks/useToken';
 import { useVesting } from '@/hooks/useVesting';
 import { formatBalance, formatBalanceTruncated } from '@/utils';
 import { VestingWithdrawButton } from './vesting-withdraw-button';
-import RealIcon from '@/components/real-icon';
-import { cn } from '@/lib/cn';
+import { RealIcon } from '@bltzr-gg/ui';
+import { cn } from '@bltzr-gg/ui';
 
 export const VestingSchedules = () => {
   const token = useToken();

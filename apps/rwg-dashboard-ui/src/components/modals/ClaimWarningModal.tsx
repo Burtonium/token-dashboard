@@ -6,12 +6,12 @@ import {
   DialogOverlay,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog';
+} from '@bltzr-gg/ui';
 import { formatBalance } from '@/utils';
 import { useToken } from '@/hooks/useToken';
 import { useCurrentWaveMembership } from '@/hooks/useCurrentWaveMembership';
 import { OctagonAlert } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '@bltzr-gg/ui';
 import Link from 'next/link';
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';

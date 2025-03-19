@@ -1,24 +1,22 @@
 import { type FC, type PropsWithChildren, useState } from 'react';
 import {
+  cn,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogOverlay,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog';
-import { Scrollable } from '../ui/scrollable';
-import {
+  Scrollable,
   Table,
   TableHeader,
   TableRow,
   TableHead,
   TableBody,
   TableCell,
-} from '../ui/table';
+} from '@bltzr-gg/ui';
 import { vipTiers } from '@bltzr-gg/realbet-api';
 import { formatWithSeparators } from '@/utils';
-import { cn } from '@/lib/cn';
 import { useRealbetProgression } from '@/hooks/useRealbetProgression';
 
 const RealbetWagerTiersModal: FC<PropsWithChildren> = ({ children }) => {

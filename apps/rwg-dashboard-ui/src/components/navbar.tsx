@@ -10,8 +10,7 @@ import React, {
 import Link from 'next/link';
 import logo from '@/assets/images/logo.png';
 import Icon from '@/assets/icons/realbet-face.svg';
-import { Burger } from './ui/burger';
-import { cn } from '@/lib/cn';
+import { cn, Burger } from '@bltzr-gg/ui';
 import {
   DynamicUserProfile,
   useDynamicContext,

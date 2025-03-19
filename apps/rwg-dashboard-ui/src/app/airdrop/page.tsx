@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { Box, Wallet } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 import {
+  cn,
+  Button,
+  Card,
+  CardContent,
+  Skeleton,
   Table,
   TableBody,
   TableBodySkeleton,
@@ -15,8 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { cn } from '@/lib/cn';
+} from '@bltzr-gg/ui';
+import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 import { useToken } from '@/hooks/useToken';
 import { formatWithSeparators } from '@/utils';
 import ErrorComponent from '@/components/error';

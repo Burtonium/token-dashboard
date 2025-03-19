@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@bltzr-gg/ui';
 import {
   Table,
   TableBody,
@@ -6,10 +6,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@bltzr-gg/ui';
 import dayjs from '@/dayjs';
 import { useVesting } from '@/hooks/useVesting';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { formatUnixDate } from '@/utils/formatUnixDate';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { formatEther } from 'viem';

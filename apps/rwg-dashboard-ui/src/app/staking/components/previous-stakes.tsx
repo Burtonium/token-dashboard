@@ -1,13 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@bltzr-gg/ui';
+import { Card } from '@bltzr-gg/ui';
+import { Progress } from '@bltzr-gg/ui';
 import dayjs from '@/dayjs';
 import { useToken } from '@/hooks/useToken';
 import {
   type TierWithDecimalMult,
   useStakingVault,
 } from '@/hooks/useStakingVault';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { formatBalance } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 

@@ -1,6 +1,6 @@
 import { useToken } from '@/hooks/useToken';
 import { useStakingVault } from '@/hooks/useStakingVault';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { balanceToFloat, formatBalance, toDurationSeconds } from '@/utils';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import dayjs from '@/dayjs';

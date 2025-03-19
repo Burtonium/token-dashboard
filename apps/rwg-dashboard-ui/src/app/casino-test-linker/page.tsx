@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@bltzr-gg/ui';
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';

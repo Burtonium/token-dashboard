@@ -1,25 +1,25 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@bltzr-gg/ui';
 import {
   Dialog,
   DialogHeader,
   DialogTitle,
   DialogContent,
   DialogOverlay,
-} from '@/components/ui/dialog';
+} from '@bltzr-gg/ui';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@bltzr-gg/ui';
 import useNetworkId from '@/hooks/useNetworkId';
 import React, { createContext, useContext, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 import * as chains from 'viem/chains';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { isDev, isTest } from '@/env';
 import { uniqBy } from 'lodash';
 

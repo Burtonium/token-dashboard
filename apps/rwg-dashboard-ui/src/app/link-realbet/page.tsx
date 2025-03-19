@@ -1,17 +1,28 @@
 'use client';
 
 import Banner from '@/components/banner';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useCurrentTicketWave } from '@/hooks/useCurrentTicketWave';
-import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
+  Skeleton,
+  RealIcon,
+  Progress,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@bltzr-gg/ui';
+import {
+  useCurrentTicketWave,
+  useDynamicAuthClickHandler,
+  useCasinoLink,
+  useToken,
+  useCurrentWaveMembership,
+  useLinkCasinoAccount,
+} from '@/hooks';
 import {
   getAuthToken,
   useDynamicContext,
@@ -28,21 +39,10 @@ import {
   Wallet2,
   Frown,
 } from 'lucide-react';
-import RealIcon from '@/assets/images/R.svg';
 import GiftBoxes from '../../components/gift-boxes';
-import { useCasinoLink } from '@/hooks/useCasinoLink';
-import { Progress } from '@/components/ui/progress';
-import { useToken } from '@/hooks/useToken';
-import { cn } from '@/lib/cn';
-import { useCurrentWaveMembership } from '@/hooks/useCurrentWaveMembership';
+import { cn } from '@bltzr-gg/ui';
 import { awardTwitterBonus } from '@/server/actions/rewards/awardTwitterBonus';
 import { TWITTER_BONUS_TICKETS } from '@/config/linkToWin';
-import { useLinkCasinoAccount } from '@/hooks/useLinkCasinoAccount';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 
 export default function LinkRealbetPage() {

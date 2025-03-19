@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@bltzr-gg/ui';
+import { Card } from '@bltzr-gg/ui';
 import {
   Form,
   FormControl,
@@ -7,11 +7,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@bltzr-gg/ui';
 import backgroundImage from '@/assets/images/vr-guy.png';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/cn';
+import { Input } from '@bltzr-gg/ui';
+import { Skeleton } from '@bltzr-gg/ui';
+import { cn } from '@bltzr-gg/ui';
 import { formatBalance, formatBigIntWithSeparators } from '@/utils';
 import dayjs from 'dayjs';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { Wallet } from 'lucide-react';
 import { PreviousStakes } from './previous-stakes';
-import RealIcon from '@/components/real-icon';
+import { RealIcon } from '@bltzr-gg/ui';
 
 const tierButtonCommonClasses =
   'flex justify-between min-w-0 max-w-28 md:max-w-full w-full rounded-[4px] p-2 h-8 text-xs';

@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Button } from '@bltzr-gg/ui';
+import { Card, CardContent, CardTitle } from '@bltzr-gg/ui';
 import {
   Form,
   FormControl,
@@ -7,11 +7,11 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@bltzr-gg/ui';
+import { Input } from '@bltzr-gg/ui';
 import dayjs from '@/dayjs';
 import { useVesting } from '@/hooks/useVesting';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';

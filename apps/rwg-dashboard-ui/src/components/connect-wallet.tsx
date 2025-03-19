@@ -1,7 +1,7 @@
 'use client';
 
 import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
-import { Button } from './ui/button';
+import { Button } from '@bltzr-gg/ui';
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { Wallet2 } from 'lucide-react';
 import usePrimaryAddress from '@/hooks/usePrimaryAddress';

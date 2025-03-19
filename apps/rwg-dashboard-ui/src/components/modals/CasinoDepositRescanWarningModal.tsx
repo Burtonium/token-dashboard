@@ -1,15 +1,15 @@
 import { type FC, type PropsWithChildren, useCallback, useState } from 'react';
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogOverlay,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog';
-import { Button } from '../ui/button';
+} from '@bltzr-gg/ui';
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
-import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
+import { useDynamicAuthClickHandler } from '@/hooks';
 
 const CasinoDepositRescanWarningModal: FC<
   PropsWithChildren<{

@@ -1378,6 +1378,7 @@ export const tokenStakingAbi = [
  */
 export const tokenStakingAddress = {
   11155111: '0xffbA2e307793896455dd7a90664ff9B2af758474',
+  1: '0x0',
 } as const;
 
 /**

@@ -1,24 +1,27 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
+import {
+  Card,
+  Button,
+  AnimatedNumber,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  RealIcon,
+} from '@bltzr-gg/ui';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { useToken } from '@/hooks/useToken';
 import { useStakingVault } from '@/hooks/useStakingVault';
 import { formatBalance } from '@/utils';
 import React, { useEffect, useState } from 'react';
-import AnimatedNumber from '@/components/ui/animated-number';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StakeComponent from './components/stake-component';
 import RewardComponent from './components/reward-component';
 import { Info, PackagePlus } from 'lucide-react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import RealIcon from '@/components/real-icon';
 
 export default function Stake() {
   const token = useToken();

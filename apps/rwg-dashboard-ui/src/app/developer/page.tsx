@@ -1,13 +1,26 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import {
+  Input,
+  Button,
+  Checkbox,
+  Skeleton,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Badge,
+} from '@bltzr-gg/ui';
 import { getAuthToken, useDynamicContext } from '@/lib/dynamic';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { issueVestingToken } from '@/app/developer/issueVestingToken';
 import { isDev } from '@/env';
 import assert from 'assert';
-import { Checkbox } from '@/components/ui/checkbox';
 import { type ClaimStatus, type RewardWave } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { saveWave } from './saveWave';
@@ -30,25 +43,15 @@ import { clearWhitelist } from './clearWhitelist';
 import { getUserClaimIds } from './getClaimIds';
 import { toHex } from 'viem';
 import { getClaimPeriod } from './getClaimPeriod';
-import { Skeleton } from '@/components/ui/skeleton';
 import { resetClaimPeriod } from './resetClaim';
 import { useCasinoDeposits } from '../../hooks/useCasinoDeposits';
 import { useAuthenticatedMutation } from '@/hooks/useAuthenticatedMutation';
 import { createCasinoTotalDeposit } from './createCasinoTotalDeposit';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { Loader2, X } from 'lucide-react';
 import { addWallet } from './addWallet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getWallets } from './getWallets';
-import { cn } from '@/lib/cn';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@bltzr-gg/ui';
 import { deleteWallet } from './deleteWallet';
 import { useWalletAddresses } from '@/hooks/useWalletAddresses';
 import { deleteApiCall } from './deleteApiCall';

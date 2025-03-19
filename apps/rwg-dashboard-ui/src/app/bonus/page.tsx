@@ -2,15 +2,8 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { Check, Loader2, Wallet2 } from 'lucide-react';
-import Banner from '@/components/banner';
 import {
-  useDynamicContext,
-  useIsLoggedIn,
-  useDynamicModals,
-} from '@dynamic-labs/sdk-react-core';
-import dayjs from '@/dayjs';
-import { Button } from '@/components/ui/button';
-import {
+  Button,
   Table,
   TableBody,
   TableBodySkeleton,
@@ -19,31 +12,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { shorten } from '@/utils';
-import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
+  RealIcon,
+  Progress,
+} from '@bltzr-gg/ui';
+import {
+  useDynamicContext,
+  useIsLoggedIn,
+  useDynamicModals,
+} from '@dynamic-labs/sdk-react-core';
+import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 import { useToken } from '@/hooks/useToken';
-import ErrorComponent from '@/components/error';
 import { useWalletAddresses } from '@/hooks/useWalletAddresses';
 import { useCasinoDeposits } from '../../hooks/useCasinoDeposits';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
+import { useEaseOut } from '@/hooks/useEaseOut';
+import useCountdown from '@/hooks/useCountdown';
+import useRandomDelay from '@/hooks/useRandomizer';
+import { shorten } from '@/utils';
+import { cn } from '@bltzr-gg/ui';
+import { sortBy } from 'lodash';
+import Banner from '@/components/banner';
+import ErrorComponent from '@/components/error';
 import Link from 'next/link';
-import RealIcon from '@/assets/images/R.svg';
 import ClaimCasinoDepositBonusModal from '@/components/modals/ClaimCasinoDepositBonusModal';
 import CasinoDepositRescanWarningModal from '@/components/modals/CasinoDepositRescanWarningModal';
 import BcGameLogo from '@/assets/icons/bc-game.svg';
-import { useEaseOut } from '@/hooks/useEaseOut';
-import { Progress } from '@/components/ui/progress';
-import useCountdown from '@/hooks/useCountdown';
-import useRandomDelay from '@/hooks/useRandomizer';
-import { cn } from '@/lib/cn';
-import { sortBy } from 'lodash';
+import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
+import dayjs from '@/dayjs';
 
 const CASINOS = ['shuffle', 'stake', 'rollbit', 'bc.game'] as const;
 

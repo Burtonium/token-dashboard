@@ -1,14 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Progress,
+  Button,
+} from '@bltzr-gg/ui';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import { useRealbetProgression } from '@/hooks/useRealbetProgression';
 import { Check, Wallet2 } from 'lucide-react';
 import Link from 'next/link';
-import { Skeleton } from './ui/skeleton';
-import { Progress } from './ui/progress';
 import RealbetVipTiersModal from './modals/RealbetWagerTiersModal';
 import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
-import { Button } from './ui/button';
 import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 
 const RealbetProgressionWidget = () => {

@@ -1,20 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
+import {
+  Button,
+  Input,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@bltzr-gg/ui';
 import { type Tier, useStakingVault } from '@/hooks/useStakingVault';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Loading from '@/components/loading';
 import youGotMe from '@/assets/images/you-got-me.webp';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Input } from '@/components/ui/input';
 import { parseEther } from 'viem';
 import { useVesting } from '@/hooks/useVesting';
 import { CheckCircle2, Loader2, XCircleIcon } from 'lucide-react';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { CreateVestingSchedule } from './components/create-vesting-schedule';
 import { VestingScheduleList } from './components/vesting-schedule-list';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImportVestingSchedules } from './components/import-vesting-schedules';
 
 const PermissionIcon = ({

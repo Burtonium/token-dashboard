@@ -1,20 +1,25 @@
 'use client';
 
 import Banner from '@/components/banner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Button,
+  Skeleton,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+  RealIcon,
+} from '@bltzr-gg/ui';
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useToken } from '@/hooks/useToken';
-import { Button } from '@/components/ui/button';
 import { formatBalance } from '@/utils';
 import { useStakingVault } from '@/hooks/useStakingVault';
-import RealIcon from '@/components/real-icon';
 import RealbetProgressionWidget from '@/components/realbet-progression-widget';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import StakingTiers from '@/components/modals/RealTokenTiers';
 import { useRealbetProgression } from '@/hooks/useRealbetProgression';
-import { Progress } from '@/components/ui/progress';
 import { useCasinoLink } from '@/hooks/useCasinoLink';
 import QuestTrack from '@/components/quest-track';
 

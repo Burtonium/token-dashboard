@@ -1,5 +1,5 @@
 import { Diamond, Gift, Rocket } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { cn } from '@bltzr-gg/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSound from 'use-sound';
 import balloonPop from '@/assets/sounds/balloon-pop.mp3';
@@ -11,7 +11,7 @@ import { useMutation } from '@tanstack/react-query';
 import type { ArrayElementType } from '@/utils';
 import { RewardType } from '@prisma/client';
 import { useToken } from '@/hooks/useToken';
-import { Button } from '@/components/ui/button';
+import { Button } from '@bltzr-gg/ui';
 import { useCurrentWaveMembership } from '@/hooks/useCurrentWaveMembership';
 import { useCurrentTicketWave } from '@/hooks/useCurrentTicketWave';
 import {
