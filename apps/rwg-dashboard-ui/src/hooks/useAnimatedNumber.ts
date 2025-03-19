@@ -52,7 +52,7 @@ export const useAnimatedNumber = (
     return () => {
       cancelAnimationFrame(rAF);
     };
-  }, [value, duration]);
+  }, [duration, value]);
 
   const finalDisplayValue = isNaN(displayValue) ? 0 : displayValue;
 

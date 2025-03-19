@@ -18,7 +18,8 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "outputs": []
     },
     "build:ui": {
       "inputs": ["packages/ui/**/*"],
