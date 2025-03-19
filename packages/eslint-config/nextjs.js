@@ -1,5 +1,6 @@
 import pluginNext from '@next/eslint-plugin-next';
 import pluginTailwind from 'eslint-plugin-tailwindcss';
+import reactHooksPlugin from 'eslint-plugin-react-hooks'; // import the plugin
 import { config as baseConfig } from './base.js';
 
 /**
@@ -15,6 +16,7 @@ export const nextJsConfig = [
       tailwindcss: {
         ...pluginTailwind,
       },
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
       ...pluginNext.configs.recommended.rules,
@@ -23,6 +25,7 @@ export const nextJsConfig = [
       'tailwindcss/no-custom-classname': 'off',
       'tailwindcss/classnames-order': 'off',
       '@next/next/no-img-element': 'off',
+      'react-hooks/exhaustive-deps': 'error',
     },
   },
 ];
