@@ -171,6 +171,7 @@ const StakeComponent = () => {
       }
 
       setStakingStatus(`Staking ${shareSymbol}...`);
+
       await stake
         .mutateAsync({
           amount,
@@ -502,14 +503,15 @@ const StakeComponent = () => {
           <span className="text-sm">
             Current multiplier:{' '}
             <span
+              data-testid="current-multiplier"
               className={cn({
-                'text-primary': parseFloat(currentMultiplier) >= 1,
+                'text-primary': parseFloat(currentMultiplier) >= 0.5,
                 'text-primary-intermediate-1':
-                  parseFloat(currentMultiplier) >= 1.25,
+                  parseFloat(currentMultiplier) >= 1,
                 'text-primary-intermediate-2':
-                  parseFloat(currentMultiplier) >= 1.5,
+                  parseFloat(currentMultiplier) >= 1.25,
                 'text-primary-intermediate-3':
-                  parseFloat(currentMultiplier) >= 1.75,
+                  parseFloat(currentMultiplier) >= 1.5,
                 'text-accent': parseFloat(currentMultiplier) >= 2,
               })}
             >

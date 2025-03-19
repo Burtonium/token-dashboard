@@ -433,6 +433,7 @@ export const useStakingVault = () => {
       const deposit = deposits.data?.find(
         (d) => d.depositIndex === Number(stakeIndex),
       );
+
       if (!deposit) {
         throw new Error('Deposit not found');
       }

@@ -91,7 +91,10 @@ export default function Stake() {
             })}
           >
             <RealIcon size="sm" className="ml-0 mt-0" />
-            <span className="mb-1 text-3xl leading-none">
+            <span
+              data-testid="token-balance"
+              className="mb-1 text-3xl leading-none"
+            >
               <AnimatedNumber
                 value={formatBalance(token.balance.data ?? 0n)}
                 decimals={2}
@@ -120,7 +123,10 @@ export default function Stake() {
             })}
           >
             <RealIcon size="sm" className="ml-0 mt-0" />
-            <span className="mb-1 text-3xl leading-none">
+            <span
+              data-testid="staked-balance"
+              className="mb-1 text-3xl leading-none"
+            >
               <AnimatedNumber
                 value={formatBalance(stakedBalance)}
                 decimals={2}
