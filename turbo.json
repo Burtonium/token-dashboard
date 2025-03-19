@@ -8,9 +8,7 @@
         "NEXTAUTH_SECRET",
         "VERCEL_URL"
       ],
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,
@@ -20,10 +18,6 @@
     "lint": {
       "dependsOn": ["^lint"],
       "outputs": []
-    },
-    "build:ui": {
-      "inputs": ["packages/ui/**/*"],
-      "outputs": ["packages/ui/dist/**"]
     }
   }
 }
