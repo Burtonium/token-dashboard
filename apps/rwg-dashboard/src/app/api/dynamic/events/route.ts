@@ -1,4 +1,5 @@
 import { env } from '@/env';
+import { NextRequest } from 'next/server';
 import * as crypto from 'crypto';
 import { type z } from 'zod';
 import {
@@ -40,7 +41,7 @@ const handlePingEvent = (_event: z.infer<typeof TestEventSchema>) =>
     message: 'pong',
   });
 
-export const handleUserCreatedEvent = async (
+const handleUserCreatedEvent = async (
   event: z.infer<typeof UserCreatedEventSchema>,
 ) => {
   await upsertDynamicUser({
@@ -58,7 +59,7 @@ export const handleUserCreatedEvent = async (
   });
 };
 
-export const handleUserUpdatedEvent = async (
+const handleUserUpdatedEvent = async (
   event: z.infer<typeof UserUpdatedEventSchema>,
 ) => {
   await upsertDynamicUser({
@@ -78,7 +79,7 @@ export const handleUserUpdatedEvent = async (
   });
 };
 
-export const handleUserDeletedEvent = async (
+const handleUserDeletedEvent = async (
   event: z.infer<typeof UserDeletedEventSchema>,
 ) => {
   await prisma.dynamicUser
@@ -102,7 +103,7 @@ export const handleUserDeletedEvent = async (
   });
 };
 
-export const handleWalletCreatedEvent = async (
+const handleWalletCreatedEvent = async (
   event: z.infer<typeof WalletCreatedEventSchema>,
 ) => {
   await upsertDynamicUser(
@@ -129,7 +130,7 @@ export const handleWalletCreatedEvent = async (
   });
 };
 
-export const handleWalletLinkedEvent = async (
+const handleWalletLinkedEvent = async (
   event: z.infer<typeof WalletLinkedEventSchema>,
 ) => {
   await upsertDynamicUser(
@@ -158,7 +159,7 @@ export const handleWalletLinkedEvent = async (
   });
 };
 
-export const handleWalletUnlinkedEvent = async (
+const handleWalletUnlinkedEvent = async (
   event: z.infer<typeof WalletUnlinkedEventSchema>,
 ) => {
   await prisma.linkedWallet
@@ -181,7 +182,7 @@ export const handleWalletUnlinkedEvent = async (
   });
 };
 
-export const handleWalletTransferredEvent = async (
+const handleWalletTransferredEvent = async (
   event: z.infer<typeof WalletTransferredEventSchema>,
 ) => {
   await prisma.linkedWallet
@@ -208,7 +209,7 @@ export const handleWalletTransferredEvent = async (
   });
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const signature = request.headers.get('x-dynamic-signature-256');
   const rawBody = await request.text();
 
