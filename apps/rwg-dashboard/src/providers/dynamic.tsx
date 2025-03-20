@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 'use client';
 
 import { env } from '@/env';
@@ -46,7 +45,6 @@ export default function ProviderWrapper({ children }: React.PropsWithChildren) {
                   console.error('Error upserting user:', (e as Error).message);
                 }
               },
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onWalletAdded: async ({ wallet }) => {
                 const { addWallet } = await import('@/app/developer/addWallet');
                 const token = getAuthToken();

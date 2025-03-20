@@ -23,5 +23,8 @@
     "globals": "^16.0.0",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
+  },
+  "dependencies": {
+    "eslint-plugin-vitest-globals": "^1.5.0"
   }
 }

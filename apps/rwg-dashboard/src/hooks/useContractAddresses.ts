@@ -46,7 +46,6 @@ const useContractAddresses = () => {
     queryKey: ['testingEnvOverride', chainId],
     queryFn: () => {
       if (!chainId || !networkIdExists(chainId)) {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
         return Promise.resolve({
           token: tokenAddress[11155111],
           tokenVesting: tokenVestingAddress[11155111],

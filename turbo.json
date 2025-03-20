@@ -6,7 +6,8 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
         "NEXTAUTH_SECRET",
-        "VERCEL_URL"
+        "VERCEL_URL",
+        "NEXT_RUNTIME"
       ],
       "dependsOn": ["^build"]
     },

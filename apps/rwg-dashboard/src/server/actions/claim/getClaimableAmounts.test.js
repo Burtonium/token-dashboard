@@ -1,6 +1,5 @@
 import { describe, it, vi } from 'vitest';
 import { getClaimableAmounts } from './getClaimableAmounts';
-import { Decimal } from '@prisma/client/runtime/library';
 
 import prisma from '@/server/prisma/client';
 

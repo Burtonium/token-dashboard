@@ -69,7 +69,7 @@ export const CreateVestingSchedule = () => {
       <CardContent className="p-0">
         <Form {...createScheduleForm}>
           <form
-            onSubmit={createScheduleForm.handleSubmit(onCreateSchedule)}
+            onSubmit={() => createScheduleForm.handleSubmit(onCreateSchedule)}
             className="flex max-w-md flex-col gap-3"
           >
             <FormField

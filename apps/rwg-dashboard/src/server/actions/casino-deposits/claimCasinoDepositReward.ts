@@ -74,7 +74,6 @@ export const claimCasinoDepositReward = authGuard(async (user) => {
           // eslint-disable-next-line no-console
           console.error(e);
           Sentry.captureException(e);
-          // eslint-disable-next-line no-console
           throw new Error('Realbet API failed to credit user bonus');
         }
       },

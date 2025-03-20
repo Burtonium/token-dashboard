@@ -11,11 +11,12 @@ export const useWalletAddresses = () => {
     queryFn: getWallets,
   });
 
-  const addresses = useMemo(
-    () =>
-      wallets.data ? uniq([...wallets.data?.map((w) => w.address)]) : undefined,
-    [wallets.data],
-  );
+  const addresses = useMemo(() => {
+    if (!wallets.data) {
+      return undefined;
+    }
+    return uniq(wallets.data.map((w) => w.address));
+  }, [wallets.data]);
 
   return {
     ...wallets,
