@@ -1,3 +1,4 @@
+import "./styles/index.css";
 export * from "./lib/cn";
 
 export * from "./components/animated-number";

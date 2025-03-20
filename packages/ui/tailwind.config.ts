@@ -4,7 +4,6 @@ import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
-  content: ["./src/**/*.tsx"],
   theme: {
     extend: {
       fontFamily: {
@@ -110,4 +109,4 @@ export default {
     },
   },
   plugins: [tailwindcssAnimate],
-} satisfies Config;
+} satisfies Partial<Config>;

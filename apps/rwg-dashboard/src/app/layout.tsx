@@ -1,4 +1,4 @@
-import '@/styles/globals.css';
+import '@bltzr-gg/ui/styles';
 
 import { type Metadata } from 'next';
 import Providers from '../providers';

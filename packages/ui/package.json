@@ -4,10 +4,15 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "tailwind.config.ts"
-  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/index.css",
+    "./tailwind": "./tailwind.config.ts"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch"
@@ -41,5 +46,12 @@
     "@types/react": "^18.3.9",
     "tsup": "^8.4.0",
     "typescript": "^5.6.2"
+  },
+  "tsup": {
+    "entry": ["src/index.ts"],
+    "format": ["esm", "cjs"],
+    "dts": true,
+    "external": ["react", "react-dom"],
+    "css": true
   }
 }

@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import config from '@bltzr-gg/ui/tailwind.config';
+import config from '@bltzr-gg/ui/tailwind';
 
 export default {
   darkMode: ['class'],
