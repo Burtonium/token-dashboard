@@ -6,6 +6,7 @@
   "scripts": {
     "build": "next build",
     "prebuild": "pnpm --filter ui build",
+    "predev": "pnpm prebuild",
     "dev": "next dev",
     "dev:test": "cp -r ../evm-contracts/ignition/deployments/chain-31337/deployed_addresses.json ./public/locally_deployed_addresses.json && NEXT_PUBLIC_VERCEL_ENV=test next dev",
     "lint": "npx eslint src --config ./eslint.config.js --max-warnings 0",

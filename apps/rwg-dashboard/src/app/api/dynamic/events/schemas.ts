@@ -25,7 +25,7 @@ export const UserCreatedEventSchema = GenericEventSchema.extend({
     newUser: z.boolean(),
     id: z.string().uuid(),
     sessionId: z.string().uuid(),
-    email: z.string().email(),
+    email: z.string().email().optional(),
   }),
 });
 
@@ -84,7 +84,7 @@ export const WalletLinkedEventSchema = GenericEventSchema.extend({
 });
 
 export const WalletCreatedEventSchema = GenericEventSchema.extend({
-  eventName: z.literal('wallet.created'), // Ensure the eventName is 'wallet.created'
+  eventName: z.literal('wallet.created'),
   data: z.object({
     chain: z.string(),
     publicKey: z.string(),

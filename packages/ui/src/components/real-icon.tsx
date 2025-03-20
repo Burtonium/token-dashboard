@@ -1,30 +1,30 @@
-import { cva } from "class-variance-authority";
-import { cn } from "@/lib/cn";
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/cn';
 
 type Props = {
   border?: boolean;
-  size?: "lg" | "md" | "sm" | "xs";
+  size?: 'lg' | 'md' | 'sm' | 'xs';
   className?: string;
 };
 
 const iconClass = cva(
-  "ml-2 inline-flex flex-col items-center justify-center rounded-full bg-black text-primary",
+  'ml-2 inline-flex flex-col items-center justify-center rounded-full bg-black text-primary',
   {
     variants: {
       border: {
-        true: "border-primary",
-        false: "border-black",
+        true: 'border-primary',
+        false: 'border-black',
       },
       size: {
-        lg: "border-2 size-12 p-1.5 mt-1",
-        md: "border-2 size-8 p-1 mt-1",
-        sm: "border size-6 p-1 mt-1",
-        xs: "border size-5 p-[3px]",
+        lg: 'border-2 size-12 p-1.5 mt-1',
+        md: 'border-2 size-8 p-1 mt-1',
+        sm: 'border size-6 p-1 mt-1',
+        xs: 'border size-5 p-[3px]',
       },
     },
     defaultVariants: {
       border: true,
-      size: "md",
+      size: 'md',
     },
   },
 );
@@ -33,6 +33,7 @@ const RealIcon = ({ border, size, className }: Props) => {
   return (
     <span className={cn(iconClass({ border, size }), className)}>
       <svg
+        className="aspect-square"
         viewBox="0 4.25 26 13.5"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -115,17 +115,13 @@ describe('signPublicSaleClaims', () => {
     });
   });
 
-  it('Should fail if no pending claims', async () => {
+  it('Should succeed with no effects if no pending claims', async () => {
     vi.spyOn(amounts, 'getClaimableAmounts').mockResolvedValue({
       signable: [],
     });
 
     const result = await signPublicSaleClaims('whatever');
 
-    expect(result).toMatchObject({
-      type: 'ServerActionError',
-      error: true,
-      message: 'No pending claims to sign.',
-    });
+    expect(result).toMatchObject(undefined);
   });
 });

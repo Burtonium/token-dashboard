@@ -33,6 +33,10 @@ export const signPublicSaleClaims = async (authToken: string) => {
 
     const { signable } = claimable;
 
+    if (signable.length === 0) {
+      return;
+    }
+
     const hashedMessages = (
       await readContracts(config, {
         contracts: signable.map((claim) => ({

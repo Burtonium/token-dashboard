@@ -40,7 +40,7 @@ const handlePingEvent = (_event: z.infer<typeof TestEventSchema>) =>
     message: 'pong',
   });
 
-const handleUserCreatedEvent = async (
+export const handleUserCreatedEvent = async (
   event: z.infer<typeof UserCreatedEventSchema>,
 ) => {
   await upsertDynamicUser({
@@ -58,7 +58,7 @@ const handleUserCreatedEvent = async (
   });
 };
 
-const handleUserUpdatedEvent = async (
+export const handleUserUpdatedEvent = async (
   event: z.infer<typeof UserUpdatedEventSchema>,
 ) => {
   await upsertDynamicUser({
@@ -78,7 +78,7 @@ const handleUserUpdatedEvent = async (
   });
 };
 
-const handleUserDeletedEvent = async (
+export const handleUserDeletedEvent = async (
   event: z.infer<typeof UserDeletedEventSchema>,
 ) => {
   await prisma.dynamicUser
@@ -102,7 +102,7 @@ const handleUserDeletedEvent = async (
   });
 };
 
-const handleWalletCreatedEvent = async (
+export const handleWalletCreatedEvent = async (
   event: z.infer<typeof WalletCreatedEventSchema>,
 ) => {
   await upsertDynamicUser(
@@ -122,13 +122,14 @@ const handleWalletCreatedEvent = async (
     // eslint-disable-next-line no-console
     console.log('Error handling wallet created event:', error.message);
   });
+
   return Response.json({
     success: true,
     message: 'Wallet created event processed',
   });
 };
 
-const handleWalletLinkedEvent = async (
+export const handleWalletLinkedEvent = async (
   event: z.infer<typeof WalletLinkedEventSchema>,
 ) => {
   await upsertDynamicUser(
@@ -157,7 +158,7 @@ const handleWalletLinkedEvent = async (
   });
 };
 
-const handleWalletUnlinkedEvent = async (
+export const handleWalletUnlinkedEvent = async (
   event: z.infer<typeof WalletUnlinkedEventSchema>,
 ) => {
   await prisma.linkedWallet
@@ -180,7 +181,7 @@ const handleWalletUnlinkedEvent = async (
   });
 };
 
-const handleWalletTransferredEvent = async (
+export const handleWalletTransferredEvent = async (
   event: z.infer<typeof WalletTransferredEventSchema>,
 ) => {
   await prisma.linkedWallet
@@ -236,6 +237,7 @@ export async function POST(request: Request) {
     Sentry.captureMessage(
       `Error when processing dynamic event: ${event.error.message}`,
     );
+
     return Response.json(
       {
         success: false,

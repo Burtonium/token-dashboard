@@ -96,7 +96,7 @@ const QuestTrack = () => {
             Claim SREAL rewards from your past deposits on top casinos.
           </p>
           <Button variant="accent" className="mt-5" asChild>
-            <Link className="flex items-center gap-3 text-sm" href="/bonus">
+            <Link className="flex items-center gap-3 text-sm" href="/switch-bonus">
               Check
             </Link>
           </Button>

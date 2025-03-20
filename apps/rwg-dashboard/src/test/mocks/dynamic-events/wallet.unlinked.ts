@@ -1,0 +1,22 @@
+export default {
+  eventId: '8023c300-daf9-493b-ab6f-ddca47514825',
+  webhookId: 'db4100d2-34e2-495f-a093-38bc03f1af70',
+  environmentId: '84fc7be7-9397-4241-b0f9-9f6d0d882755',
+  data: {
+    chain: 'eip155',
+    address: '0xB6b7cE10a5Aaf0B9dB80bdB8aAAc01237CB78103',
+    nameService: {},
+    walletName: 'metamask',
+    signInEnabled: true,
+    format: 'blockchain',
+    id: '3766d346-c42d-4fdf-a38b-9974282c9a2a',
+    publicIdentifier: '0xB6b7cE10a5Aaf0B9dB80bdB8aAAc01237CB78103',
+    lastSelectedAt: '2025-02-11T04:24:52.407Z',
+    walletProvider: 'browserExtension',
+  },
+  environmentName: 'sandbox',
+  messageId: '0d34e53a-0cfc-4641-8197-3535b22282b7',
+  eventName: 'wallet.unlinked',
+  userId: 'c2a3f156-9bcc-46f5-8ea7-fe697bf556cb',
+  timestamp: '2025-02-21T07:07:21.801Z',
+};

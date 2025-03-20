@@ -140,7 +140,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           <li>
             <NextLink
               className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
-              path="/bonus"
+              path="/switch-bonus"
             >
               <svg
                 className="w-6"
@@ -176,7 +176,7 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           {(isDev ||
             !!vault.isAdmin.data ||
             env.NEXT_PUBLIC_VERCEL_ENV !== 'production') && (
-            <hr className="hidden h-px border-none bg-lighter lg:block" />
+            <hr className="h-px border-none bg-lighter" />
           )}
           {env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && (
             <li>
