@@ -12,6 +12,7 @@ const withBundleAnalyzer = analyzer({
 });
 
 const config = {
+  transpilePackages: ['@bltzr-gg/ui'],
   webpack: (config, options) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     config.module.rules.push({
