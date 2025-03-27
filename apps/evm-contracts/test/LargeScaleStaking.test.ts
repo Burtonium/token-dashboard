@@ -22,7 +22,9 @@ describe("TokenStaking Large Scale Test", function () {
 
     console.log("Minting tokens and approving staking contract...");
     for (let i = 0; i < numberOfUsers; i++) {
-      if (!users[i]) continue;
+      if (!users[i]) {
+        continue;
+      }
       await realToken.write.mint([users[i]?.account?.address, parseEther("1000")], { account: admin?.account });
       await realToken.write.approve([staking.address, parseEther("1000")], {
         account: users[i].account,
@@ -31,7 +33,9 @@ describe("TokenStaking Large Scale Test", function () {
 
     console.log("Staking tokens for all users...");
     for (let i = 0; i < numberOfUsers; i++) {
-      if (!users[i]) continue;
+      if (!users[i]) {
+        continue;
+      }
       const amount = parseEther(String(Math.floor(Math.random() * 100) + 1));
       const tierIndex = Math.floor(Math.random() * numberOfTiers);
       await staking.write.stake([amount, tierIndex], { account: users[i].account });
@@ -51,7 +55,9 @@ describe("TokenStaking Large Scale Test", function () {
 
       // Simulate some users claiming rewards
       for (let i = 0; i < numberOfUsers; i += 10) {
-        if (!users[i]) continue;
+        if (!users[i]) {
+          continue;
+        }
         const userStakes = await staking.read.getUserStakes([users[i].account.address]);
         const thisEpoch = BigInt(userStakes[0].lastClaimEpoch) + 1n;
 
@@ -69,11 +75,15 @@ describe("TokenStaking Large Scale Test", function () {
 
       //   Simulate some users unstaking
       for (let i = 5; i < numberOfUsers; i += 20) {
-        if (!users[i]) continue;
+        if (!users[i]) {
+          continue;
+        }
 
         // Check if the stake is locked
         const isLocked = await staking.read.isLocked([0n], { account: users[i].account });
-        if (isLocked) continue;
+        if (isLocked) {
+          continue;
+        }
 
         const userStakes = await staking.read.getUserStakes([users[i].account.address]);
 
@@ -84,7 +94,9 @@ describe("TokenStaking Large Scale Test", function () {
 
       //   // Simulate some users staking again
       for (let i = 15; i < numberOfUsers; i += 5) {
-        if (!users[i]) continue;
+        if (!users[i]) {
+          continue;
+        }
         const amount = parseEther(String(Math.floor(Math.random() * 50) + 1));
         const tierIndex = Math.floor(Math.random() * numberOfTiers);
         await staking.write.stake([amount, tierIndex], { account: users[i].account });
@@ -95,7 +107,9 @@ describe("TokenStaking Large Scale Test", function () {
     let totalStaked = 0n;
     let totalRewardsClaimed = 0n;
     for (let i = 0; i < numberOfUsers; i++) {
-      if (!users[i]) continue;
+      if (!users[i]) {
+        continue;
+      }
       const userStakes = await staking.read.getUserStakes([users[i].account.address]);
       //   console.log(userStakes);
       let userTotalStaked = 0n;

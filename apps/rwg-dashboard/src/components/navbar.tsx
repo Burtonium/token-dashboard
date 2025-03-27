@@ -175,10 +175,10 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           </li>
           {(isDev ||
             !!vault.isAdmin.data ||
-            env.NEXT_PUBLIC_VERCEL_ENV !== 'production') && (
+            env.NEXT_PUBLIC_ENVIRONMENT !== 'production') && (
             <hr className="h-px border-none bg-lighter" />
           )}
-          {env.NEXT_PUBLIC_VERCEL_ENV !== 'production' && (
+          {env.NEXT_PUBLIC_ENVIRONMENT !== 'production' && (
             <li>
               <NextLink
                 className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"

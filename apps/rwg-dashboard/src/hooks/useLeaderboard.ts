@@ -51,7 +51,7 @@ export const useLeaderboard = () => {
         }
       );
     },
-    enabled: walletAddress !== '',
+    enabled: !!walletAddress,
   });
 
   const totalBzr =

@@ -24,6 +24,8 @@ import { isDev } from '@/env';
 import { cn } from '@bltzr-gg/ui';
 import VestingIndicator from './components/vesting-indicator';
 import { VestingSchedules } from './components/vesting-schedules';
+import { Uniswap } from './components/uniswap';
+import useUniswap from '@/hooks/useUniswap';
 
 const ClaimPage = () => {
   const { sdkHasLoaded } = useDynamicContext();
@@ -38,6 +40,7 @@ const ClaimPage = () => {
     canClaim,
   } = useClaims();
   const token = useToken();
+  const { tokenPrice } = useUniswap();
   const showPeriod = claims.isLoading || claims.data?.period;
 
   return (
@@ -50,6 +53,35 @@ const ClaimPage = () => {
           Claim your tokens from various sources here.
         </p>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{token.symbol} Price</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col flex-wrap items-start justify-between gap-5 md:flex-row md:items-center">
+            <div className="flex items-center gap-2 text-xl md:gap-5 md:text-heading">
+              <RealIcon size="lg" />
+              <div>
+                1 <span className="text-primary">{token.symbol}</span> ={' '}
+                {tokenPrice > 0 ? (
+                  `$${tokenPrice.toFixed(6)}`
+                ) : (
+                  <Skeleton className="-mb-1 inline-block h-8 w-24 rounded-full" />
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Uniswap>
+                <Button>Get {token.symbol}</Button>
+              </Uniswap>
+              <Button variant="ghost" size="sm" onClick={token.watchToken}>
+                <RealIcon size="xs" className="ml-0" />
+                Add token to wallet
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>{token.symbol} Balance</CardTitle>
@@ -68,22 +100,6 @@ const ClaimPage = () => {
                   <span className="text-primary">{token.symbol}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <Button variant="outline" asChild>
-                <a
-                  href="https://app.uniswap.org"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Buy {token.symbol}
-                </a>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={token.watchToken}>
-                <RealIcon size="xs" className="ml-0" />
-                Add token to wallet
-              </Button>
             </div>
           </div>
         </CardContent>

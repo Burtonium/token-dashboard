@@ -8,7 +8,7 @@ import { env } from '@/env.js';
 
 const MOCKED_URL = `https://app.dynamicauth.com/api/v0/sdk/${env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID}/settings?sdkVersion=WalletKit%2F3.9.10`;
 
-if (env.NEXT_PUBLIC_VERCEL_ENV === 'test') {
+if (env.NEXT_PUBLIC_ENVIRONMENT === 'test') {
   const originalFetch = global.fetch;
 
   global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {

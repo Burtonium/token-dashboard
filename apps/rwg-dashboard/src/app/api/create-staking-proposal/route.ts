@@ -23,9 +23,7 @@ import { createWalletClient } from 'viem';
 import { snapshotApiUrl } from '@/config/snapshot';
 import type { NextRequest } from 'next/server';
 import { checkCronJobAuth } from '@/utils/checkCronJobAuth';
-import assert from 'assert';
 
-assert(isDev, 'Not in dev mode');
 const chain = sepolia;
 const transport = isDev
   ? testnetTransports[sepolia.id]

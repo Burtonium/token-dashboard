@@ -32,17 +32,16 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID: z.string(),
-    NEXT_PUBLIC_VERCEL_ENV: z.enum([
+    NEXT_PUBLIC_ENVIRONMENT: z.enum([
       'production',
       'preview',
-      'development',
       'test',
+      'development',
     ]),
     NEXT_PUBLIC_ALCHEMY_API_KEY: z.string(),
     NEXT_PUBLIC_RAW_PASS_CONTRACT_ADDRESS: z.string(),
     NEXT_PUBLIC_CASINO_URL: z.string(),
     NEXT_PUBLIC_SNAPSHOT_SPACE: z.string(),
-    NEXT_PUBLIC_REAL_TOKEN_ADDRESS: z.string(),
   },
 
   /**
@@ -59,7 +58,8 @@ export const env = createEnv({
     NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID:
       process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ??
       '21452bd4-902f-40be-9b8f-5bc817b00e0e',
-    NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV ?? 'development',
+    NEXT_PUBLIC_ENVIRONMENT:
+      process.env.NEXT_PUBLIC_ENVIRONMENT ?? 'development',
     NEXT_PUBLIC_ALCHEMY_API_KEY:
       process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ??
       'vlIJU80HdfL61kafixpO45fFrvqVPJx9', // public Alchemy demo key
@@ -75,8 +75,6 @@ export const env = createEnv({
     SUPABASE_DB_POSTGRES_URL: process.env.SUPABASE_DB_POSTGRES_URL,
     NEXT_PUBLIC_SNAPSHOT_SPACE:
       process.env.NEXT_PUBLIC_SNAPSHOT_SPACE ?? 'fakeworldgaming.eth',
-    NEXT_PUBLIC_REAL_TOKEN_ADDRESS:
-      process.env.NEXT_PUBLIC_REAL_TOKEN_ADDRESS ?? 'dummy',
     DUNE_API_KEY: process.env.DUNE_API_KEY,
     REALBET_API_SECRET_KEY: process.env.REALBET_API_SECRET_KEY,
     DYNAMIC_API_KEY: process.env.DYNAMIC_API_KEY,
@@ -94,5 +92,5 @@ export const env = createEnv({
   emptyStringAsUndefined: true,
 });
 
-export const isDev = env.NEXT_PUBLIC_VERCEL_ENV !== 'production';
-export const isTest = env.NEXT_PUBLIC_VERCEL_ENV === 'test';
+export const isDev = env.NEXT_PUBLIC_ENVIRONMENT !== 'production';
+export const isTest = env.NEXT_PUBLIC_ENVIRONMENT === 'test';

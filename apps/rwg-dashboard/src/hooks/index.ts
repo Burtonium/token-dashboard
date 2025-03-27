@@ -26,3 +26,4 @@ export * from './useToken';
 export * from './useTrackedBalances';
 export * from './useVesting';
 export * from './useWalletAddresses';
+export * from './useUniswap';

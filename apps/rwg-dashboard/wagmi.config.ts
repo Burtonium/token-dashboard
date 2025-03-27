@@ -1,10 +1,47 @@
 import 'dotenv/config';
 import { defineConfig } from '@wagmi/cli';
-import { react, etherscan } from '@wagmi/cli/plugins';
-import { sepolia } from 'viem/chains';
+import { etherscan, react } from '@wagmi/cli/plugins';
+import { mainnet, sepolia } from 'wagmi/chains';
+import uniswapV4QuoterAbi from './src/contracts/abi/uniswapV4Quoter';
+import uniswapV4RouterAbi from './src/contracts/abi/uniswapV4Router';
+import permit2Abi from '@/contracts/abi/permit2';
 
 export default defineConfig({
   out: 'src/contracts/generated.ts',
+  contracts: [
+    {
+      name: 'UniswapV4Quoter',
+      abi: uniswapV4QuoterAbi,
+      address: {
+        [mainnet.id]: '0x52F0E24D1c21C8A0cB1e5a5dD6198556BD9E1203',
+        [sepolia.id]: '0x61B3f2011A92d183C7dbaDBdA940a7555Ccf9227',
+      },
+    },
+    {
+      name: 'UniswapV4Router',
+      abi: uniswapV4RouterAbi,
+      address: {
+        [mainnet.id]: '0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af',
+        [sepolia.id]: '0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b',
+      },
+    },
+    {
+      name: 'Permit2',
+      abi: permit2Abi,
+      address: {
+        [mainnet.id]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+        [sepolia.id]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+      },
+    },
+    {
+      name: 'UniswapPoolHook',
+      abi: [],
+      address: {
+        [mainnet.id]: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
+        [sepolia.id]: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
+      },
+    },
+  ],
   plugins: [
     etherscan({
       apiKey: process.env.ETHERSCAN_API_KEY!,
@@ -14,6 +51,7 @@ export default defineConfig({
           name: 'Token',
           address: {
             [sepolia.id]: '0xBE2bC88bac5F1C94360AC4Df95424529511e25E2',
+            [mainnet.id]: '0x6eA9Ea07B9CBb1fB20a94344E47b7A64C9278F11',
           },
         },
         {

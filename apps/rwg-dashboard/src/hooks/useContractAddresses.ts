@@ -6,12 +6,14 @@ import {
   tokenMasterAddress,
   tokenStakingAddress,
   tokenVestingAddress,
+  uniswapPoolHookAddress,
 } from '@/contracts/generated';
 import { env } from '@/env';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { hardhat } from 'viem/chains';
 import { useChainId } from 'wagmi';
+import { Address, zeroAddress } from 'viem';
 
 const fetchLocallyDeployedAddresses = async () => {
   const response =
@@ -36,6 +38,7 @@ const fetchLocallyDeployedAddresses = async () => {
     tokenMaster: locallyDeployedJson[
       'TestTokenMaster#TestTokenMaster'
     ] as `0x${string}`,
+    uniswapPoolHook: zeroAddress as Address,
   };
 };
 
@@ -51,16 +54,18 @@ const useContractAddresses = () => {
           tokenVesting: tokenVestingAddress[11155111],
           tokenStaking: tokenStakingAddress[11155111],
           tokenMaster: tokenMasterAddress[11155111],
+          uniswapPoolHook: uniswapPoolHookAddress[11155111],
         });
       }
 
-      return env.NEXT_PUBLIC_VERCEL_ENV === 'test' || chainId === hardhat.id
+      return env.NEXT_PUBLIC_ENVIRONMENT === 'test' || chainId === hardhat.id
         ? fetchLocallyDeployedAddresses()
         : Promise.resolve({
             token: tokenAddress[chainId],
             tokenVesting: tokenVestingAddress[chainId],
             tokenStaking: tokenStakingAddress[chainId],
             tokenMaster: tokenMasterAddress[chainId],
+            uniswapPoolHook: uniswapPoolHookAddress[chainId],
           });
     },
   });

@@ -53,5 +53,5 @@ const wagmiConfigs: Record<Environment, ReturnType<typeof createConfig>> = {
 };
 
 export default wagmiConfigs[
-  process.env.NEXT_PUBLIC_VERCEL_ENV as Environment
+  process.env.NEXT_PUBLIC_ENVIRONMENT as Environment
 ] ?? development;
