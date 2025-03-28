@@ -87,7 +87,9 @@ export const ImportVestingSchedules = () => {
       amount: parseEther(schedule.amount),
     });
 
-    setIssuedSchedules((prev) => ({ ...prev, [id]: tx }));
+    if (tx) {
+      setIssuedSchedules((prev) => ({ ...prev, [id]: tx }));
+    }
   };
 
   return (
