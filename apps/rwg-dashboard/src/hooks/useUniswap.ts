@@ -59,6 +59,11 @@ const assets = [
 
 type AssetAmounts = [amount0: string, amount1: string];
 
+export type SwapResult = {
+  amountOut: bigint;
+  label: string;
+};
+
 const useUniswap = () => {
   const publicClient = usePublicClient();
   const contractAddresses = useContractAddresses();
@@ -74,6 +79,8 @@ const useUniswap = () => {
   const [slippage, setSlippage] = useState('0.5');
   const [txDeadlineMins, setTxDeadlineMins] = useState('30');
 
+  const [result, setResult] = useState<SwapResult | null>(null);
+
   const sortedAssets = useMemo(() => {
     const a = flipAssets ? [...assets].reverse() : assets;
     return a.map((asset) => ({
@@ -83,6 +90,7 @@ const useUniswap = () => {
   }, [flipAssets, amounts]);
 
   const setAmount = (index: number, amount: string) => {
+    setResult(null);
     setFlipTimestamp(Date.now());
     setAmounts((amounts) => {
       const vals = [...amounts] as AssetAmounts;
@@ -219,6 +227,10 @@ const useUniswap = () => {
   const flip = async () => {
     setFlipTimestamp(Date.now());
     setFlipAssets((flipAssets) => !flipAssets);
+  };
+
+  const reset = () => {
+    setAmounts(['0', '0']);
   };
 
   const swap = useMutation({
@@ -424,8 +436,23 @@ const useUniswap = () => {
 
       const { request } = await publicClient.simulateContract(swapParams);
 
-      await writeContractAsync(request);
+      const tx = await writeContractAsync(request);
+
+      await publicClient.waitForTransactionReceipt({ hash: tx });
+
+      setResult({
+        amountOut: swapQuote.amountOut,
+        label: outCurrency,
+      });
+
+      reset();
     },
+    onSuccess: () =>
+      Promise.all([
+        reset,
+        tokenAllowance.refetch(),
+        permit2Allowance.refetch(),
+      ]),
   });
 
   useEffect(() => {
@@ -451,6 +478,11 @@ const useUniswap = () => {
     selectedAsset,
     flipTimestamp,
   ]);
+
+  const outCurrency = useMemo(() => {
+    const asset = assets.find((asset) => asset.idx !== selectedAsset);
+    return asset?.label ?? assets[0].label;
+  }, [selectedAsset]);
 
   const swapQuote = useMemo(() => {
     if (!swapQuoteResult.data) {
@@ -492,6 +524,7 @@ const useUniswap = () => {
     setSlippage,
     txDeadlineMins,
     setTxDeadlineMins,
+    result,
   };
 };
 

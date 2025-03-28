@@ -3,7 +3,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { multicall, readContract } from '@wagmi/core';
 import config from '@/config/wagmi';
 import { useMemo } from 'react';
-import { useWriteContract } from 'wagmi';
+import { usePublicClient, useWriteContract } from 'wagmi';
 import { waitForTransactionReceipt } from '@wagmi/core';
 import { tokenVestingAbi, tokenVestingConfig } from '@/contracts/generated';
 import assert from 'assert';
@@ -16,6 +16,7 @@ import { isDev } from '@/env';
 
 export const useVesting = () => {
   const token = useToken();
+  const publicClient = usePublicClient();
   const { primaryWallet } = useDynamicContext();
   const { writeContractAsync } = useWriteContract();
   const { data: networkId } = useNetworkId();
@@ -257,7 +258,11 @@ export const useVesting = () => {
         throw new Error('Vesting contract required');
       }
 
-      const tx = await writeContractAsync({
+      if (!publicClient) {
+        return;
+      }
+
+      const { request } = await publicClient.simulateContract({
         address: vestingContractAddress,
         abi: tokenVestingConfig.abi,
         functionName: 'createVestingSchedule',
@@ -270,7 +275,10 @@ export const useVesting = () => {
           revocable,
           amount,
         ],
+        account: primaryWallet!.address as `0x${string}`,
       });
+
+      const tx = await writeContractAsync(request);
 
       await waitForTransactionReceipt(config, { hash: tx });
 

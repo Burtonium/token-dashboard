@@ -1,4 +1,4 @@
-import { type FC, type PropsWithChildren, useState } from 'react';
+import { type FC, type PropsWithChildren, useEffect, useState } from 'react';
 import { useIsLoggedIn } from '@/lib/dynamic';
 import { useDynamicAuthClickHandler } from '@/hooks/useDynamicAuthClickHandler';
 import { useToken } from '@/hooks/useToken';
@@ -23,6 +23,7 @@ import UniswapIcon from '@/assets/icons/uniswap.svg';
 import { ArrowDownCircleIcon, CogIcon, FuelIcon } from 'lucide-react';
 import useUniswap from '@/hooks/useUniswap';
 import Eth from '@/assets/icons/chains/eth.svg';
+import { formatBalanceTruncated } from '@/utils';
 
 const assetIcons = {
   ETH: <Eth className="ml-2 mt-0 size-8 p-1" />,
@@ -46,6 +47,7 @@ export const Uniswap: FC<PropsWithChildren> = ({ children }) => {
     setSlippage,
     txDeadlineMins,
     setTxDeadlineMins,
+    result,
   } = useUniswap();
 
   const [open, setOpen] = useState(false);
@@ -194,6 +196,20 @@ export const Uniswap: FC<PropsWithChildren> = ({ children }) => {
             {swap.error.message.replace('Error: ', '')}
           </p>
         )}
+
+        {result && (
+          <div className="text-center">
+            <div>Swap completed.</div>
+            <div className="mt-4 text-3xl text-green-500">
+              +
+              {formatBalanceTruncated(result.amountOut, {
+                precision: 4,
+              })}{' '}
+              {result.label}
+            </div>
+          </div>
+        )}
+
         <a href="https://app.uniswap.org" target="_blank">
           <div className="align-center flex justify-end gap-2 text-sm text-muted">
             Powered by <UniswapIcon className="fill-muted text-muted" />
