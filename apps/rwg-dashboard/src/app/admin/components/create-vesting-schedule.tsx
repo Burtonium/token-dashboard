@@ -20,7 +20,7 @@ import { z } from 'zod';
 
 const CreateScheduleSchema = z.object({
   address: z.string().length(42, { message: 'Address must be 42 characters' }),
-  startTime: z.coerce.date().transform((v) => Math.floor(v.getTime() / 1000)),
+  startTime: z.coerce.number().min(0),
   cliff: z.coerce.number().min(0),
   duration: z.coerce.number().min(0),
   slicePeriod: z.coerce.number().min(1),
