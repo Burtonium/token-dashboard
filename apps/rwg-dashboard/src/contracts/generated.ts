@@ -1704,23 +1704,23 @@ export const tokenVestingConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
  */
 export const uniswapPoolHookAbi = [] as const;
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
  */
 export const uniswapPoolHookAddress = {
-  1: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
-  11155111: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
+  1: '0x882104c70A54Af22311Bb1C324eB0ebaBca5D080',
+  11155111: '0x882104c70A54Af22311Bb1C324eB0ebaBca5D080',
 } as const;
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
- * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x882104c70A54Af22311Bb1C324eB0ebaBca5D080)
  */
 export const uniswapPoolHookConfig = {
   address: uniswapPoolHookAddress,

@@ -37,8 +37,8 @@ export default defineConfig({
       name: 'UniswapPoolHook',
       abi: [],
       address: {
-        [mainnet.id]: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
-        [sepolia.id]: '0x10051c1a83485c7C9Af71CeeCafB8C8a6D749080',
+        [mainnet.id]: '0x882104c70A54Af22311Bb1C324eB0ebaBca5D080',
+        [sepolia.id]: '0x882104c70A54Af22311Bb1C324eB0ebaBca5D080',
       },
     },
   ],
