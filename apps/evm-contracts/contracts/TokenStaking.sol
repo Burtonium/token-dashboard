@@ -116,7 +116,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
         emit RewardSet(epoch, reward);
     }
 
-    function stake(uint256 amount, uint32 tierIndex) external nonReentrant whenNotPaused {
+    function stake(address beneficiary, uint256 amount, uint32 tierIndex) external nonReentrant whenNotPaused {
         if (amount == 0) {
             revert CannotStakeZeroAmount();
         }
@@ -133,7 +133,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
 
         updateTotalEffectiveSupply(totalEffectiveSupply);
 
-        userStakes[msg.sender].push(
+        userStakes[beneficiary].push(
             Stake({
                 amount: amount,
                 effectiveAmount: effectiveAmount,
@@ -145,9 +145,20 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
 
         TOKEN.safeTransferFrom(msg.sender, address(this), amount);
 
-        _mint(msg.sender, amount);
+        _mint(beneficiary, amount);
 
-        emit Staked(msg.sender, amount, tierIndex);
+        emit Staked(beneficiary, amount, tierIndex);
+    }
+
+    function _tax(uint256 stakeIndex) internal view returns (uint256) {
+        Stake storage userStake = userStakes[msg.sender][stakeIndex];
+        uint256 amount = userStake.amount;
+
+        if (isLocked(stakeIndex)) {
+            return (amount * 20) / 100;
+        }
+
+        return amount;
     }
 
     // This function is for unstaking only. It does not claim rewards.
@@ -156,9 +167,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
             revert InvalidStakeIndex();
         }
         Stake storage userStake = userStakes[msg.sender][stakeIndex];
-        if (isLocked(stakeIndex)) {
-            revert LockPeriodNotEnded();
-        }
+
         uint256 currentEpoch = getCurrentEpoch();
 
         // Check if there are any unclaimed rewards
@@ -173,11 +182,15 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
 
         updateTotalEffectiveSupply(totalEffectiveSupply);
 
+        // Apply tax, if any
+        uint256 taxedAmount = _tax(stakeIndex);
+
         // Remove the stake by swapping with the last element and popping
         userStakes[msg.sender][stakeIndex] = userStakes[msg.sender][userStakes[msg.sender].length - 1];
         userStakes[msg.sender].pop();
 
-        TOKEN.safeTransfer(msg.sender, amount);
+        // Send tokens to user
+        TOKEN.safeTransfer(msg.sender, taxedAmount);
 
         _burn(msg.sender, amount);
 

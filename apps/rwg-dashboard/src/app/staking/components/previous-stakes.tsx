@@ -10,6 +10,7 @@ import {
 import { cn } from '@bltzr-gg/ui';
 import { formatBalance } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
+import EarlyUnstakeWarningModal from '@/components/modals/EarlyUnstakeWarningModal';
 
 const depositTierClasses = (tier: TierWithDecimalMult | undefined) =>
   tier
@@ -135,26 +136,25 @@ export const PreviousStakes = () => {
                     variant={remaining <= 0 ? 'accent' : 'lightest'}
                   />
                 </div>
-                <div
-                  className={cn('col-span-3 text-right md:col-span-1', {
-                    'hidden md:block': remaining > 0,
-                  })}
-                >
-                  <Button
-                    variant="neutral"
-                    size="sm"
-                    onClick={() =>
+                <div className="col-span-3 text-right md:col-span-1">
+                  <EarlyUnstakeWarningModal
+                    bypass={remaining <= 0}
+                    onConfirm={() => {
                       unstakeDeposit.mutateAsync({
                         depositIndex: BigInt(deposit.depositIndex),
                         lastClaimEpoch: deposit.lastClaimEpoch,
-                      })
-                    }
-                    disabled={remaining > 0}
-                    loading={unstakeDeposit.isPending}
-                    className="w-full px-4 py-2 md:w-auto"
+                      });
+                    }}
                   >
-                    Unstake
-                  </Button>
+                    <Button
+                      variant="neutral"
+                      size="sm"
+                      loading={unstakeDeposit.isPending}
+                      className="w-full px-4 py-2 md:w-auto"
+                    >
+                      Unstake
+                    </Button>
+                  </EarlyUnstakeWarningModal>
                   <p className="text-destructive empty:hidden">
                     {unstake.error?.message}
                   </p>

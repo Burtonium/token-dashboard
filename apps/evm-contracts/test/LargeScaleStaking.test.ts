@@ -38,7 +38,7 @@ describe("TokenStaking Large Scale Test", function () {
       }
       const amount = parseEther(String(Math.floor(Math.random() * 100) + 1));
       const tierIndex = Math.floor(Math.random() * numberOfTiers);
-      await staking.write.stake([amount, tierIndex], { account: users[i].account });
+      await staking.write.stake([users[i].account.address, amount, tierIndex], { account: users[i].account });
     }
 
     console.log("Simulating passage of time and epochs...");
@@ -99,7 +99,7 @@ describe("TokenStaking Large Scale Test", function () {
         }
         const amount = parseEther(String(Math.floor(Math.random() * 50) + 1));
         const tierIndex = Math.floor(Math.random() * numberOfTiers);
-        await staking.write.stake([amount, tierIndex], { account: users[i].account });
+        await staking.write.stake([users[i].account.address, amount, tierIndex], { account: users[i].account });
       }
     }
 

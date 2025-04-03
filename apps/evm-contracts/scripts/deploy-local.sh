@@ -27,8 +27,13 @@ for file in "$MODULES_DIR"/*.ts "$MODULES_DIR"/*.js; do
     npx hardhat ignition deploy "ignition/modules/$MODULE_NAME" --network "$NETWORK"
 
     if [ $? -ne 0 ]; then
-      echo "Error deploying $MODULE_NAME. Exiting..."
-      exit 1
+      if [[ $MODULE_NAME == Test* ]]; then
+        echo "Error deploying $MODULE_NAME. Exiting..."
+        exit 1
+      else
+        echo "Warning: error deploying $MODULE_NAME. Skipping..."
+        continue
+      fi
     fi
   fi
 done

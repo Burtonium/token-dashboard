@@ -46,7 +46,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      const tx = await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      const tx = await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       const logs = await client.getContractEvents({
@@ -65,6 +65,35 @@ describe("TokenStaking", function () {
       expect(userStakes[0].tierIndex).to.equal(0n);
     });
 
+    it("should allow users to stake tokens with someone else as the beneficiary", async function () {
+      const client = await viem.getPublicClient();
+      const [, addr1, addr2] = await viem.getWalletClients();
+      const { staking, realToken } = await loadFixture(stakingModuleFixture);
+
+      await realToken.write.mint([addr1.account.address, parseEther("1000")]);
+      await realToken.write.approve([staking.address, parseEther("100")], {
+        account: addr1.account,
+      });
+
+      const tx = await staking.write.stake([addr2.account.address, parseEther("100"), 0], { account: addr1.account });
+      await client.waitForTransactionReceipt({ hash: tx });
+
+      const logs = await client.getContractEvents({
+        address: staking.address,
+        abi: staking.abi,
+        eventName: "Staked",
+      });
+
+      expect(logs[0].args.user).to.equal(getAddress(addr2.account.address));
+      expect(logs[0].args.amount).to.equal(parseEther("100"));
+      expect(logs[0].args.tierIndex).to.equal(0n);
+
+      const userStakes = await staking.read.getUserStakes([addr2.account.address]);
+      expect(userStakes.length).to.equal(1);
+      expect(userStakes[0].amount).to.equal(parseEther("100"));
+      expect(userStakes[0].tierIndex).to.equal(0n);
+    });
+
     it("should not allow staking with invalid tier", async function () {
       const [, addr1] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
@@ -74,7 +103,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
       await expect(
-        staking.write.stake([parseEther("100"), 5], { account: addr1.account }),
+        staking.write.stake([addr1.account.address, parseEther("100"), 5], { account: addr1.account }),
       ).to.be.revertedWithCustomError(staking, "InvalidTierIndex");
     });
 
@@ -88,7 +117,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      const tx = await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      const tx = await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       const balance = await staking.read.balanceOf([addr1.account.address]);
@@ -105,7 +134,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      const tx = await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      const tx = await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       await expect(
@@ -125,7 +154,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      const tx = await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      const tx = await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
       await client.waitForTransactionReceipt({ hash: tx });
 
       await expect(
@@ -145,7 +174,7 @@ describe("TokenStaking", function () {
   });
 
   describe("unstaking", function () {
-    it("should not allow unstaking before lock period ends", async function () {
+    it("should allow unstaking before lock period ends, with a tax", async function () {
       const [, addr1] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
 
@@ -154,12 +183,16 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      const initialBalance = await realToken.read.balanceOf([addr1.account.address]);
 
-      await expect(staking.write.unstake([0n], { account: addr1.account })).to.be.revertedWithCustomError(
-        staking,
-        "LockPeriodNotEnded",
-      );
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
+
+      await staking.write.unstake([0n], { account: addr1.account });
+
+      const newBalance = await realToken.read.balanceOf([addr1.account.address]);
+
+      // Expect to have taxed 80% of the stake
+      expect(newBalance).to.equal(initialBalance - parseEther("80"));
     });
 
     it("should not allow unstaking if rewards are not claimed", async function () {
@@ -173,7 +206,7 @@ describe("TokenStaking", function () {
 
       await realToken.write.mint([staking.address, parseEther("10000")]);
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       await time.increase(90n * 24n * 60n * 60n + 1n); // 90 days + 1 second
@@ -202,7 +235,7 @@ describe("TokenStaking", function () {
 
       await realToken.write.mint([staking.address, parseEther("10000")]);
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       await time.increase(90n * 24n * 60n * 60n + 1n); // 90 days + 1 second
@@ -232,7 +265,7 @@ describe("TokenStaking", function () {
 
       await realToken.write.mint([staking.address, parseEther("10000")]);
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       await time.increase(90n * 24n * 60n * 60n + 1n); // 90 days + 1 second
@@ -263,6 +296,7 @@ describe("TokenStaking", function () {
       });
 
       expect(logs[0].args.user).to.equal(getAddress(addr1.account.address));
+      // Original stake should be returned untaxed
       expect(logs[0].args.amount).to.equal(parseEther("100"));
     });
   });
@@ -308,7 +342,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       const epochDuration = await staking.read.epochDuration();
@@ -336,7 +370,7 @@ describe("TokenStaking", function () {
 
       await realToken.write.mint([staking.address, parseEther("10000")]);
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       const epochDuration = await staking.read.epochDuration();
@@ -387,7 +421,7 @@ describe("TokenStaking", function () {
 
       await realToken.write.mint([staking.address, parseEther("10000")]);
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       const epochDuration = await staking.read.epochDuration();
@@ -421,6 +455,55 @@ describe("TokenStaking", function () {
 
       expect(logs[0].args.user).to.equal(getAddress(addr1.account.address));
       expect(logs[0].args.amount).to.equal(expectedBalance);
+    });
+
+    it("should tax the user if they unstake while claiming rewards", async function () {
+      const numberOfEpochs = 3n;
+
+      const client = await viem.getPublicClient();
+      const [, addr1, addr2] = await viem.getWalletClients();
+      const { staking, realToken } = await loadFixture(stakingModuleFixture);
+
+      const initialBalance = parseEther("1000");
+
+      await realToken.write.mint([staking.address, parseEther("1000000")]);
+      await realToken.write.mint([addr1.account.address, initialBalance]);
+      await realToken.write.approve([staking.address, parseEther("100")], {
+        account: addr1.account,
+      });
+
+      await realToken.write.mint([staking.address, parseEther("10000")]);
+
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
+
+      // Fast forward time
+      const epochDuration = await staking.read.epochDuration();
+      await time.increase(epochDuration * numberOfEpochs); // 3 epochs
+
+      const userStakes = await staking.read.getUserStakes([addr1.account.address]);
+
+      // Set Merkle root for epochs
+      const merkleTree = generateEpochMerkleTree([addr1.account.address, addr2.account.address]);
+
+      const epochs = [];
+      const merkleProofs = [];
+      for (let i = 0; i < Number(numberOfEpochs); i++) {
+        const thisEpoch = userStakes[0].lastClaimEpoch + i + 1;
+        await staking.write.setMerkleRoot([BigInt(thisEpoch), merkleTree.root]);
+        epochs.push(thisEpoch);
+        merkleProofs.push(merkleTree.proofs.find((x: Proof) => x.address === addr1.account.address)?.proof ?? []);
+      }
+
+      // Default epoch rewards x 3
+      const expectedRewards = parseEther("100") * numberOfEpochs;
+
+      const tx = await staking.write.claimRewards([0n, epochs, merkleProofs, true], { account: addr1.account });
+      await client.waitForTransactionReceipt({ hash: tx });
+
+      const newBalance = await realToken.read.balanceOf([addr1.account.address]);
+
+      const expectedBalance = initialBalance - parseEther("80") + expectedRewards;
+      expect(newBalance).to.equal(expectedBalance);
     });
 
     it("should revert if an invalid stake index is provided", async function () {
@@ -499,7 +582,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       const currentEpoch = await staking.read.getCurrentEpoch();
       const totalEffectiveSupply = await staking.read.getTotalEffectiveSupplyAtEpoch([currentEpoch]);
@@ -532,7 +615,7 @@ describe("TokenStaking", function () {
       });
 
       // Stake tokens
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time
       await time.increase(90n * 24n * 60n * 60n + 1n); // 90 days + 1 second
@@ -673,7 +756,7 @@ describe("TokenStaking", function () {
       await staking.write.pause({ account: admin.account });
 
       await expect(
-        staking.write.stake([parseEther("100"), 0], { account: addr1.account }),
+        staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account }),
       ).to.be.revertedWithCustomError(staking, "EnforcedPause");
     });
 
@@ -686,7 +769,7 @@ describe("TokenStaking", function () {
         account: addr1.account,
       });
 
-      await staking.write.stake([parseEther("100"), 0], { account: addr1.account });
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
 
       // Fast forward time to end lock period
       await time.increase(90n * 24n * 60n * 60n + 1n);
