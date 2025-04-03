@@ -25,7 +25,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
-import { Wallet } from 'lucide-react';
+import { ExternalLink, Wallet } from 'lucide-react';
 import { PreviousStakes } from './previous-stakes';
 import { RealIcon } from '@bltzr-gg/ui';
 
@@ -434,15 +434,26 @@ const StakeComponent = () => {
                   )}
                 />
               </div>
-              <Button
-                data-testid="stake-button"
-                loading={stakeFormLoading}
-                type="submit"
-                className="mt-5 w-64"
-              >
-                Stake
-                <RealIcon size="sm" className="ml-0 mt-0" />
-              </Button>
+              <div className="flex items-end justify-between">
+                <Button
+                  data-testid="stake-button"
+                  loading={stakeFormLoading}
+                  type="submit"
+                  className="mt-5 w-64"
+                >
+                  Stake
+                  <RealIcon size="sm" className="ml-0 mt-0" />
+                </Button>
+                <a
+                  className="py-0.5 text-sm hover:text-primary hover:underline"
+                  href="/$REAL_Zokyo_audit_report_Jan27th_2025.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View Smart Contract Audit{' '}
+                  <ExternalLink className="mb-1 inline size-4" />
+                </a>
+              </div>
             </form>
           </Form>
           {errors.map((e) => (
