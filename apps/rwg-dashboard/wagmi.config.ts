@@ -50,13 +50,14 @@ export default defineConfig({
         {
           name: 'Token',
           address: {
-            [sepolia.id]: '0xBE2bC88bac5F1C94360AC4Df95424529511e25E2',
             [mainnet.id]: '0x90836D7f096506D8A250f9DC27306d4Ac1351e6c',
+            [sepolia.id]: '0xBE2bC88bac5F1C94360AC4Df95424529511e25E2',
           },
         },
         {
           name: 'TokenVesting',
           address: {
+            [mainnet.id]: '0xda40e82D93Af5247226eAD81e85AA20E2013f3bc',
             [sepolia.id]: '0xC6a6EbB044629647eb5CD2eFCC1C748c38349154',
           },
         },

@@ -2,10 +2,12 @@
 
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-const tokenVesting = buildModule("TokenVesting", (m) => {
-  const token = m.getParameter("token");
+import realToken from "./RealToken";
 
-  const tokenVesting = m.contract("TokenVesting", [token]);
+const tokenVesting = buildModule("TokenVesting", (m) => {
+  const tokenModule = m.useModule(realToken);
+
+  const tokenVesting = m.contract("TokenVesting", [tokenModule.token]);
 
   return {
     tokenVesting,
