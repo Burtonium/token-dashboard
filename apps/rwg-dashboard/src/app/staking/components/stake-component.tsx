@@ -155,8 +155,7 @@ const StakeComponent = () => {
         setStakingStatus('Approving allowance...');
         try {
           await increaseAllowance.mutateAsync(amount);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
+        } catch {
           setStakingStatus('');
           stakeForm.setError('amount', {
             message: 'Error when attempting to increase allowance',

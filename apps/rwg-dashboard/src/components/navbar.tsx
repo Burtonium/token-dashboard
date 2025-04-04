@@ -81,7 +81,6 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           className="flex items-center gap-3 text-white hover:text-gray-300"
           href="/"
         >
-          <Icon />
           <img
             src={logo.src}
             className="w-[106px] transition-colors hover:text-primary hover:drop-shadow-primary"
