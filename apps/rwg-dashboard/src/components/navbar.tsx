@@ -176,10 +176,10 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
           </li>
           <li>
             <NextLink
-              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary"
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
               path="/airdrop"
             >
-              <Box />
+              <Box strokeWidth={1} />
               <span>Airdrop</span>
             </NextLink>
           </li>
