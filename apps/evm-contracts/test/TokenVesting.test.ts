@@ -184,6 +184,77 @@ describe("TokenVesting", function () {
        */
     });
 
+    it("should allow vesting to start in the future", async function () {
+      const [admin, addr1, addr2] = await viem.getWalletClients();
+      // deploy vesting contract
+      const { tokenVesting, token } = await loadFixture(tokenVestingFixture);
+      expect((await tokenVesting.read.getToken()).toString()).to.equal(token.address);
+      // send tokens to vesting contract
+      await expect(token.write.transfer([tokenVesting.address, 1000n]))
+        .to.emit(token, "Transfer")
+        .withArgs(getAddress(admin.account.address), tokenVesting.address, 1000);
+
+      const vestingContractBalance = await token.read.balanceOf([tokenVesting.address]);
+      expect(vestingContractBalance).to.equal(1000);
+      expect(await tokenVesting.read.getWithdrawableAmount()).to.equal(1000);
+
+      const baseTime = 1622551248n;
+      const beneficiary = addr1;
+      const startTime = baseTime + 100n;
+      const cliff = 0n;
+      const duration = 1000n;
+      const slicePeriodSeconds = 1n;
+      const revokable = true;
+      const amount = 100n;
+
+      // create new vesting schedule
+      await tokenVesting.write.createVestingSchedule([
+        beneficiary.account.address,
+        startTime,
+        cliff,
+        duration,
+        slicePeriodSeconds,
+        revokable,
+        amount,
+      ]);
+
+      expect(await tokenVesting.read.getVestingSchedulesCount()).to.be.equal(1);
+      expect(await tokenVesting.read.getVestingSchedulesCountByBeneficiary([beneficiary.account.address])).to.be.equal(
+        1,
+      );
+
+      // compute vesting schedule id
+      const vestingScheduleId = await tokenVesting.read.computeVestingScheduleIdForAddressAndIndex([
+        beneficiary.account.address,
+        0n,
+      ]);
+
+      // check that vested amount is 0
+      expect(await tokenVesting.read.computeReleasableAmount([vestingScheduleId])).to.be.equal(0);
+
+      // set time to half the delay
+      const halfDelayTime = baseTime + 50n;
+      await tokenVesting.write.setCurrentTime([halfDelayTime]);
+
+      expect(
+        await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
+          account: beneficiary.account,
+        }),
+        "check that vested amount is still 0",
+      ).to.be.equal(0);
+
+      // set time to half the vesting period, plus the delay
+      const halfTime = baseTime + duration / 2n + 100n;
+      await tokenVesting.write.setCurrentTime([halfTime]);
+
+      expect(
+        await tokenVesting.read.computeReleasableAmount([vestingScheduleId], {
+          account: beneficiary.account,
+        }),
+        "check that vested amount is half the total amount to vest",
+      ).to.be.equal(50);
+    });
+
     it("should release vested tokens if revoked", async function () {
       const [admin, addr1] = await viem.getWalletClients();
       // deploy vesting contract
