@@ -72,7 +72,7 @@ const gradientTierButtonClasses = [
 const DEFAULT_GLOBAL_STAKE = '10,000,000';
 const DEFAULT_MONTHLY_REWARDS = '14,000,000';
 
-const calculateAPY = (rate: number, periods: number) => {
+const calculateAPR = (rate: number, periods: number) => {
   return ((1 + rate / periods) ** periods - 1) * 100;
 };
 
@@ -144,16 +144,16 @@ export default function StakePreview() {
     },
   );
 
-  const apy = useMemo(
+  const apr = useMemo(
     () =>
-      calculateAPY(
+      calculateAPR(
         anticipatedMonthlyReward / parseFloat(stakeAmount.replace(/,/g, '')),
         12,
       ).toFixed(2),
     [anticipatedMonthlyReward, stakeAmount],
   );
 
-  const animatedAPY = useAnimatedNumber(apy, {
+  const animatedAPR = useAnimatedNumber(apr, {
     decimals: 2,
     duration: 300,
   });
@@ -351,7 +351,7 @@ export default function StakePreview() {
                   <span>the rewards</span>
                 </div>
               )}
-              <div className="text-heading font-medium">{animatedAPY}% APY</div>
+              <div className="text-heading font-medium">{animatedAPR}% APR</div>
               <div className="text-xl">
                 ~{anticipatedMonthlyRewardAnimated}
                 <span className="inline-flex items-center gap-1">
