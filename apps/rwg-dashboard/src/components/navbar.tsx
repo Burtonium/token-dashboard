@@ -24,6 +24,7 @@ import {
   Code,
   Rocket,
   HandCoins,
+  Box,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { env, isDev } from '@/env';
@@ -170,6 +171,15 @@ const Navbar: React.FC<{ className?: string }> = ({ className }) => {
             >
               <HandCoins strokeWidth={1} />
               <span>Vesting and Claims</span>
+            </NextLink>
+          </li>
+          <li>
+            <NextLink
+              className="flex items-center gap-3 leading-none hover:text-primary hover:drop-shadow-primary lg:text-sm"
+              path="/airdrop"
+            >
+              <Box strokeWidth={1} />
+              <span>Airdrop</span>
             </NextLink>
           </li>
           {(isDev ||
