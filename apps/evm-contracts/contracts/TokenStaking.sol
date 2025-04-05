@@ -19,6 +19,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
     uint256 public epochDuration;
     uint256 public epochStartTime;
     uint256 public defaultEpochRewards;
+    uint256 public taxPercentage = 80;
 
     struct Tier {
         uint256 lockPeriod;
@@ -50,6 +51,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
     event RewardSet(uint256 indexed epoch, uint256 amount);
     event TierAdded(uint256 lockPeriod, uint256 multiplier);
     event DefaultEpochRewardsSet(uint256 defaultEpochRewards);
+    event TaxPercentageUpdated(uint256 newTaxPercentage);
 
     error MultiplierMustBeGreaterThanZero();
     error CannotSetRewardForPastEpochs();
@@ -65,6 +67,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
     error InvalidEpoch();
     error UnclaimedRewardsRemain();
     error NotEnoughBalance();
+    error InvalidTaxPercentage();
 
     constructor(
         address token,
@@ -150,12 +153,14 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
         emit Staked(beneficiary, amount, tierIndex);
     }
 
-    function _tax(uint256 stakeIndex) internal view returns (uint256) {
+    function _calculateWithdrawalAmount(uint256 stakeIndex) internal view returns (uint256) {
         Stake storage userStake = userStakes[msg.sender][stakeIndex];
         uint256 amount = userStake.amount;
 
         if (isLocked(stakeIndex)) {
-            return (amount * 20) / 100;
+            unchecked {
+                return (amount * (100 - taxPercentage)) / 100;
+            }
         }
 
         return amount;
@@ -183,7 +188,7 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
         updateTotalEffectiveSupply(totalEffectiveSupply);
 
         // Apply tax, if any
-        uint256 taxedAmount = _tax(stakeIndex);
+        uint256 taxedAmount = _calculateWithdrawalAmount(stakeIndex);
 
         // Remove the stake by swapping with the last element and popping
         userStakes[msg.sender][stakeIndex] = userStakes[msg.sender][userStakes[msg.sender].length - 1];
@@ -393,5 +398,13 @@ contract TokenStaking is ERC20, ReentrancyGuard, TokenStakingRoles, Voting, Paus
             revert NotEnoughBalance();
         }
         TOKEN.safeTransfer(msg.sender, amount);
+    }
+
+    function setTaxPercentage(uint256 _newTaxPercentage) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (_newTaxPercentage > 100) {
+            revert InvalidTaxPercentage();
+        }
+        taxPercentage = _newTaxPercentage;
+        emit TaxPercentageUpdated(_newTaxPercentage);
     }
 }

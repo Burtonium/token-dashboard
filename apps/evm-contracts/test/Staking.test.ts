@@ -195,6 +195,29 @@ describe("TokenStaking", function () {
       expect(newBalance).to.equal(initialBalance - parseEther("80"));
     });
 
+    it("should allow the early unstake tax to be configured", async function () {
+      const [, addr1] = await viem.getWalletClients();
+      const { staking, realToken } = await loadFixture(stakingModuleFixture);
+
+      await staking.write.setTaxPercentage([60n]);
+
+      await realToken.write.mint([addr1.account.address, parseEther("1000")]);
+      await realToken.write.approve([staking.address, parseEther("100")], {
+        account: addr1.account,
+      });
+
+      const initialBalance = await realToken.read.balanceOf([addr1.account.address]);
+
+      await staking.write.stake([addr1.account.address, parseEther("100"), 0], { account: addr1.account });
+
+      await staking.write.unstake([0n], { account: addr1.account });
+
+      const newBalance = await realToken.read.balanceOf([addr1.account.address]);
+
+      // Expect to have taxed 60% of the stake
+      expect(newBalance).to.equal(initialBalance - parseEther("60"));
+    });
+
     it("should not allow unstaking if rewards are not claimed", async function () {
       const [, addr1, addr2] = await viem.getWalletClients();
       const { staking, realToken } = await loadFixture(stakingModuleFixture);
@@ -779,6 +802,36 @@ describe("TokenStaking", function () {
       await expect(staking.write.unstake([0n], { account: addr1.account })).to.be.revertedWithCustomError(
         staking,
         "EnforcedPause",
+      );
+    });
+
+    it("should allow tax percentage to be updated", async function () {
+      const [admin] = await viem.getWalletClients();
+      const { staking } = await loadFixture(stakingModuleFixture);
+
+      await staking.write.setTaxPercentage([10n], { account: admin.account });
+
+      const newTaxPercentage = await staking.read.taxPercentage();
+      expect(newTaxPercentage).to.equal(10n);
+    });
+
+    it("should not allow tax percentage to be set to more than 100", async function () {
+      const [admin] = await viem.getWalletClients();
+      const { staking } = await loadFixture(stakingModuleFixture);
+
+      await expect(staking.write.setTaxPercentage([101n], { account: admin.account })).to.be.revertedWithCustomError(
+        staking,
+        "InvalidTaxPercentage",
+      );
+    });
+
+    it("should not allow tax percentage to be updated by a non-admin", async function () {
+      const [, addr1] = await viem.getWalletClients();
+      const { staking } = await loadFixture(stakingModuleFixture);
+
+      await expect(staking.write.setTaxPercentage([10n], { account: addr1.account })).to.be.revertedWithCustomError(
+        staking,
+        "AccessControlUnauthorizedAccount",
       );
     });
   });

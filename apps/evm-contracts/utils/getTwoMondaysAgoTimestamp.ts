@@ -1,6 +1,6 @@
 export function getTwoMondaysAgoTimestamp() {
   const now = new Date();
-  now.setUTCHours(0, 0, 0, 0);
+  now.setUTCHours(16, 0, 0, 0);
 
   // Get last Monday
   const lastMonday = new Date(now);
