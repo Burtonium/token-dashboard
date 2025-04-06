@@ -34,6 +34,7 @@ import { snapshotApiUrl } from '@/config/snapshot';
 import { Popover, PopoverContent, PopoverTrigger } from '@bltzr-gg/ui';
 import { useToken } from '@/hooks/useToken';
 import { formatUnixDate } from '@/utils/formatUnixDate';
+import ReactMarkdown from 'react-markdown';
 
 const space = env.NEXT_PUBLIC_SNAPSHOT_SPACE;
 const client = new snapshot.Client712(snapshotApiUrl);
@@ -217,7 +218,11 @@ const RewardComponent = () => {
             </Popover>
           </div>
           <div className="flex flex-col gap-4">
-            <p>{latestProposal?.body}</p>
+            {latestProposal && (
+              <ReactMarkdown
+                children={`${latestProposal.body.substring(0, 500)} . . .`}
+              />
+            )}
             <p className="text-right">
               <a
                 href={latestProposal?.link}
