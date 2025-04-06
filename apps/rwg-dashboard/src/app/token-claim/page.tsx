@@ -20,12 +20,13 @@ import { useToken } from '@/hooks/useToken';
 import { formatBalance } from '@/utils';
 import { Calendar, Check, CircleX, HandCoins, Info } from 'lucide-react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { isDev } from '@/env';
+import { env, isDev } from '@/env';
 import { cn } from '@bltzr-gg/ui';
 import VestingIndicator from './components/vesting-indicator';
 import { VestingSchedules } from './components/vesting-schedules';
 import { Uniswap } from './components/uniswap';
 import useUniswap from '@/hooks/useUniswap';
+import Link from 'next/link';
 
 const ClaimPage = () => {
   const { sdkHasLoaded } = useDynamicContext();
@@ -71,9 +72,19 @@ const ClaimPage = () => {
               </div>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <Uniswap>
-                <Button>Get {token.symbol}</Button>
-              </Uniswap>
+              {env.NEXT_PUBLIC_BUY_REAL_URL &&
+                env.NEXT_PUBLIC_BUY_REAL_URL.length > 0 && (
+                  <Button asChild>
+                    <Link href={env.NEXT_PUBLIC_BUY_REAL_URL} target="_blank">
+                      Get {token.symbol}
+                    </Link>
+                  </Button>
+                )}
+              {(env.NEXT_PUBLIC_BUY_REAL_URL || '').length === 0 && (
+                <Uniswap>
+                  <Button>Get {token.symbol}</Button>
+                </Uniswap>
+              )}
               <Button variant="ghost" size="sm" onClick={token.watchToken}>
                 <RealIcon size="xs" className="ml-0" />
                 Add token to wallet

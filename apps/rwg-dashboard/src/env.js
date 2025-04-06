@@ -43,6 +43,7 @@ export const env = createEnv({
     NEXT_PUBLIC_RAW_PASS_CONTRACT_ADDRESS: z.string(),
     NEXT_PUBLIC_CASINO_URL: z.string(),
     NEXT_PUBLIC_SNAPSHOT_SPACE: z.string(),
+    NEXT_PUBLIC_BUY_REAL_URL: z.string().optional(),
   },
 
   /**
@@ -77,7 +78,8 @@ export const env = createEnv({
     HELIUS_API_KEY: process.env.HELIUS_API_KEY,
     SUPABASE_DB_POSTGRES_URL: process.env.SUPABASE_DB_POSTGRES_URL,
     NEXT_PUBLIC_SNAPSHOT_SPACE:
-      process.env.NEXT_PUBLIC_SNAPSHOT_SPACE ?? 'fakeworldgaming.eth',
+      process.env.NEXT_PUBLIC_SNAPSHOT_SPACE ?? 'rwg.eth',
+    NEXT_PUBLIC_BUY_REAL_URL: process.env.NEXT_PUBLIC_BUY_REAL_URL ?? '',
     DUNE_API_KEY: process.env.DUNE_API_KEY,
     REALBET_API_SECRET_KEY: process.env.REALBET_API_SECRET_KEY,
     DYNAMIC_API_KEY: process.env.DYNAMIC_API_KEY,
