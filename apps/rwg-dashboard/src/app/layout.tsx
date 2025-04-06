@@ -9,8 +9,8 @@ import '../dynamic-intercept';
 
 export const metadata: Metadata = {
   title: 'REAL VIP',
-  description: 'Dashboard for the Realbet Casino',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  description: 'Dashboard for the Real Token',
+  icons: [{ rel: 'icon', url: '/$REAL.svg' }],
 };
 
 export default function RootLayout({
