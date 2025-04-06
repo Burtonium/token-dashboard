@@ -28,6 +28,7 @@ import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { ExternalLink, Wallet } from 'lucide-react';
 import { PreviousStakes } from './previous-stakes';
 import { RealIcon } from '@bltzr-gg/ui';
+import usePrimaryAddress from '@/hooks/usePrimaryAddress';
 
 const tierButtonCommonClasses =
   'flex justify-between min-w-0 max-w-28 md:max-w-full w-full rounded-[4px] p-2 h-8 text-xs';
@@ -77,6 +78,7 @@ const StakeComponent = () => {
   const { sdkHasLoaded, setShowAuthFlow } = useDynamicContext();
   const parallaxRef = useRef<HTMLDivElement>(null);
   const parallax = useParallaxEffect(parallaxRef);
+  const primaryAddress = usePrimaryAddress();
 
   const StakeFormSchema = z.object({
     amount: z.string({ message: 'Amount is required' }),
@@ -132,7 +134,7 @@ const StakeComponent = () => {
 
   const onStake = useCallback(
     async (values: StakeValues) => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !primaryAddress) {
         return setShowAuthFlow(true);
       }
 
@@ -173,6 +175,7 @@ const StakeComponent = () => {
 
       await stake
         .mutateAsync({
+          beneficiary: primaryAddress,
           amount,
           tier: parseInt(values.duration),
         })

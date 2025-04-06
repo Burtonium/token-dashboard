@@ -1,6 +1,8 @@
 {
+  "RealToken": {
+    "recipient": "0x19778E11bcfF24Fb20a4F05a00624EAa3a98ceFa"
+  },
   "TokenStaking": {
-    "token": "0x80503a00e1B60C9Be8E6f005C3d4fDbbDAbd5be2",
     "epochDuration": 28800,
     "tiers": [
       [28800, "100000000000000000n"],

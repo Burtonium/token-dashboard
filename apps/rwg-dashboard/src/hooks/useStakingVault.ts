@@ -8,7 +8,7 @@ import { useToken } from './useToken';
 import useNetworkId from './useNetworkId';
 import usePrimaryAddress from './usePrimaryAddress';
 import { tokenAbi, tokenStakingConfig } from '@/contracts/generated';
-import { erc20Abi, formatEther } from 'viem';
+import { Address, erc20Abi, formatEther } from 'viem';
 import assert from 'assert';
 import { useAuthenticatedQuery } from './useAuthenticatedQuery';
 import { getStakingMerkleProofs } from '@/server/actions/staking/getStakingMerkleProofs';
@@ -251,13 +251,21 @@ export const useStakingVault = () => {
   };
 
   const stake = useMutation({
-    mutationFn: async ({ amount, tier }: { amount: bigint; tier: number }) => {
+    mutationFn: async ({
+      beneficiary,
+      amount,
+      tier,
+    }: {
+      beneficiary: Address;
+      amount: bigint;
+      tier: number;
+    }) => {
       await networkGuard();
       const tx = await writeContractAsync({
         address: addresses.data.tokenStaking,
         abi: tokenStakingConfig.abi,
         functionName: 'stake',
-        args: [amount, tier],
+        args: [beneficiary, amount, tier],
       });
 
       await waitForTransactionReceipt(config, { hash: tx });

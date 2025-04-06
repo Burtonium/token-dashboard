@@ -64,7 +64,8 @@ export default defineConfig({
         {
           name: 'TokenStaking',
           address: {
-            [sepolia.id]: '0xffbA2e307793896455dd7a90664ff9B2af758474',
+            [mainnet.id]: '0x06c8c7A2e11aB26F28fbAe39795c4b4Ae14fEB1D',
+            [sepolia.id]: '0x2B897c5f0a828F43Aa7Cf81dd35a071D79Abd7d9',
           },
         },
         {

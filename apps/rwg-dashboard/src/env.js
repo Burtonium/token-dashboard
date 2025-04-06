@@ -15,6 +15,7 @@ export const env = createEnv({
     HELIUS_API_KEY: z.string().optional(),
     TESTNET_SIGNER_PRIVATE_KEY: z.string().optional(),
     TOKEN_MASTER_SIGNER_PRIVATE_KEY: z.string().optional(),
+    STAKING_EPOCH_MANAGER_PRIVATE_KEY: z.string().optional(),
     CASINO_API_SECRET_KEY: z.string(),
     SUPABASE_DB_POSTGRES_URL: z.string(),
     DUNE_API_KEY: z.string().optional(),
@@ -55,6 +56,8 @@ export const env = createEnv({
     TESTNET_SIGNER_PRIVATE_KEY: process.env.TESTNET_SIGNER_PRIVATE_KEY,
     TOKEN_MASTER_SIGNER_PRIVATE_KEY:
       process.env.TOKEN_MASTER_SIGNER_PRIVATE_KEY,
+    STAKING_EPOCH_MANAGER_PRIVATE_KEY:
+      process.env.STAKING_EPOCH_MANAGER_PRIVATE_KEY,
     NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID:
       process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ??
       '21452bd4-902f-40be-9b8f-5bc817b00e0e',

@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   }
 
   const account = privateKeyToAccount(
-    env.TESTNET_SIGNER_PRIVATE_KEY! as `0x${string}`,
+    env.STAKING_EPOCH_MANAGER_PRIVATE_KEY! as `0x${string}`,
   );
 
   const walletClient = createWalletClient({
