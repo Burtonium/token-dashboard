@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Wallet } from 'lucide-react';
+import { Box, Wallet, X } from 'lucide-react';
 import {
   cn,
   Button,
@@ -66,7 +66,7 @@ export default function Airdrop() {
           </div>
         </div>
         <CardContent>
-          <p className="my-6 rounded-lg bg-white/5 p-[10px] text-base font-bold">
+          <p className="-mx-3 my-6 rounded-lg bg-white/5 p-[10px] font-mono text-base text-sm font-bold">
             {token.symbol} Allocation = Base rP Allocation + (Points *
             Conversion Rate)
           </p>
@@ -84,15 +84,15 @@ export default function Airdrop() {
           </p>
           <p className="mb-6 mt-2">
             <strong>15%</strong> of airdrop will be unlocked at TGE. Remainder
-            will have <strong>6-month</strong> linear vest.
+            will have a <strong>6-month</strong> linear vest.
           </p>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>raW Pass</TableHead>
-                <TableHead>Quantity</TableHead>
+                <TableHead>Quantity Held</TableHead>
                 <TableHead>{token.symbol} Rate</TableHead>
-                <TableHead>Quantity</TableHead>
+                <TableHead>{token.symbol} Quantity</TableHead>
               </TableRow>
             </TableHeader>
             {!sdkHasLoaded || leaderboard.isLoading ? (
@@ -112,7 +112,17 @@ export default function Airdrop() {
               </TableBody>
             )}
           </Table>
-          <div className="mt-6 flex flex-col items-stretch gap-5 sm:flex-row">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 p-3 font-bold">
+            <h3 className="leading-none">Base allocation:</h3>
+            {!sdkHasLoaded || leaderboard.isLoading ? (
+              <Skeleton className="inline-block h-6 w-40" />
+            ) : (
+              <span className="text-xl leading-none">
+                {formatWithSeparators(leaderboard.baseAllocation)}
+              </span>
+            )}
+          </div>
+          <div className="my-2 flex flex-col items-stretch gap-2 sm:flex-row md:gap-5">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 p-3 font-bold sm:w-1/2">
               <h3 className="leading-none">Points:</h3>
               {!sdkHasLoaded || leaderboard.isLoading ? (
@@ -123,6 +133,9 @@ export default function Airdrop() {
                 </span>
               )}
             </div>
+            <div className="hidden items-center md:flex">
+              <X />
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 p-3 font-bold sm:w-1/2">
               <h3>Points conversion rate:</h3>
               {!sdkHasLoaded ? (
@@ -132,13 +145,13 @@ export default function Airdrop() {
               )}
             </div>
           </div>
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 p-3 font-bold text-primary">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-lighter/50 p-3 font-bold text-primary">
             <h3>Total {token.symbol} allocation:</h3>
             {!sdkHasLoaded ? (
-              <Skeleton variant="primary" className="inline-block h-6 w-40" />
+              <Skeleton className="inline-block h-6 w-40" />
             ) : (
               <span className="text-xl leading-none">
-                {formatWithSeparators(leaderboard.totalBzr)} {token.symbol}
+                {formatWithSeparators(leaderboard.totalTokens)} {token.symbol}
               </span>
             )}
           </div>

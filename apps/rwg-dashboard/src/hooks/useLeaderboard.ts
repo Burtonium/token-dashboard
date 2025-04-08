@@ -6,13 +6,13 @@ import usePrimaryAddress from './usePrimaryAddress';
 
 const RpLeaderboardData = z.array(
   z.object({
-    totalPasses: z.number(),
+    affiliateCode: z.string(),
     lowestId: z.number(),
     points: z.number(),
-    wallet: z.string(),
-    affiliateCode: z.string(),
-    rankScore: z.number(),
     rank: z.number(),
+    rankScore: z.number(),
+    totalPasses: z.number(),
+    wallet: z.string(),
   }),
 );
 
@@ -22,6 +22,7 @@ const API_BASE_URL = 'https://rp-leaderboard-api.prod.walletwars.io';
 
 export const useLeaderboard = () => {
   const {
+    baseAllocation,
     passes: rawPasses,
     nfts: { isLoading, isSuccess, error },
   } = useRawPasses();
@@ -41,35 +42,38 @@ export const useLeaderboard = () => {
         throw new Error('Failed to fetch leaderboard data');
       }
 
-      return (
-        RpLeaderboardData.parse(await response.json())[0] ?? {
-          points: 0,
-          totalPasses: 0,
-          wallet: walletAddress,
-          rankScore: 0,
-          rank: 0,
-        }
-      );
+      const data = RpLeaderboardData.parse(await response.json());
+
+      return data.length > 0
+        ? data[0]
+        : {
+            points: 0,
+            totalPasses: 0,
+            wallet: walletAddress,
+            rankScore: 0,
+            rank: 0,
+          };
     },
     enabled: !!walletAddress,
   });
 
-  const totalBzr =
-    useMemo(
-      () =>
-        leaderboard.isSuccess && isSuccess
-          ? rawPasses.reduce(
-              (result, g) => result + g.qty * g.bzrPerPass,
-              Math.floor(leaderboard.data.points * bzrConversionRate),
-            )
-          : undefined,
-      [rawPasses, leaderboard.isSuccess, leaderboard.data, isSuccess],
-    ) ?? 0;
+  const totalTokens = useMemo(() => {
+    if (!leaderboard.data) {
+      return 0;
+    }
+    return leaderboard.isSuccess && isSuccess
+      ? rawPasses.reduce(
+          (result, g) => result + g.qty * g.bzrPerPass,
+          Math.floor(leaderboard.data.points * bzrConversionRate),
+        )
+      : 0;
+  }, [rawPasses, leaderboard.isSuccess, leaderboard.data, isSuccess]);
 
   return {
     data: leaderboard.data,
     rawPasses: rawPasses,
-    totalBzr,
+    baseAllocation,
+    totalTokens,
     isLoading: leaderboard.isLoading || isLoading,
     isSuccess: leaderboard.isSuccess && isSuccess,
     error: error ?? leaderboard.error,

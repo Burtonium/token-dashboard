@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { toBase26 } from '@/utils';
 import usePrimaryAddress from './usePrimaryAddress';
 import { fetchNFTs } from '@/server/actions/fetchNFTs';
+import assert from 'assert';
 
 const passGroups = [
   { title: 'Single Digit', bzrPerPass: 14_000 },
@@ -18,7 +19,10 @@ export function useRawPasses() {
   const nfts = useQuery({
     queryKey: ['nftList', address],
     enabled: sdkHasLoaded && !!address,
-    queryFn: async () => fetchNFTs(address!),
+    queryFn: async () => {
+      assert(address, 'No address');
+      return fetchNFTs(address);
+    },
   });
 
   const passes = useMemo(
@@ -43,8 +47,14 @@ export function useRawPasses() {
     [nfts.isSuccess, nfts.data],
   );
 
+  const baseAllocation = useMemo(
+    () => passes.reduce((a, g) => a + g.bzrPerPass * g.qty, 0),
+    [passes],
+  );
+
   return {
     nfts,
     passes,
+    baseAllocation,
   };
 }
