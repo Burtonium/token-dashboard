@@ -4,7 +4,7 @@ import { WAVE_CONFIGURATIONS } from '@/config/linkToWin';
 import { readClaims } from './getClaimsData';
 
 const prisma = new PrismaClient({
-  datasourceUrl: process.env.SUPABASE_DB_POSTGRES_URL_NON_POOLING,
+  datasourceUrl: process.env.DB_POSTGRES_URL_NON_POOLING,
 });
 
 const waveConfig = WAVE_CONFIGURATIONS[1];

@@ -12,12 +12,11 @@ export const env = createEnv({
       .default('development'),
     SENTRY_AUTH_TOKEN: z.string().optional(),
     COINMARKETCAP_API_KEY: z.string().optional(),
-    HELIUS_API_KEY: z.string().optional(),
     TESTNET_SIGNER_PRIVATE_KEY: z.string().optional(),
     TOKEN_MASTER_SIGNER_PRIVATE_KEY: z.string().optional(),
     STAKING_EPOCH_MANAGER_PRIVATE_KEY: z.string().optional(),
     CASINO_API_SECRET_KEY: z.string(),
-    SUPABASE_DB_POSTGRES_URL: z.string(),
+    DB_POSTGRES_URL: z.string(),
     DUNE_API_KEY: z.string().optional(),
     REALBET_API_URL: z.string(),
     REALBET_API_SECRET_KEY: z.string(),
@@ -75,8 +74,7 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET ?? 'dummy',
     NEXT_PUBLIC_CASINO_URL:
       process.env.NEXT_PUBLIC_CASINO_URL ?? '/casino-test-linker',
-    HELIUS_API_KEY: process.env.HELIUS_API_KEY,
-    SUPABASE_DB_POSTGRES_URL: process.env.SUPABASE_DB_POSTGRES_URL,
+    DB_POSTGRES_URL: process.env.DB_POSTGRES_URL,
     NEXT_PUBLIC_SNAPSHOT_SPACE:
       process.env.NEXT_PUBLIC_SNAPSHOT_SPACE ?? 'rwg.eth',
     NEXT_PUBLIC_BUY_REAL_URL: process.env.NEXT_PUBLIC_BUY_REAL_URL ?? '',
