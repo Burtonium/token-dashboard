@@ -22,7 +22,7 @@ RUN apt-get update -qq && \
 
 ARG NPM_TOKEN
 RUN if [ -z "$NPM_TOKEN" ]; then echo "NPM_TOKEN is not set!" && exit 1; fi && \
-    echo "//registry.npmjs.org/:_authToken=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" > .npmrc
+    echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
 
 # Set registry for @bltzr-gg scope
 RUN echo "@bltzr-gg:registry=https://registry.npmjs.org/" >> .npmrc
